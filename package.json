@@ -1,0 +1,26 @@
+{
+  "name": "xom-nho",
+  "private": true,
+  "description": "Xóm Nhỏ: diễn đàn cộng đồng tiếng Việt (NestJS + Next.js + React/Vite + Expo)",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:backend": "turbo run dev --filter=backend",
+    "dev:web": "turbo run dev --filter=backend --filter=web",
+    "dev:admin": "turbo run dev --filter=backend --filter=admin",
+    "dev:mobile": "turbo run dev --filter=backend --filter=mobile-app",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.0",
+    "turbo": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

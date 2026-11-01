@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Build
+.next/
+out/
+build/
+dist/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Vite
+*.local
+
+# Expo
+.expo/
+expo-env.d.ts
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+frontend/mobile-app/ios/
+frontend/mobile-app/android/
+
+# Test
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Env (chỉ commit .env.example)
+.env
+.env.*
+!.env.example
+
+# Prisma client sinh ra
+backend/src/generated/
+
+# Upload cục bộ khi dev
+backend/uploads/
+
+# Claude Code: file cá nhân, không chia sẻ
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/conversations/
+.claude/context/
+.claude/cache/
+.claude/state.db
+
+# Hệ điều hành / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
