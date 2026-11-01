@@ -2,6 +2,8 @@
 
 Next.js App Router. Trang cho **khách, hàng xóm, cây bút**: đọc, tìm, viết bài, bình luận, hồ sơ. **Không có trang quản trị** (ở `frontend/admin`). **Không có database, không có API riêng**: mọi dữ liệu lấy từ `backend` qua `@xom-nho/shared/api-client`.
 
+> **Giao diện**: theo `design-system/xom-nho/MASTER.md`. Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
+
 ## Trước khi viết code
 
 Next.js bản mới có nhiều thay đổi phá vỡ. Đọc `AGENTS.md` (Next.js tạo) và tài liệu trong `node_modules/next/dist/docs/` cho API định dùng. Kiểm tra `next.config.ts` có bật `cacheComponents` không.

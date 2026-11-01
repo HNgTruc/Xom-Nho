@@ -13,7 +13,7 @@ Design system của Xóm Nhỏ (package `@xom-nho/ui`). Hai phần với hai đ�
 ```
 src/
 ├── tokens/
-│   ├── colors.ts          bảng màu sáng/tối theo docs/giong-van-va-giao-dien.md
+│   ├── colors.ts          bảng màu sáng/tối theo design-system/xom-nho/MASTER.md
 │   ├── typography.ts      font, cỡ chữ, độ cao dòng
 │   ├── spacing.ts
 │   ├── radius.ts
@@ -28,6 +28,9 @@ components.json            cấu hình shadcn CLI cho thư mục này
 ```
 
 ## Quy tắc
+
+- **Nguồn sự thật là `design-system/xom-nho/MASTER.md`.** Token ở đây chỉ là bản code của file đó; đổi giá trị thì sửa cả ba nơi (MASTER, `tokens/`, `theme.css`).
+- Thêm/sửa component: dùng skill ui-ux-pro-max (`--stack shadcn`, `--domain ux`) để kiểm tra quy tắc, và chạy checklist trong MASTER.
 
 - `tokens/` **không import gì** (không React, không CSS) để React Native dùng được.
 - Đổi màu: sửa `tokens/colors.ts` **và** `styles/theme.css` cùng lúc, hai nơi phải khớp. (Có thể viết script sinh `theme.css` từ tokens sau này.)

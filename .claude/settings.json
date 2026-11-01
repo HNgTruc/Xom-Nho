@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm --filter backend lint:*)",
+      "Bash(pnpm --filter backend typecheck:*)",
+      "Bash(pnpm --filter backend test:*)",
+      "Bash(pnpm --filter web lint:*)",
+      "Bash(pnpm --filter web typecheck:*)",
+      "Bash(pnpm --filter web test:*)",
+      "Bash(pnpm --filter admin lint:*)",
+      "Bash(pnpm --filter admin typecheck:*)",
+      "Bash(pnpm --filter admin test:*)",
+      "Bash(pnpm --filter mobile-app lint:*)",
+      "Bash(pnpm --filter mobile-app typecheck:*)",
+      "Bash(pnpm --filter @xom-nho/ui typecheck:*)",
+      "Bash(pnpm --filter @xom-nho/shared test:*)",
+      "Bash(pnpm --filter @xom-nho/shared typecheck:*)",
+      "Bash(pnpm --filter backend exec prisma format:*)",
+      "Bash(pnpm --filter backend exec prisma validate:*)",
+      "Bash(pnpm --filter backend exec prisma generate:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)"
+    ],
+    "ask": [
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(npx expo install:*)",
+      "Bash(pnpm dlx shadcn:*)",
+      "Bash(pnpm --filter backend exec prisma migrate:*)",
+      "Bash(pnpm --filter backend db:migrate:*)",
+      "Bash(docker compose down:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./backend/.env)",
+      "Read(./backend/.env.local)",
+      "Read(./frontend/web/.env.local)",
+      "Read(./frontend/admin/.env.local)",
+      "Read(./frontend/mobile-app/.env)",
+      "Bash(docker compose down -v:*)",
+      "Bash(pnpm --filter backend exec prisma migrate reset:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-files.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format-file.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

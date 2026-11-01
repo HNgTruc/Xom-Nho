@@ -7,7 +7,7 @@
 3. [phan-quyen.md](phan-quyen.md): ai được làm gì
 4. [co-so-du-lieu.md](co-so-du-lieu.md): bảng, quan hệ, tìm kiếm
 5. [api.md](api.md): hợp đồng giữa app và server
-6. [giong-van-va-giao-dien.md](giong-van-va-giao-dien.md): cách xưng hô, màu, chữ
+6. [giong-van-va-giao-dien.md](giong-van-va-giao-dien.md): cách xưng hô, câu mẫu; giao diện chi tiết ở [design-system/xom-nho/MASTER.md](../design-system/xom-nho/MASTER.md)
 7. [thiet-lap-moi-truong.md](thiet-lap-moi-truong.md): cài đặt trên máy
 8. [lo-trinh.md](lo-trinh.md): làm gì trước, làm gì sau
 

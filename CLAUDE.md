@@ -17,6 +17,7 @@ frontend/admin/        React + Vite: trang quản trị cho trưởng xóm
 frontend/mobile-app/   Expo: app điện thoại, như web trừ quản trị
 ui/                    Design system: token (cả 3 frontend) + component shadcn/ui (web, admin)
 shared/                Zod schema, kiểu API, hằng số, tiện ích, API client có kiểu
+design-system/xom-nho/ Design system: MASTER.md + override cho admin, mobile
 docs/                  Tài liệu thiết kế
 docker/                Cấu hình MySQL
 ```
@@ -78,17 +79,28 @@ Script được thêm khi khởi tạo từng phần (giai đoạn 0). Script ch
 
 ## Tài liệu
 
-| File                             | Nội dung                                                 |
-| -------------------------------- | -------------------------------------------------------- |
-| `docs/kien-truc.md`              | Sơ đồ hệ thống, cây thư mục, tầng trong backend/frontend |
-| `docs/co-so-du-lieu.md`          | Bảng, quan hệ, chỉ mục, tìm kiếm tiếng Việt              |
-| `docs/api.md`                    | Endpoint `/api/v1` và `/api/v1/admin`                    |
-| `docs/phan-quyen.md`             | Ma trận quyền                                            |
-| `docs/tinh-nang.md`              | Tính năng và tiêu chí hoàn thành                         |
-| `docs/giong-van-va-giao-dien.md` | Giọng văn, màu, chữ                                      |
-| `docs/thiet-lap-moi-truong.md`   | Cài đặt trên Windows, Docker, Expo Go                    |
-| `docs/lo-trinh.md`               | Các giai đoạn                                            |
-| `docs/quyet-dinh/`               | Quyết định kỹ thuật (ADR)                                |
+| File                              | Nội dung                                                 |
+| --------------------------------- | -------------------------------------------------------- |
+| `docs/kien-truc.md`               | Sơ đồ hệ thống, cây thư mục, tầng trong backend/frontend |
+| `docs/co-so-du-lieu.md`           | Bảng, quan hệ, chỉ mục, tìm kiếm tiếng Việt              |
+| `docs/api.md`                     | Endpoint `/api/v1` và `/api/v1/admin`                    |
+| `docs/phan-quyen.md`              | Ma trận quyền                                            |
+| `docs/tinh-nang.md`               | Tính năng và tiêu chí hoàn thành                         |
+| `docs/giong-van-va-giao-dien.md`  | Giọng văn, câu mẫu                                       |
+| `design-system/xom-nho/MASTER.md` | Màu, chữ, khoảng cách, thành phần, checklist giao diện   |
+| `docs/thiet-lap-moi-truong.md`    | Cài đặt trên Windows, Docker, Expo Go                    |
+| `docs/lo-trinh.md`                | Các giai đoạn                                            |
+| `docs/quyet-dinh/`                | Quyết định kỹ thuật (ADR)                                |
+
+## Làm giao diện
+
+Mọi việc thay đổi giao diện (trang, màn hình, component, màu, bố cục, chuyển động) ở web, admin, mobile-app, ui:
+
+1. Đọc `design-system/xom-nho/MASTER.md`, rồi file override nếu có (`pages/admin.md` cho admin, `pages/mobile.md` cho mobile-app). Override thắng MASTER.
+2. Dùng skill **ui-ux-pro-max** để tra quy tắc cụ thể (`--domain ux`, `--stack nextjs|react|shadcn|react-native`). Không chạy lại `--design-system --persist --force` khi người dùng chưa đồng ý: MASTER đã có quyết định đã kiểm tra.
+3. Trước khi xong: chạy checklist ở cuối MASTER (và của file override).
+
+Đổi token (màu, chữ, khoảng cách) thì sửa MASTER, `ui/src/tokens/*` và `ui/src/styles/theme.css` cùng lúc.
 
 ## Công cụ Claude trong repo
 

@@ -44,34 +44,18 @@ Toàn bộ chữ hiển thị nên gom về một chỗ (`shared/src/constants/m
 
 ## Giao diện
 
-### Cảm giác
+Toàn bộ quyết định giao diện (màu, chữ, khoảng cách, chuyển động, biểu tượng, thành phần, checklist) nằm ở **[design-system/xom-nho/MASTER.md](../design-system/xom-nho/MASTER.md)**, lập bằng skill ui-ux-pro-max, mọi cặp màu đã tính tương phản WCAG. Quy tắc riêng:
 
-Ấm, gọn, dễ đọc lâu. Giống một quán nhỏ đầu ngõ hơn là một mạng xã hội ồn ào. Nội dung là chính, trang trí ít.
+- Trang quản trị: [design-system/xom-nho/pages/admin.md](../design-system/xom-nho/pages/admin.md)
+- App điện thoại: [design-system/xom-nho/pages/mobile.md](../design-system/xom-nho/pages/mobile.md)
 
-### Màu (gợi ý, chỉnh khi thiết kế)
+Tóm tắt nhanh:
 
-| Vai trò     | Sáng                  | Tối       |
-| ----------- | --------------------- | --------- |
-| Nền         | `#FBF8F3` (giấy kem)  | `#1C1917` |
-| Chữ chính   | `#292524`             | `#F5F5F4` |
-| Chữ phụ     | `#78716C`             | `#A8A29E` |
-| Màu chủ đạo | `#C2410C` (gạch nung) | `#FB923C` |
-| Màu phụ     | `#15803D` (lá)        | `#4ADE80` |
-| Viền        | `#E7E5E4`             | `#44403C` |
-
-Định nghĩa thành biến CSS của shadcn/ui (`--background`, `--primary`...) trên web, và một file `theme.ts` trên app dùng cùng mã màu.
-
-### Chữ
-
-- Font có đủ dấu tiếng Việt: **Be Vietnam Pro** (giao diện) và **Lora** hoặc **Noto Serif** (nội dung bài, đọc lâu dễ chịu hơn).
-- Cỡ chữ nội dung bài: 18px trên web, 17 trên app; độ cao dòng 1.7; bề ngang cột chữ tối đa khoảng 70 ký tự.
+- Phong cách Minimalism & Swiss, pattern Feed + Thread View, ấm và thân thiện.
+- Màu chủ đạo gạch nung `#C2410C` (tối: `#FB923C`), nền giấy kem `#FBF8F3`, mỗi danh mục một màu riêng.
+- Font Be Vietnam Pro (giao diện) + Lora (nội dung bài), cả hai có đủ dấu tiếng Việt.
+- Biểu tượng Lucide, không dùng emoji làm biểu tượng.
 
 ### Logo
 
-Mái nhà nhỏ với bong bóng trò chuyện, hoặc vài mái nhà sát nhau. Một màu, dùng tốt ở cỡ 32px.
-
-### Khả năng tiếp cận
-
-- Tương phản chữ đạt WCAG AA.
-- Mọi nút chỉ có biểu tượng phải có nhãn (`aria-label` trên web, `accessibilityLabel` trên app).
-- Dùng được bằng bàn phím trên web; vùng chạm tối thiểu 44×44 trên app.
+Mái nhà nhỏ với bong bóng trò chuyện, hoặc vài mái nhà sát nhau. Một màu (`primary`), dùng tốt ở cỡ 32px, có bản cho nền tối.

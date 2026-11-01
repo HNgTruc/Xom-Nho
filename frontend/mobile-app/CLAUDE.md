@@ -2,6 +2,8 @@
 
 App Expo (Expo Router, TypeScript), chạy thử bằng **Expo Go trên điện thoại thật** qua Wi-Fi. Có mọi tính năng của web **trừ quản trị**. Gọi `backend` qua `@xom-nho/shared/api-client`.
 
+> **Giao diện**: theo `design-system/xom-nho/MASTER.md` và override `design-system/xom-nho/pages/mobile.md` (override thắng). Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
+
 ## Trước khi viết code
 
 - Chỉ dùng thư viện có trong Expo SDK hoặc thuần JS (chạy được trên Expo Go). Thư viện cần native code riêng thì hỏi trước.
