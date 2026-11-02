@@ -1,30 +1,49 @@
 # @xom-nho/ui
 
-Design system Xóm Nhỏ: token thiết kế cho cả ba frontend, component React (shadcn/ui) cho web và admin. Chưa khởi tạo, xem giai đoạn 0 trong [docs/lo-trinh.md](../docs/lo-trinh.md).
+Design system Xóm Nhỏ: token thiết kế cho cả ba frontend, component React (shadcn/ui, Radix) cho web và admin. Nguồn sự thật: [design-system/xom-nho/MASTER.md](../design-system/xom-nho/MASTER.md). Quy tắc: [CLAUDE.md](CLAUDE.md).
 
-## Khởi tạo
+## Dùng trong app
 
-1. `package.json`:
+```ts
+// Mobile (và bất cứ đâu): token TS thuần
+import { colors, radius, fontSize } from "@xom-nho/ui/tokens";
 
-   ```jsonc
-   {
-     "name": "@xom-nho/ui",
-     "private": true,
-     "type": "module",
-     "exports": {
-       "./tokens": "./src/tokens/index.ts",
-       "./styles/theme.css": "./src/styles/theme.css",
-       "./components/*": "./src/components/*.tsx",
-       "./lib/utils": "./src/lib/utils.ts",
-       "./hooks/*": "./src/hooks/*.ts",
-     },
-   }
-   ```
+// Web, admin: component
+import { Button } from "@xom-nho/ui/components/button";
+```
 
-   Không cần bước build: Next.js (`transpilePackages`), Vite và Metro đều đọc được TypeScript.
+```css
+/* Web, admin: file CSS chính của app */
+@import "@xom-nho/ui/styles/theme.css";
+```
 
-2. Chạy `pnpm dlx shadcn@latest init` trong thư mục này để tạo `components.json`, chỉnh đường dẫn về `src/components`, `src/lib/utils`.
-3. Viết `src/tokens/*` và `src/styles/theme.css` theo bảng màu và font trong [docs/giong-van-va-giao-dien.md](../docs/giong-van-va-giao-dien.md).
-4. Thêm các component đầu tiên: `button input label textarea select dialog alert-dialog dropdown-menu table badge card tabs sonner skeleton pagination avatar`.
+`theme.css` đã gồm `@import "tailwindcss"`, nên app không import Tailwind lần nữa. Font do app tự nạp (web: `next/font` với `variable: "--font-be-vietnam-pro"` và `"--font-lora"`; admin: `@fontsource`); không có biến thì theme rơi về tên font. Chế độ tối bật bằng class `dark` trên phần tử gốc.
 
-Quy tắc: [CLAUDE.md](CLAUDE.md).
+Không có bước build: Next.js (`transpilePackages: ["@xom-nho/ui"]`), Vite và Metro đọc thẳng TypeScript.
+
+## Có gì
+
+| Phần                   | Nội dung                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `src/tokens/`          | `colors` (sáng/tối), `categoryColors`, `statusColors`, `fontSize`, `space`, `radius`, `duration`  |
+| `src/styles/theme.css` | Biến CSS + `@theme` cho Tailwind v4; class như `bg-primary`, `text-status-pending`, `shadow-card` |
+| `src/components/`      | `button` (có `loading`), `input`, `textarea`, `label`, `card`, `badge`, `skeleton`                |
+
+Còn cần thêm khi tới lúc dùng: `select dialog alert-dialog dropdown-menu table tabs sonner pagination avatar`.
+
+## Thêm component
+
+```bash
+cd ui
+pnpm dlx shadcn@4.23.0 add <ten>
+```
+
+Rồi chỉnh theo MASTER (skill `them-component-ui`). Preset `radix-nova` của shadcn khác MASTER ở nhiều chỗ: nút cao 32px, bo `rounded-xl`, focus mờ 50%, chữ ô nhập 14px, `leading-none` cắt dấu chữ hoa tiếng Việt.
+
+## Kiểm tra
+
+```bash
+pnpm --filter @xom-nho/ui typecheck
+pnpm --filter @xom-nho/ui lint
+pnpm --filter @xom-nho/ui test      # tokens/*.ts và theme.css phải khớp từng mã màu
+```

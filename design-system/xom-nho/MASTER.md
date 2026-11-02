@@ -34,6 +34,7 @@ Mọi cặp chữ/nền dưới đây đã tính tương phản theo WCAG 2.x.
 | `primary`                | `#C2410C` | `#FB923C` | Nút chính, liên kết, điểm nhấn (gạch nung)   | 4.9 / 7.7 trên nền                               |
 | `primary-foreground`     | `#FFFFFF` | `#1C1917` | Chữ trên nút chính                           | 5.2 / 7.7                                        |
 | `secondary`              | `#15803D` | `#4ADE80` | Điểm nhấn phụ (lá), trạng thái tích cực      | 4.7 / 10.0                                       |
+| `secondary-foreground`   | `#FFFFFF` | `#1C1917` | Chữ trên nền `secondary`                     | 5.0 / 10.0                                       |
 | `border`                 | `#E7E5E4` | `#44403C` | Viền trang trí, đường phân cách              | (trang trí, không mang thông tin)                |
 | `input`                  | `#8F8883` | `#78716C` | Viền ô nhập, checkbox, thành phần điều khiển | 3.3 / 3.7 (≥ 3:1 cho UI)                         |
 | `ring`                   | `#C2410C` | `#FB923C` | Viền focus khi dùng bàn phím                 | 4.9 / 7.7                                        |
@@ -46,27 +47,31 @@ Không dùng `#78716C` cho chữ nhỏ trên nền `muted` (chỉ đạt 4.2).
 
 Mỗi danh mục một màu để nhận ra nhanh trong feed. Màu chỉ là tín hiệu phụ: **luôn kèm tên danh mục bằng chữ**.
 
-| Danh mục      | Chữ (sáng) | Nền badge (sáng) | Chữ (tối) | Tương phản |
-| ------------- | ---------- | ---------------- | --------- | ---------- |
-| Đời sống      | `#B45309`  | `#FEF3C7`        | `#FBBF24` | 4.5 / 10.5 |
-| Công nghệ     | `#1D4ED8`  | `#DBEAFE`        | `#60A5FA` | 5.5 / 6.9  |
-| Học tập       | `#047857`  | `#D1FAE5`        | `#34D399` | 4.8 / 9.1  |
-| Góc kể chuyện | `#7E22CE`  | `#F3E8FF`        | `#C084FC` | 5.9 / 6.6  |
-| Hỏi đáp       | `#BE123C`  | `#FFE4E6`        | `#FB7185` | 5.2 / 6.5  |
+| Danh mục      | Token    | Chữ (sáng) | Nền badge (sáng) | Chữ (tối) | Tương phản |
+| ------------- | -------- | ---------- | ---------------- | --------- | ---------- |
+| Đời sống      | `amber`  | `#B45309`  | `#FEF3C7`        | `#FBBF24` | 4.5 / 7.0  |
+| Công nghệ     | `blue`   | `#1D4ED8`  | `#DBEAFE`        | `#60A5FA` | 5.5 / 4.9  |
+| Học tập       | `green`  | `#047857`  | `#D1FAE5`        | `#34D399` | 4.8 / 6.2  |
+| Góc kể chuyện | `purple` | `#7E22CE`  | `#F3E8FF`        | `#C084FC` | 5.9 / 4.7  |
+| Hỏi đáp       | `rose`   | `#BE123C`  | `#FFE4E6`        | `#FB7185` | 5.2 / 4.7  |
 
-Badge chế độ tối: chữ màu "tối" ở trên, nền là chính màu đó với độ mờ 15% trên `card`. Danh mục mới thêm sau phải kiểm tra tương phản trước khi dùng.
+Badge chế độ tối: chữ màu "tối" ở trên, nền là chính màu đó với độ mờ **12%** (hex thêm `1F`, ví dụ `#C084FC1F`); tương phản ở bảng tính trên `card`, trên `background` còn cao hơn. Không tăng lên 15%: `purple` và `rose` sẽ rơi xuống 4.5 (đã tính lại 2026-11-03).
+
+Token đặt theo sắc độ, không theo tên danh mục: danh mục lưu khóa màu (`amber`, `blue`...), nên đổi tên hay thêm danh mục không phải sửa token. Danh mục mới chọn trong 5 màu này; muốn thêm màu thứ sáu thì phải tính tương phản cả hai chế độ trước.
 
 ### 2.3 Màu trạng thái bài
 
 Trạng thái phải **luôn hiển thị** cho tác giả và admin (skill cảnh báo: "hidden post state" là anti-pattern của forum).
 
-| Trạng thái | Chữ       | Nền       | Tương phản | Kèm biểu tượng |
-| ---------- | --------- | --------- | ---------- | -------------- |
-| Bản nháp   | `#57534E` | `#E7E5E4` | 6.1        | bút chì        |
-| Chờ duyệt  | `#92400E` | `#FEF3C7` | 6.4        | đồng hồ        |
-| Đã đăng    | `#166534` | `#DCFCE7` | 6.5        | dấu tích       |
-| Bị từ chối | `#991B1B` | `#FEE2E2` | 6.8        | dấu x          |
-| Đã ẩn      | `#57534E` | `#F5F5F4` | 7.0        | mắt gạch chéo  |
+| Trạng thái | Token       | Chữ (sáng) | Nền (sáng) | Chữ (tối) | Tương phản | Kèm biểu tượng |
+| ---------- | ----------- | ---------- | ---------- | --------- | ---------- | -------------- |
+| Bản nháp   | `draft`     | `#57534E`  | `#E7E5E4`  | `#D6D3D1` | 6.1 / 7.5  | bút chì        |
+| Chờ duyệt  | `pending`   | `#92400E`  | `#FEF3C7`  | `#FCD34D` | 6.4 / 7.8  | đồng hồ        |
+| Đã đăng    | `published` | `#166534`  | `#DCFCE7`  | `#86EFAC` | 6.5 / 8.0  | dấu tích       |
+| Bị từ chối | `rejected`  | `#991B1B`  | `#FEE2E2`  | `#FCA5A5` | 6.8 / 6.3  | dấu x          |
+| Đã ẩn      | `hidden`    | `#57534E`  | `#F5F5F4`  | `#A8A29E` | 7.0 / 4.9  | mắt gạch chéo  |
+
+Chế độ tối dùng cùng cách với badge danh mục: nền là màu chữ mờ 12% (thêm 2026-11-03, trước đó MASTER chỉ có màu sáng).
 
 Không dựa vào màu đơn thuần: badge luôn có chữ, nên có thêm biểu tượng.
 
@@ -161,6 +166,8 @@ Motion 2/10: chỉ phản hồi tương tác, không có hiệu ứng trang trí
 | Destructive                         | Xóa, cấm, từ chối                                             |
 
 Cao tối thiểu 40px (web), 44pt (mobile). Trạng thái đang gửi: khóa nút, hiện spinner nhỏ và giữ nguyên bề rộng.
+
+Hover nút có nền màu: trộn 12% `foreground` vào màu nút (`color-mix(in srgb, var(--primary), var(--foreground) 12%)`), chế độ sáng đậm lên, chế độ tối sáng lên; chữ trên nút đạt ≥ 5.7 ở mọi trường hợp. **Không** làm nhạt bằng độ mờ (`bg-primary/90`): chữ trắng trên primary chỉ còn 4.4, secondary còn 4.2 (đã tính 2026-11-03).
 
 ### Form
 

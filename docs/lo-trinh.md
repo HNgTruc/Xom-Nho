@@ -11,7 +11,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] `docker-compose.yml` cho MySQL + Adminer
 - [x] `docker compose up -d` chạy được, vào được Adminer
 - [x] `shared`: package.json, tsconfig, `src/index.ts`
-- [ ] `ui`: package.json, `tokens/`, `styles/theme.css`, shadcn init, vài component đầu tiên
+- [x] `ui`: package.json, `tokens/`, `styles/theme.css`, shadcn init, vài component đầu tiên
 - [x] `backend`: `nest new`, cổng 4000, endpoint `GET /api/v1/health`
 - [ ] `frontend/web`: `create-next-app`, import theme từ `ui`
 - [ ] `frontend/admin`: Vite React TS, Tailwind, React Router, import theme từ `ui`

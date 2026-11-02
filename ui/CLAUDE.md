@@ -36,6 +36,10 @@ components.json            cấu hình shadcn CLI cho thư mục này
 - Đổi màu: sửa `tokens/colors.ts` **và** `styles/theme.css` cùng lúc, hai nơi phải khớp. (Có thể viết script sinh `theme.css` từ tokens sau này.)
 - Component ở đây chỉ là **component nền, không biết gì về nghiệp vụ**: không gọi API, không biết "bài viết", "bình luận". Component có nghiệp vụ (PostCard, CommentThread) nằm trong `features/` của từng frontend.
 - Thêm component bằng shadcn CLI chạy trong thư mục `ui/`, rồi chỉnh màu theo token. Không sao chép component vào web/admin.
+- Cấu hình shadcn (`components.json`): style `radix-nova`, alias `@xom-nho/ui/*` (tsconfig `paths` trỏ về `./src/*`), `rsc: true` để component cần client tự có `"use client"` cho Next.js. Component import `cn` thẳng từ package `cn` (thay cho clsx + tailwind-merge).
+- `react`, `react-dom`, `tailwindcss` là `peerDependencies`: mỗi app chỉ có một bản React.
+- Đổi màu phải chạy `pnpm --filter @xom-nho/ui test`: test so từng biến trong `theme.css` với `tokens/colors.ts`.
+- Màu hover của nút có nền: `color-mix` với `foreground` 12%, không dùng `/90` (xem MASTER mục 7 "Nút").
 - Chữ mặc định trong component (nếu có, ví dụ "Đóng" của Dialog) viết tiếng Việt.
 - Mỗi component có `aria-*` đúng chuẩn; giữ nguyên khả năng tiếp cận của Radix.
 - Đổi API của component đang dùng: tìm chỗ dùng trong `frontend/web` và `frontend/admin`, sửa cùng lúc.

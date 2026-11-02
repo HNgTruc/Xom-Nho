@@ -1,0 +1,208 @@
+/*
+ * Theme Xóm Nhỏ cho Tailwind CSS v4 (web, admin).
+ * Giá trị khớp design-system/xom-nho/MASTER.md và src/tokens/*; test styles/theme.test.ts kiểm tra màu.
+ *
+ * App dùng: trong file CSS chính của app, `@import "@xom-nho/ui/styles/theme.css";`
+ * Font do từng app nạp (next/font, @fontsource) và đặt biến --font-be-vietnam-pro, --font-lora;
+ * không có biến thì rơi về tên font.
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Class dùng trong component của ui; mã của từng app được Tailwind tự quét */
+@source "../components";
+@source "../hooks";
+
+:root {
+  --background: #fbf8f3;
+  --foreground: #292524;
+  --card: #ffffff;
+  --card-foreground: #292524;
+  --muted: #f3efe8;
+  --muted-foreground: #6b635e;
+  --primary: #c2410c;
+  --primary-foreground: #ffffff;
+  --secondary: #15803d;
+  --secondary-foreground: #ffffff;
+  --border: #e7e5e4;
+  --input: #8f8883;
+  --ring: #c2410c;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+
+  /* Tên shadcn dùng nhưng MASTER không tách riêng: trỏ về token có sẵn */
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
+  --accent: var(--muted);
+  --accent-foreground: var(--foreground);
+
+  --category-amber: #b45309;
+  --category-amber-bg: #fef3c7;
+  --category-blue: #1d4ed8;
+  --category-blue-bg: #dbeafe;
+  --category-green: #047857;
+  --category-green-bg: #d1fae5;
+  --category-purple: #7e22ce;
+  --category-purple-bg: #f3e8ff;
+  --category-rose: #be123c;
+  --category-rose-bg: #ffe4e6;
+
+  --status-draft: #57534e;
+  --status-draft-bg: #e7e5e4;
+  --status-pending: #92400e;
+  --status-pending-bg: #fef3c7;
+  --status-published: #166534;
+  --status-published-bg: #dcfce7;
+  --status-rejected: #991b1b;
+  --status-rejected-bg: #fee2e2;
+  --status-hidden: #57534e;
+  --status-hidden-bg: #f5f5f4;
+
+  --elevation: 0 1px 2px rgb(41 37 36 / 0.06), 0 4px 12px rgb(41 37 36 / 0.06);
+}
+
+.dark {
+  --background: #1c1917;
+  --foreground: #f5f5f4;
+  --card: #292524;
+  --card-foreground: #f5f5f4;
+  --muted: #292524;
+  --muted-foreground: #a8a29e;
+  --primary: #fb923c;
+  --primary-foreground: #1c1917;
+  --secondary: #4ade80;
+  --secondary-foreground: #1c1917;
+  --border: #44403c;
+  --input: #78716c;
+  --ring: #fb923c;
+  --destructive: #f87171;
+  --destructive-foreground: #1c1917;
+
+  /* Nền badge tối: màu chữ mờ 12% (1F). Không tăng lên, purple/rose sẽ dưới 4.5:1 */
+  --category-amber: #fbbf24;
+  --category-amber-bg: #fbbf241f;
+  --category-blue: #60a5fa;
+  --category-blue-bg: #60a5fa1f;
+  --category-green: #34d399;
+  --category-green-bg: #34d3991f;
+  --category-purple: #c084fc;
+  --category-purple-bg: #c084fc1f;
+  --category-rose: #fb7185;
+  --category-rose-bg: #fb71851f;
+
+  --status-draft: #d6d3d1;
+  --status-draft-bg: #d6d3d11f;
+  --status-pending: #fcd34d;
+  --status-pending-bg: #fcd34d1f;
+  --status-published: #86efac;
+  --status-published-bg: #86efac1f;
+  --status-rejected: #fca5a5;
+  --status-rejected-bg: #fca5a51f;
+  --status-hidden: #a8a29e;
+  --status-hidden-bg: #a8a29e1f;
+
+  /* Chế độ tối dùng viền thay cho bóng */
+  --elevation: none;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-category-amber: var(--category-amber);
+  --color-category-amber-bg: var(--category-amber-bg);
+  --color-category-blue: var(--category-blue);
+  --color-category-blue-bg: var(--category-blue-bg);
+  --color-category-green: var(--category-green);
+  --color-category-green-bg: var(--category-green-bg);
+  --color-category-purple: var(--category-purple);
+  --color-category-purple-bg: var(--category-purple-bg);
+  --color-category-rose: var(--category-rose);
+  --color-category-rose-bg: var(--category-rose-bg);
+
+  --color-status-draft: var(--status-draft);
+  --color-status-draft-bg: var(--status-draft-bg);
+  --color-status-pending: var(--status-pending);
+  --color-status-pending-bg: var(--status-pending-bg);
+  --color-status-published: var(--status-published);
+  --color-status-published-bg: var(--status-published-bg);
+  --color-status-rejected: var(--status-rejected);
+  --color-status-rejected-bg: var(--status-rejected-bg);
+  --color-status-hidden: var(--status-hidden);
+  --color-status-hidden-bg: var(--status-hidden-bg);
+
+  --font-sans: var(--font-be-vietnam-pro, "Be Vietnam Pro"), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora, "Lora"), ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --shadow-card: var(--elevation);
+}
+
+@theme {
+  /* Thang chữ: chỉ 3xl và 4xl khác mặc định của Tailwind (dòng 38 và 44) */
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.375rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.75rem;
+
+  /* MASTER chỉ có ba mức; xl trở lên ép về lg để component shadcn không tự bo to hơn */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 14px;
+  --radius-2xl: 14px;
+  --radius-3xl: 14px;
+  --radius-4xl: 14px;
+
+  /* `transition` không ghi thời gian thì dùng duration-fast */
+  --default-transition-duration: 120ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -15,16 +15,18 @@ description: Thêm hoặc sửa component nền và design token trong ui/ (desi
 
 ```bash
 cd ui
-pnpm dlx shadcn@latest add <ten>
+pnpm dlx shadcn@4.23.0 add <ten>
 ```
 
 Sau đó:
 
-1. Kiểm tra file nằm ở `ui/src/components/<ten>.tsx`, import `cn` từ `../lib/utils`.
+1. Kiểm tra file nằm ở `ui/src/components/<ten>.tsx` (import `cn` từ package `cn`, component khác qua `@xom-nho/ui/components/...`).
 2. Thay mã màu cứng (nếu có) bằng class theo theme (`bg-primary`, `text-muted-foreground`).
-3. Đổi chữ mặc định sang tiếng Việt (ví dụ nút đóng có `sr-only` "Đóng").
-4. Nếu `package.json` có danh sách `exports` cụ thể thì thêm đường dẫn; nếu dùng `./components/*` thì không cần.
-5. Dùng thử ở web hoặc admin: `import { Button } from "@xom-nho/ui/components/button"`.
+3. Chỉnh khác biệt quen thuộc của preset `radix-nova` so với MASTER: bo góc (`rounded-xl`/`4xl` → `sm`/`md`/`lg` theo MASTER mục 4), focus (`ring-3 ring-ring/50` → `ring-2 ring-ring ring-offset-2`), chiều cao điều khiển (≥ 40px), chữ ô nhập 16px, `leading-none` trên chữ (cắt dấu tiếng Việt), hover `/80` `/90` (→ `color-mix` với foreground).
+4. Đổi chữ mặc định sang tiếng Việt (ví dụ nút đóng có `sr-only` "Đóng").
+5. Tính tương phản cho mọi trạng thái có màu (thường, hover, chế độ tối) nếu đổi màu nền hay độ mờ.
+6. Chạy `pnpm --filter @xom-nho/ui typecheck lint test`.
+7. Dùng thử ở web hoặc admin: `import { Button } from "@xom-nho/ui/components/button"`.
 
 ## Sửa token
 
