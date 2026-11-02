@@ -2,14 +2,14 @@
 
 ## 1. Cài công cụ
 
-| Công cụ                | Ghi chú                                                                           |
-| ---------------------- | --------------------------------------------------------------------------------- |
-| Node.js 22 LTS trở lên | https://nodejs.org                                                                |
-| pnpm                   | Sau khi cài Node: `corepack enable` rồi `corepack prepare pnpm@latest --activate` |
-| Git                    | Kèm Git Bash (Claude Code trên Windows cần Git Bash)                              |
-| Docker Desktop         | Bật WSL 2 backend khi cài                                                         |
-| VS Code                | Extension gợi ý: ESLint, Prettier, Tailwind CSS IntelliSense, Prisma, Expo Tools  |
-| Expo Go                | Cài trên điện thoại (CH Play / App Store)                                         |
+| Công cụ                | Ghi chú                                                                                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js 22 LTS trở lên | https://nodejs.org                                                                                                                  |
+| pnpm                   | Sau khi cài Node: `corepack enable` (PowerShell **Administrator**). Phiên bản pnpm lấy từ `packageManager` trong `package.json` gốc |
+| Git                    | Kèm Git Bash (Claude Code trên Windows cần Git Bash)                                                                                |
+| Docker Desktop         | Bật WSL 2 backend khi cài                                                                                                           |
+| VS Code                | Extension gợi ý: ESLint, Prettier, Tailwind CSS IntelliSense, Prisma, Expo Tools                                                    |
+| Expo Go                | Cài trên điện thoại (CH Play / App Store)                                                                                           |
 
 Kiểm tra: `node -v`, `pnpm -v`, `docker -v`.
 

@@ -5,6 +5,8 @@ NestJS API cho Xóm Nhỏ. Nơi **duy nhất** chạm database và giữ quy t�
 ## Trước khi viết code
 
 - NestJS, Prisma, Better Auth đổi API giữa các bản lớn. Đọc tài liệu theo đúng bản trong `package.json`.
+- Dự án sinh bằng Nest CLI 12: **ESM** (`"type": "module"`), import tương đối phải có đuôi `.js`; test bằng **Vitest** (`describe`/`it`/`expect` là global); lint bằng **oxlint**. TypeScript 6.0 (bản Nest CLI dùng), chưa lên 7.
+- Cấu hình app dùng chung (tiền tố `/api/v1`, sau này CORS, pipe, filter) đặt trong `src/setup-app.ts`, gọi từ cả `main.ts` lẫn test e2e.
 - Better Auth gắn vào Nest qua handler Node (`toNodeHandler`) trên adapter Express, ở `src/main.ts`, **trước** body parser của Nest. Có thư viện cộng đồng tích hợp sẵn; kiểm tra tài liệu Better Auth mục NestJS trước khi tự viết.
 
 ## Tầng và trách nhiệm

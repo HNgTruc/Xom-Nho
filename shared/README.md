@@ -28,10 +28,14 @@ src/
 - Đọc biến môi trường.
 - Kiểu sinh từ Prisma (frontend không cài Prisma). Backend dùng mapper để chuyển sang kiểu ở đây.
 
-## Khởi tạo
+## Build
 
-- `package.json`: `"name": "@xom-nho/shared"`, `"type": "module"`, `"exports"` trỏ vào `src/index.ts` và `src/api-client/index.ts` (`"./api-client"`).
-- Phụ thuộc duy nhất: `zod`.
-- Vitest cho `utils/` và `schemas/`.
+`shared` là package ESM, **build ra `dist/`** bằng `tsc` (`pnpm --filter @xom-nho/shared build`). `exports` trỏ vào `dist/` (cả JS lẫn `.d.ts`) vì backend chạy bằng Node và biên dịch bằng `tsc`: trỏ thẳng vào `src/*.ts` thì Node không chạy được, còn `tsc` của backend sẽ coi file của shared là mã nguồn của mình.
+
+- `turbo` tự build shared trước `dev`, `typecheck`, `lint`, `test` của package khác (`dependsOn: ["^build"]`).
+- `pnpm dev` chạy `tsc --watch` cho shared, sửa là các package khác thấy ngay.
+- Import nội bộ dùng đuôi `.js` (`from "./constants/api.js"`), bắt buộc với `moduleResolution: NodeNext`.
+- Thêm `"./api-client"` vào `exports` khi viết api-client (giai đoạn 1).
+- Phụ thuộc duy nhất: `zod` (thêm khi viết schema đầu tiên). Vitest cho `utils/` và `schemas/`.
 
 Các package khác khai báo: `"@xom-nho/shared": "workspace:*"`.
