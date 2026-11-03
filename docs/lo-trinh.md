@@ -51,8 +51,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 3: Đọc bài
 
-- [ ] Backend: `posts` (danh sách, chi tiết), `categories`, `tags`, `users` (hồ sơ), `search`
-- [ ] Test service + policy cho từng vai trò
+- [x] Backend: `posts` (danh sách, chi tiết), `categories`, `tags`, `users` (hồ sơ), `search`
+- [x] Test service + policy cho từng vai trò
 - [ ] Web: trang chủ có phân trang, chi tiết bài (Markdown an toàn), danh mục, tag, hồ sơ, tìm kiếm
 - [ ] Web: metadata, Open Graph, sitemap
 
