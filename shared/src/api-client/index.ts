@@ -1,0 +1,23 @@
+import { categoriesApi } from "./categories.js";
+import { type ClientOptions, createRequest } from "./client.js";
+import { healthApi } from "./health.js";
+
+/**
+ * API client có kiểu cho `/api/v1`. Mỗi frontend tạo một client với cấu hình riêng:
+ *
+ *   const api = createClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL!, credentials: "include" });
+ *   const { data } = await api.categories.list();
+ */
+export function createClient(options: ClientOptions) {
+  const request = createRequest(options);
+  return {
+    request,
+    health: healthApi(request),
+    categories: categoriesApi(request),
+  };
+}
+
+export type ApiClient = ReturnType<typeof createClient>;
+
+export { ApiError, isApiError } from "./api-error.js";
+export type { ClientOptions, QueryValue, RequestFn, RequestOptions } from "./client.js";

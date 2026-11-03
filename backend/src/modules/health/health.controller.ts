@@ -1,11 +1,15 @@
 import { Controller, Get } from "@nestjs/common";
 import type { HealthStatus } from "@xom-nho/shared";
+import { Public } from "../../common/decorators/public.decorator.js";
+import { HealthService } from "./health.service.js";
 
 @Controller("health")
 export class HealthController {
-  // TODO(giai đoạn 1): kiểm tra kết nối database khi đã có PrismaService; @Public() khi đã có AuthGuard
+  constructor(private readonly healthService: HealthService) {}
+
+  @Public()
   @Get()
-  check(): HealthStatus {
-    return { status: "ok", timestamp: new Date().toISOString() };
+  check(): Promise<HealthStatus> {
+    return this.healthService.check();
   }
 }

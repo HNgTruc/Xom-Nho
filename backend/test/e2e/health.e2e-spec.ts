@@ -1,34 +1,32 @@
 import type { INestApplication } from "@nestjs/common";
-import { Test } from "@nestjs/testing";
 import request from "supertest";
 import type { App } from "supertest/types.js";
-import { AppModule } from "../../src/app.module.js";
-import { setupApp } from "../../src/setup-app.js";
+import { createTestApp } from "../fixtures/app.js";
 
 describe("GET /api/v1/health", () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-    setupApp(app);
-    await app.init();
+  beforeAll(async () => {
+    app = await createTestApp();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
   });
 
-  it("trả 200 và status ok", async () => {
+  it("trả 200, bọc trong data, status ok khi database trả lời", async () => {
     const res = await request(app.getHttpServer()).get("/api/v1/health").expect(200);
 
-    expect(res.body.status).toBe("ok");
+    expect(res.body.data.status).toBe("ok");
   });
 
   it("không có route ngoài tiền tố /api/v1", async () => {
     await request(app.getHttpServer()).get("/health").expect(404);
+  });
+
+  it("route không có trong /api/v1 trả 404 đúng định dạng lỗi", async () => {
+    const res = await request(app.getHttpServer()).get("/api/v1/khong-co").expect(404);
+
+    expect(res.body).toEqual({ error: { code: "NOT_FOUND", message: expect.any(String) } });
   });
 });

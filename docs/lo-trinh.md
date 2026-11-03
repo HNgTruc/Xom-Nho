@@ -19,19 +19,19 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Mỗi package có script `dev`, `build`, `lint`, `typecheck`, `test` để `turbo` chạy được
 - [ ] `pnpm dev` chạy được cả 4, mỗi frontend gọi được `/api/v1/health`
 - [ ] GitHub Actions: lint + typecheck + test mỗi lần push
-- [ ] Commit đầu tiên lên GitHub
+- [x] Commit đầu tiên lên GitHub
 
 **Xong khi:** clone repo về máy khác, làm theo README là thấy cả 4 phần chạy và nói chuyện được với backend.
 
 ## Giai đoạn 1: Nền móng backend
 
-- [ ] `config/`: đọc và kiểm tra biến môi trường bằng Zod
-- [ ] `common/`: `ZodValidationPipe`, `AppException` + filter, response interceptor, `@Public`, `@CurrentUser`, `@Roles`
-- [ ] `infrastructure/database`: Prisma kết nối MySQL Docker
-- [ ] Schema Prisma theo `co-so-du-lieu.md`, migration đầu tiên
-- [ ] `shared`: `slugify`, `removeVietnameseTones`, `Result`, hằng số vai trò/trạng thái/mã lỗi, có test
-- [ ] Seed dữ liệu mẫu
-- [ ] `shared/api-client`: `createClient`, `ApiError`
+- [x] `config/`: đọc và kiểm tra biến môi trường bằng Zod
+- [x] `common/`: `ZodValidationPipe`, `AppException` + filter, response interceptor, `@Public`, `@CurrentUser`, `@Roles`
+- [x] `infrastructure/database`: Prisma kết nối MySQL Docker
+- [x] Schema Prisma theo `co-so-du-lieu.md`, migration đầu tiên
+- [x] `shared`: `slugify`, `removeVietnameseTones`, `Result`, hằng số vai trò/trạng thái/mã lỗi, có test
+- [x] Seed dữ liệu mẫu
+- [x] `shared/api-client`: `createClient`, `ApiError`
 
 **Xong khi:** mở Adminer thấy đủ bảng và dữ liệu mẫu; `GET /api/v1/categories` trả đúng định dạng.
 

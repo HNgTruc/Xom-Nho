@@ -76,6 +76,15 @@ erDiagram
 
 `Session`, `Account`, `Verification` do Better Auth quản lý. Sinh schema của chúng bằng CLI của Better Auth (xem tài liệu bản đã cài), rồi thêm các cột riêng của Xóm Nhỏ (`bio`, `username`) vào model `User`. Plugin admin tự thêm `role`, `banned`, `banReason`, `banExpires`.
 
+Hiện trạng (giai đoạn 1): model `User` đã có sẵn các cột lõi của Better Auth và của plugin admin, để bài viết và bình luận có khóa ngoại ngay. Ba bảng `session`, `account`, `verification` được thêm ở giai đoạn 2; lúc đó so schema do CLI Better Auth sinh với model `User` hiện có, lệch thì tạo migration mới.
+
+Ghi chú cài đặt:
+
+- Tên bảng viết thường, số ít, gạch dưới (`user`, `post`, `post_tag`) qua `@@map`; tên cột giữ camelCase như Better Auth.
+- `Post.content` là `MEDIUMTEXT` (16 MB): `TEXT` chỉ 64 KB, bài tiếng Việt dài (mỗi chữ có dấu 2-3 byte) dễ vượt.
+- Server MySQL mặc định `utf8mb4_0900_ai_ci`, nhưng Prisma tạo từng bảng với `utf8mb4_unicode_ci` và không theo dõi collation. Giữ nguyên `unicode_ci` cho mọi bảng (không sửa tay migration) để các bảng luôn đồng nhất. Cả hai collation đều không phân biệt dấu khi so sánh, nên cột `UNIQUE` coi "bàn" và "ban" là trùng (hai tag này không cùng tồn tại được). Đây là hành vi mong muốn cho tên tag, danh mục. Tìm kiếm không phụ thuộc collation vì `searchText` đã bỏ dấu sẵn.
+- Kết nối qua driver adapter `@prisma/adapter-mariadb` (Prisma 7 bắt buộc dùng adapter). `DATABASE_URL` khai báo trong `prisma.config.ts`, không còn trong `schema.prisma`.
+
 ## Quy ước
 
 - Khóa chính: chuỗi `cuid()` (hoặc id do Better Auth sinh cho bảng của nó), không dùng số tự tăng lộ ra URL.

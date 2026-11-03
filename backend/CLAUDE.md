@@ -55,7 +55,7 @@ Nhờ vậy frontend và backend kiểm tra bằng đúng một schema.
 ```bash
 pnpm --filter backend dev          # nest start --watch, http://localhost:4000
 pnpm --filter backend test
-pnpm --filter backend test:e2e
+pnpm --filter backend test:e2e     # chạy trên database <tên>_test, tự áp migration trước
 pnpm --filter backend db:migrate   # prisma migrate dev
 pnpm --filter backend db:seed
 pnpm --filter backend db:studio
