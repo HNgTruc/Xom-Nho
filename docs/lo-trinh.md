@@ -18,8 +18,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] `frontend/mobile-app`: `create-expo-app`, `src/theme` đọc token từ `ui`
 - [x] Mỗi package có script `dev`, `build`, `lint`, `typecheck`, `test` để `turbo` chạy được (`ui` không có `dev`/`build` vì xuất thẳng TS; mobile không có `build`, build app bằng EAS ở giai đoạn 7)
 - [x] `pnpm dev` chạy được cả 4, mỗi frontend gọi được `/api/v1/health`
-- [ ] GitHub Actions: lint + typecheck + test mỗi lần push (đã viết `.github/workflows/ci.yml`, chờ lần push đầu chạy xanh)
-- [ ] Kiểm tra app trên điện thoại thật bằng Expo Go (đã bundle thử Android thành công; cần quét QR trên máy thật)
+- [x] GitHub Actions: lint + typecheck + test mỗi lần push
+- [x] Kiểm tra app trên điện thoại thật bằng Expo Go (iPhone hiện "Đã kết nối backend")
 - [x] Commit đầu tiên lên GitHub
 
 **Xong khi:** clone repo về máy khác, làm theo README là thấy cả 4 phần chạy và nói chuyện được với backend.
@@ -38,14 +38,14 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 2: Đăng nhập
 
-- [ ] Better Auth trong backend (`infrastructure/auth`), sinh bảng auth, migration
-- [ ] `AuthGuard` toàn cục, `RolesGuard`, plugin admin (vai trò `user`, `author`, `admin`)
-- [ ] CORS + `trustedOrigins` cho web và admin
-- [ ] `modules/auth`: `GET /me`, `PATCH /me`
-- [ ] Web: đăng ký, đăng nhập email, chuyển tiếp cookie trong Server Components
-- [ ] Admin: trang đăng nhập, chặn người không phải admin
-- [ ] Mobile: plugin Expo, đăng nhập email, nhớ phiên
-- [ ] Google + GitHub trên web, rồi trên mobile
+- [x] Better Auth trong backend (`infrastructure/auth`), sinh bảng auth, migration
+- [x] `AuthGuard` toàn cục, `RolesGuard`, plugin admin (vai trò `user`, `author`, `admin`)
+- [x] CORS + `trustedOrigins` cho web và admin
+- [x] `modules/auth`: `GET /me`, `PATCH /me`
+- [x] Web: đăng ký, đăng nhập email, chuyển tiếp cookie trong Server Components
+- [x] Admin: trang đăng nhập, chặn người không phải admin
+- [ ] Mobile: plugin Expo, đăng nhập email, nhớ phiên (đã code, Metro bundle được; chờ thử trên điện thoại)
+- [ ] Google + GitHub trên web, rồi trên mobile (đã code, nút tự ẩn khi thiếu khóa; cần tạo khóa OAuth để thử)
 
 **Xong khi:** cùng một tài khoản đăng nhập được ở cả 3 frontend; tài khoản thường không vào được admin.
 

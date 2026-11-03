@@ -76,7 +76,9 @@ erDiagram
 
 `Session`, `Account`, `Verification` do Better Auth quản lý. Sinh schema của chúng bằng CLI của Better Auth (xem tài liệu bản đã cài), rồi thêm các cột riêng của Xóm Nhỏ (`bio`, `username`) vào model `User`. Plugin admin tự thêm `role`, `banned`, `banReason`, `banExpires`.
 
-Hiện trạng (giai đoạn 1): model `User` đã có sẵn các cột lõi của Better Auth và của plugin admin, để bài viết và bình luận có khóa ngoại ngay. Ba bảng `session`, `account`, `verification` được thêm ở giai đoạn 2; lúc đó so schema do CLI Better Auth sinh với model `User` hiện có, lệch thì tạo migration mới.
+Hiện trạng (giai đoạn 2, better-auth 1.7): `session`, `account`, `verification` thêm ở migration `add_better_auth_tables`, cột lấy đúng theo định nghĩa bảng trong mã nguồn Better Auth (bảng core + `session.impersonatedBy` của plugin admin), không dùng CLI vì cấu hình Better Auth nằm trong Nest. Id của bốn bảng auth do Better Auth sinh (32 ký tự), không phải `cuid()`. `username` tự sinh khi đăng ký (từ tên, bỏ dấu, trùng thì thêm số, `infrastructure/auth/username.ts`). Mật khẩu băm nằm ở `account.password` với `providerId = "credential"`; không repository nào đọc bảng `account`, `session`.
+
+Nâng cấp Better Auth lên bản mới: so lại cột với `@better-auth/core/dist/db/get-tables.mjs` và schema của plugin admin; lệch thì tạo migration mới.
 
 Ghi chú cài đặt:
 

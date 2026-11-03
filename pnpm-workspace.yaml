@@ -17,6 +17,7 @@ catalog:
   tailwindcss: ^4.3.3
   typescript: ~6.0.3
   vitest: ^5.1.0
+  zod: ^4.6.7
 
 # Package được chạy script cài đặt (pnpm 10 chặn mặc định): Prisma tải schema engine, tsx cần esbuild
 onlyBuiltDependencies:

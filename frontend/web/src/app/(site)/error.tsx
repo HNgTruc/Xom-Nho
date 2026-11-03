@@ -1,0 +1,15 @@
+"use client";
+
+import { ERROR_MESSAGES } from "@xom-nho/shared";
+import { Button } from "@xom-nho/ui/components/button";
+
+// Lỗi không lường trước trong các trang chính: câu tiếng Việt + nút thử lại, không hiện chi tiết kỹ thuật
+export default function SiteError({ retry }: { error: unknown; retry: () => void }) {
+  return (
+    <main className="mx-auto flex max-w-md flex-col items-start gap-4 px-4 py-16" role="alert">
+      <h1 className="text-xl font-semibold">Ôi, trang chưa hiện được</h1>
+      <p className="text-muted-foreground">{ERROR_MESSAGES.INTERNAL_ERROR}</p>
+      <Button onClick={() => retry()}>Thử lại</Button>
+    </main>
+  );
+}

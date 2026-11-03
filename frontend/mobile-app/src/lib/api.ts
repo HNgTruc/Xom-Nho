@@ -1,11 +1,18 @@
 import { createClient } from "@xom-nho/shared/api-client";
-import Constants from "expo-constants";
-import { resolveApiUrl } from "./api-url";
+import { authClient } from "./auth-client";
+import { backendUrl, backendUrlOrInvalid } from "./backend-url";
 
-export const apiUrl = resolveApiUrl(process.env.EXPO_PUBLIC_API_URL, Constants.expoConfig?.hostUri);
+export const apiUrl = backendUrl;
 
-/** api-client của app. TODO(giai đoạn 2): gửi cookie phiên do plugin Expo của Better Auth lưu. */
+/**
+ * api-client của app. App không có cookie như trình duyệt: lấy cookie phiên plugin Expo đã lưu,
+ * gửi bằng header Cookie, và đặt `credentials: "omit"` (tài liệu Better Auth cho Expo).
+ */
 export const api = createClient({
-  // Thiếu địa chỉ thì mọi request lỗi ngay, màn hình hiện hướng dẫn đặt EXPO_PUBLIC_API_URL
-  baseUrl: apiUrl ?? "http://khong-biet-dia-chi-backend.invalid",
+  baseUrl: backendUrlOrInvalid,
+  credentials: "omit",
+  headers: async (): Promise<Record<string, string>> => {
+    const cookie = await authClient.getCookie();
+    return cookie ? { cookie } : {};
+  },
 });

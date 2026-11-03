@@ -1,6 +1,7 @@
 import { categoriesApi } from "./categories.js";
 import { type ClientOptions, createRequest } from "./client.js";
 import { healthApi } from "./health.js";
+import { authApi, meApi } from "./me.js";
 
 /**
  * API client có kiểu cho `/api/v1`. Mỗi frontend tạo một client với cấu hình riêng:
@@ -14,6 +15,8 @@ export function createClient(options: ClientOptions) {
     request,
     health: healthApi(request),
     categories: categoriesApi(request),
+    me: meApi(request),
+    auth: authApi(request),
   };
 }
 

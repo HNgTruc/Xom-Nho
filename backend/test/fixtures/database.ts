@@ -18,6 +18,8 @@ export async function resetDatabase(prisma: PrismaClient): Promise<void> {
     prisma.post.deleteMany(),
     prisma.tag.deleteMany(),
     prisma.category.deleteMany(),
+    // session, account xóa theo user (onDelete: Cascade)
     prisma.user.deleteMany(),
+    prisma.verification.deleteMany(),
   ]);
 }

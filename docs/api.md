@@ -77,13 +77,30 @@ Interceptor (`common/interceptors/response.interceptor.ts`) bọc `data`/`meta`;
 
 ### Danh mục, tag, người dùng
 
-| Method | Đường dẫn          |     | Mô tả                             |
-| ------ | ------------------ | --- | --------------------------------- |
-| GET    | `/categories`      | 🌐  | Tất cả danh mục, kèm số bài       |
-| GET    | `/tags?q=`         | 🌐  | Gợi ý tag khi gõ (tối đa 10)      |
-| GET    | `/users/:username` | 🌐  | Hồ sơ công khai + bài đã đăng     |
-| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)    |
-| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện |
+| Method | Đường dẫn          |     | Mô tả                                                                                                |
+| ------ | ------------------ | --- | ---------------------------------------------------------------------------------------------------- |
+| GET    | `/categories`      | 🌐  | Tất cả danh mục, kèm số bài                                                                          |
+| GET    | `/tags?q=`         | 🌐  | Gợi ý tag khi gõ (tối đa 10)                                                                         |
+| GET    | `/users/:username` | 🌐  | Hồ sơ công khai + bài đã đăng                                                                        |
+| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                       |
+| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                            |
+| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút) |
+
+`Me`: `id, name, email, username, image, bio, role, createdAt`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
+
+### Đăng nhập (`/api/auth/*`, Better Auth)
+
+Không nằm dưới `/api/v1`, định dạng phản hồi là của Better Auth (lỗi: `{ code, message }`). Frontend gọi qua Better Auth client, không qua `api-client`. Các endpoint đang dùng:
+
+| Method | Đường dẫn                  | Mô tả                                                                                |
+| ------ | -------------------------- | ------------------------------------------------------------------------------------ |
+| POST   | `/api/auth/sign-up/email`  | Đăng ký `{ name, email, password }` (schema `signUpSchema`), vai trò mặc định `user` |
+| POST   | `/api/auth/sign-in/email`  | Đăng nhập. Sai 5 lần/phút bị chặn (429)                                              |
+| POST   | `/api/auth/sign-in/social` | Google/GitHub (chỉ khi backend có khóa)                                              |
+| POST   | `/api/auth/sign-out`       | Đăng xuất                                                                            |
+| GET    | `/api/auth/get-session`    | Phiên hiện tại                                                                       |
+
+Mã lỗi Better Auth → câu tiếng Việt: `authErrorMessage()` trong `shared/src/constants/auth-messages.ts`. Origin được tin (chống CSRF): các origin trong `CORS_ORIGINS`, `xomnho://` (app), `exp://**` khi không phải production.
 
 ### Hệ thống
 

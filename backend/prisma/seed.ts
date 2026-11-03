@@ -1,8 +1,9 @@
 /**
  * Dữ liệu mẫu cho máy dev: `pnpm --filter backend db:seed`. Chạy lại nhiều lần được (upsert theo khóa duy nhất).
- * Người dùng mẫu CHƯA có mật khẩu: bảng account của Better Auth thêm ở giai đoạn 2, lúc đó seed tạo mật khẩu.
+ * Mọi tài khoản mẫu đăng nhập bằng `<username>@xomnho.local` / SEED_PASSWORD (chỉ dùng ở máy dev).
  */
 import { slugify, toSearchText } from "@xom-nho/shared";
+import { hashPassword } from "better-auth/crypto";
 import { loadEnv } from "../src/config/load-env.js";
 import { type PostStatus } from "../src/generated/prisma/client.js";
 import { createPrismaClient } from "../src/infrastructure/database/create-prisma-client.js";
@@ -11,6 +12,8 @@ const env = loadEnv();
 if (env.NODE_ENV === "production") throw new Error("Không chạy seed trên production.");
 
 const prisma = createPrismaClient(env.DATABASE_URL);
+
+const SEED_PASSWORD = "xomnho123";
 
 const DAY = 24 * 60 * 60 * 1000;
 const now = Date.now();
@@ -138,6 +141,22 @@ async function main() {
     });
   }
 
+  // Tài khoản "credential" của Better Auth: accountId là id người dùng, mật khẩu băm bằng hàm của Better Auth
+  const passwordHash = await hashPassword(SEED_PASSWORD);
+  for (const user of users) {
+    const data = {
+      accountId: user.id,
+      providerId: "credential",
+      userId: user.id,
+      password: passwordHash,
+    };
+    await prisma.account.upsert({
+      where: { id: `${user.id}-credential` },
+      create: { id: `${user.id}-credential`, ...data },
+      update: data,
+    });
+  }
+
   const categoryIds: string[] = [];
   for (const [index, category] of categories.entries()) {
     const data = { ...category, slug: slugify(category.name), sortOrder: index };
@@ -229,6 +248,9 @@ async function main() {
 
   console.info(
     `Seed xong: ${users.length} người dùng, ${categories.length} danh mục, ${tags.length} tag, ${posts.length} bài, ${n} bình luận.`,
+  );
+  console.info(
+    `Đăng nhập: truongxom@xomnho.local (trưởng xóm), lananh@xomnho.local (cây bút), baongoc@xomnho.local (hàng xóm); mật khẩu ${SEED_PASSWORD}`,
   );
 }
 

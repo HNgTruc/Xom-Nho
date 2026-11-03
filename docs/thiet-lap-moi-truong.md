@@ -19,7 +19,13 @@ Kiểm tra: `node -v`, `pnpm -v`, `docker -v`.
 cp .env.example .env
 ```
 
-Điền mật khẩu MySQL, `BETTER_AUTH_SECRET` (lệnh tạo có sẵn trong file). Khóa Google/GitHub để trống cũng được, nút đăng nhập tương ứng sẽ ẩn.
+Điền mật khẩu MySQL và `BETTER_AUTH_SECRET` (bắt buộc, ít nhất 32 ký tự; thiếu thì backend không khởi động). Tạo chuỗi ngẫu nhiên:
+
+```powershell
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Khóa Google/GitHub để trống cũng được, nút đăng nhập tương ứng sẽ ẩn.
 
 Mỗi phần đọc biến môi trường ở đâu:
 
@@ -66,7 +72,15 @@ pnpm dev              # tất cả
 | http://localhost:4000/api/v1/health | Backend còn sống không                                 |
 | http://localhost:3000               | Web                                                    |
 | http://localhost:5173               | Admin (đăng nhập bằng tài khoản trưởng xóm trong seed) |
-| http://localhost:8080               | Adminer                                                |
+
+Tài khoản mẫu sau khi chạy seed (chỉ ở máy dev), mật khẩu đều là `xomnho123`:
+
+| Email                    | Vai trò              |
+| ------------------------ | -------------------- |
+| `truongxom@xomnho.local` | Trưởng xóm (`admin`) |
+| `lananh@xomnho.local`    | Cây bút (`author`)   |
+| `baongoc@xomnho.local`   | Hàng xóm (`user`)    |
+| http://localhost:8080    | Adminer              |
 
 ## 5. Chạy app trên điện thoại thật bằng Expo Go
 
@@ -87,6 +101,22 @@ pnpm dev              # tất cả
 
 6. Kiểm tra: mở trình duyệt trên điện thoại, vào `http://192.168.1.5:4000/api/v1/health`. Thấy JSON là thông.
 7. `pnpm dev:mobile` (hoặc `pnpm --filter mobile-app start` khi backend đã chạy), quét QR bằng Expo Go (Android) hoặc Camera (iPhone). Expo Go trên điện thoại phải hỗ trợ đúng SDK của app (xem `expo` trong `frontend/mobile-app/package.json`); cập nhật Expo Go nếu nó báo không tương thích. Phím tắt của Expo (`r` tải lại, `j` mở debugger) chỉ dùng được khi chạy `pnpm --filter mobile-app start` riêng, không qua turbo.
+
+### Đăng nhập Expo (bắt buộc với iPhone)
+
+Expo Go trên iOS (SDK 58) đòi **cả Expo Go lẫn Expo CLI trên máy tính** cùng đăng nhập một tài khoản, nếu không sẽ báo _"You're signed in to Expo Go as ..., but not signed in to Expo CLI"_. Đăng xuất Expo Go không giải quyết được (sẽ báo cần đăng nhập cả hai).
+
+Trên Windows, `npx expo login` (bản CLI đi kèm SDK 58) bị lỗi khi tự mở trình duyệt (`cmd.exe /c start "" https://expo.dev/login?...` thoát với mã 1) rồi dừng luôn. Cách đi vòng, chỉ cần làm một lần cho mỗi máy (chạy trong `frontend/mobile-app`, PowerShell):
+
+```powershell
+$env:NODE_OPTIONS="--unhandled-rejections=warn"
+npx expo login --browser
+Remove-Item Env:NODE_OPTIONS
+```
+
+Lệnh in ra dòng _"visit this link to log in: https://expo.dev/login?..."_ và chờ. Copy link đó mở bằng trình duyệt, đăng nhập (kể cả bằng GitHub/Google), bấm **Approve**; terminal báo `Logged in`. Kiểm tra bằng `npx expo whoami`. Sau đó **khởi động lại Metro** (`Ctrl+C`, `pnpm dev:mobile`) vì Metro chỉ đọc trạng thái đăng nhập lúc khởi động.
+
+Tài khoản có mật khẩu (đăng ký bằng email) thì dùng gọn hơn: `npx expo login --no-browser`. Cách khác cho mọi loại tài khoản: tạo access token ở expo.dev → Account settings → Access tokens, rồi đặt `$env:EXPO_TOKEN="..."` trong terminal trước khi chạy Metro (không lưu token vào repo).
 
 IP có thể đổi khi bạn đổi mạng; nếu app báo lỗi mạng, kiểm tra lại bước 2 và 3. Không vào được dù đã làm đủ: thử `npx expo start --tunnel`.
 

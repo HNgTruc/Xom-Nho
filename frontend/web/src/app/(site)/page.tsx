@@ -8,15 +8,30 @@ import {
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import { Suspense } from "react";
 import { BackendStatus } from "@/components/common/backend-status";
+import { getCurrentUser } from "@/features/auth";
 
-// Trang chủ tạm của giai đoạn 0: kiểm tra theme từ ui và kết nối backend. Danh sách bài làm ở giai đoạn 3.
+async function Greeting() {
+  // Backend không trả lời thì chào như khách; khối BackendStatus bên dưới đã báo lỗi kết nối
+  const user = await getCurrentUser().catch(() => null);
+  return (
+    <CardDescription>
+      {user
+        ? `Chào ${user.name}, hôm nay xóm có gì mới nè.`
+        : "Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện."}
+    </CardDescription>
+  );
+}
+
+// Trang chủ tạm: lời chào theo người đăng nhập, kiểm tra kết nối backend. Danh sách bài làm ở giai đoạn 3.
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl items-center px-4 py-16">
-      <Card className="w-full">
+    <main className="mx-auto max-w-2xl px-4 py-12">
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Xóm Nhỏ</CardTitle>
-          <CardDescription>Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện.</CardDescription>
+          <Suspense fallback={<Skeleton className="h-6 w-72" />}>
+            <Greeting />
+          </Suspense>
         </CardHeader>
         <CardContent>
           <Suspense fallback={<Skeleton className="h-6 w-44" />}>

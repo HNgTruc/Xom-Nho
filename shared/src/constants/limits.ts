@@ -5,6 +5,12 @@ export const LIMITS = {
   ADMIN_PAGE_SIZE_MAX: 100,
 
   PASSWORD_MIN: 8,
+  /** Better Auth mặc định từ chối mật khẩu dài hơn 128 */
+  PASSWORD_MAX: 128,
+  USER_NAME_MIN: 2,
+  USER_NAME_MAX: 50,
+  USER_BIO_MAX: 500,
+  URL_MAX: 500,
 
   POST_TITLE_MIN: 5,
   POST_TITLE_MAX: 200,

@@ -17,6 +17,8 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: "Xóm Nhỏ" }} />
+        <Stack.Screen name="(auth)/dang-nhap" options={{ title: "Đăng nhập" }} />
+        <Stack.Screen name="(auth)/dang-ky" options={{ title: "Đăng ký" }} />
       </Stack>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
     </QueryClientProvider>

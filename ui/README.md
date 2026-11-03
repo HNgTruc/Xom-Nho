@@ -23,11 +23,12 @@ Không có bước build: Next.js (`transpilePackages: ["@xom-nho/ui"]`), Vite v
 
 ## Có gì
 
-| Phần                   | Nội dung                                                                                          |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| `src/tokens/`          | `colors` (sáng/tối), `categoryColors`, `statusColors`, `fontSize`, `space`, `radius`, `duration`  |
-| `src/styles/theme.css` | Biến CSS + `@theme` cho Tailwind v4; class như `bg-primary`, `text-status-pending`, `shadow-card` |
-| `src/components/`      | `button` (có `loading`), `input`, `textarea`, `label`, `card`, `badge`, `skeleton`                |
+| Phần                   | Nội dung                                                                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/tokens/`          | `colors` (sáng/tối), `categoryColors`, `statusColors`, `fontSize`, `space`, `radius`, `duration`                                                |
+| `src/styles/theme.css` | Biến CSS + `@theme` cho Tailwind v4; class như `bg-primary`, `text-status-pending`, `shadow-card`                                               |
+| `src/components/`      | `button` (có `loading`), `input`, `password-input` (nút hiện/ẩn), `field-error`, `form-alert`, `textarea`, `label`, `card`, `badge`, `skeleton` |
+| `src/hooks/`           | `use-zod-form`: form kiểm tra bằng schema Zod (web, admin; mobile có bản riêng vì khác bản React)                                               |
 
 Còn cần thêm khi tới lúc dùng: `select dialog alert-dialog dropdown-menu table tabs sonner pagination avatar`.
 

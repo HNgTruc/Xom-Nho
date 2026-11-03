@@ -18,6 +18,17 @@ export default defineConfig({
     globalSetup: ["./test/e2e/global-setup.ts"],
     // Các file e2e dùng chung một database: chạy lần lượt
     fileParallelism: false,
-    env: { NODE_ENV: "test", DATABASE_URL: process.env.DATABASE_URL ?? "" },
+    // Cấu hình cố định cho test, không phụ thuộc .env trên máy (trừ DATABASE_URL đã đổi sang _test)
+    env: {
+      NODE_ENV: "test",
+      DATABASE_URL: process.env.DATABASE_URL ?? "",
+      BETTER_AUTH_SECRET: "e2e-chi-dung-cho-test-khong-dung-o-dau-khac",
+      BETTER_AUTH_URL: "http://localhost:4000",
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:5173",
+      GOOGLE_CLIENT_ID: "",
+      GOOGLE_CLIENT_SECRET: "",
+      GITHUB_CLIENT_ID: "",
+      GITHUB_CLIENT_SECRET: "",
+    },
   },
 });

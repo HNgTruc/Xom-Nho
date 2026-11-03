@@ -28,9 +28,12 @@
           "backgroundColor": "#FBF8F3",
           "image": "./assets/splash-icon.png",
           "imageWidth": 76,
-          "dark": { "backgroundColor": "#1C1917" }
+          "dark": {
+            "backgroundColor": "#1C1917"
+          }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

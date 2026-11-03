@@ -46,7 +46,7 @@ TypeScript · NestJS · Prisma · MySQL · Better Auth · Next.js · React + Vit
 Cần: Node.js 22+, pnpm, Docker Desktop, app Expo Go trên điện thoại.
 
 ```bash
-cp .env.example .env            # rồi điền mật khẩu MySQL
+cp .env.example .env            # rồi điền mật khẩu MySQL và BETTER_AUTH_SECRET (lệnh tạo có trong file)
 cp .env backend/.env            # backend đọc DATABASE_URL, CORS_ORIGINS từ đây
 docker compose up -d            # MySQL :3307, Adminer http://localhost:8080
 pnpm install                    # tự sinh Prisma client
