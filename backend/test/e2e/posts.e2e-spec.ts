@@ -73,7 +73,9 @@ describe("Đọc bài (/api/v1/posts)", () => {
     const minh = await prisma.user.create({
       data: { id: "minh", name: "Minh", email: "minh@test.local", username: "minh" },
     });
-    const amThuc = await prisma.category.create({ data: { name: "Ẩm thực", slug: "am-thuc" } });
+    const amThuc = await prisma.category.create({
+      data: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
+    });
     const doiSong = await prisma.category.create({ data: { name: "Đời sống", slug: "doi-song" } });
     const anVat = await prisma.tag.create({ data: { name: "Ăn vặt", slug: "an-vat" } });
 
@@ -145,7 +147,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
         slug: "moi-nhat",
         commentCount: 1,
         author: { id: "lan", name: "Lan", username: "lan", image: null },
-        category: { name: "Ẩm thực", slug: "am-thuc" },
+        category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
         tags: [{ name: "Ăn vặt", slug: "an-vat" }],
       });
       expect(post).not.toHaveProperty("content");

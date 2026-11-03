@@ -3,8 +3,8 @@ import type { Category } from "./category.js";
 import type { TagRef } from "./tag.js";
 import type { UserSummary } from "./user.js";
 
-/** Danh mục gắn trên bài: chỉ cần tên và slug để dựng liên kết `/danh-muc/<slug>`. */
-export type CategoryRef = Pick<Category, "name" | "slug">;
+/** Danh mục gắn trên bài: tên, slug để dựng liên kết `/danh-muc/<slug>`, màu để tô badge. */
+export type CategoryRef = Pick<Category, "name" | "slug" | "color">;
 
 /**
  * Một bài trong danh sách: `GET /posts`, `GET /search`.

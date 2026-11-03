@@ -224,7 +224,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
       expect(res.body.data[0]).toMatchObject({
         slug: "do-an-duong-pho",
         author: { id: "lan", name: "Lan", username: "lan", image: null },
-        category: { name: "Ẩm thực", slug: "am-thuc" },
+        category: { name: "Ẩm thực", slug: "am-thuc", color: "amber" },
         tags: [
           { name: "Ăn vặt", slug: "an-vat" },
           { name: "Đồ ăn", slug: "do-an" },

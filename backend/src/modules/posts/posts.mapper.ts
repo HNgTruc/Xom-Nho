@@ -1,5 +1,7 @@
 import {
+  type CategoryRef,
   POST_STATUSES,
+  toCategoryColor,
   type PostDetail,
   type PostListItem,
   type TagRef,
@@ -11,6 +13,10 @@ import type { PostDetailRow, PostListRow } from "./posts.repository.js";
 
 function toUserSummary(author: PostListRow["author"]): UserSummary {
   return { id: author.id, name: author.name, username: author.username, image: author.image };
+}
+
+function toCategoryRef(category: PostListRow["category"]): CategoryRef {
+  return { name: category.name, slug: category.slug, color: toCategoryColor(category.color) };
 }
 
 function toTagRef({ tag }: PostListRow["tags"][number]): TagRef {
@@ -27,7 +33,7 @@ export function toPostListItem(row: PostListRow): PostListItem {
     viewCount: row.viewCount,
     commentCount: row._count.comments,
     author: toUserSummary(row.author),
-    category: { name: row.category.name, slug: row.category.slug },
+    category: toCategoryRef(row.category),
     tags: row.tags.map(toTagRef),
   };
 }

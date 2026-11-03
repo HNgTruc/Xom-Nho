@@ -60,9 +60,17 @@ describe("GET /api/v1/categories", () => {
         name: "Đời sống",
         slug: "doi-song",
         description: null,
+        color: "amber",
         postCount: 0,
       },
-      { id: hoiDap.id, name: "Hỏi đáp", slug: "hoi-dap", description: null, postCount: 2 },
+      {
+        id: hoiDap.id,
+        name: "Hỏi đáp",
+        slug: "hoi-dap",
+        description: null,
+        color: "amber",
+        postCount: 2,
+      },
     ]);
   });
 });

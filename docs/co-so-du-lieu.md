@@ -51,6 +51,7 @@ erDiagram
     string name UK
     string slug UK
     string description
+    string color "amber | blue | green | purple | rose"
     int sortOrder
   }
   Tag {

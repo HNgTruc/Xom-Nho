@@ -29,11 +29,11 @@ const users = [
 ] as const;
 
 const categories = [
-  { name: "Đời sống", description: "Chuyện thường ngày trong xóm" },
-  { name: "Công nghệ", description: "Máy móc, phần mềm, mẹo vặt" },
-  { name: "Học tập", description: "Kinh nghiệm học, sách hay" },
-  { name: "Góc kể chuyện", description: "Truyện ngắn, tản văn, kỷ niệm" },
-  { name: "Hỏi đáp", description: "Thắc mắc gì cứ hỏi hàng xóm" },
+  { name: "Đời sống", description: "Chuyện thường ngày trong xóm", color: "amber" },
+  { name: "Công nghệ", description: "Máy móc, phần mềm, mẹo vặt", color: "blue" },
+  { name: "Học tập", description: "Kinh nghiệm học, sách hay", color: "green" },
+  { name: "Góc kể chuyện", description: "Truyện ngắn, tản văn, kỷ niệm", color: "purple" },
+  { name: "Hỏi đáp", description: "Thắc mắc gì cứ hỏi hàng xóm", color: "rose" },
 ];
 
 const tags = [

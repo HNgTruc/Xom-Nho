@@ -10,23 +10,45 @@ function setup(rows: CategoryListRow[]) {
 describe("CategoriesService.list", () => {
   it("đổi bản ghi sang kiểu Category, số bài lấy từ _count", async () => {
     const { service } = setup([
-      { id: "c1", name: "Đời sống", slug: "doi-song", description: null, _count: { posts: 3 } },
+      {
+        id: "c1",
+        name: "Đời sống",
+        slug: "doi-song",
+        description: null,
+        color: "amber",
+        _count: { posts: 3 },
+      },
     ]);
 
     await expect(service.list()).resolves.toEqual([
-      { id: "c1", name: "Đời sống", slug: "doi-song", description: null, postCount: 3 },
+      {
+        id: "c1",
+        name: "Đời sống",
+        slug: "doi-song",
+        description: null,
+        color: "amber",
+        postCount: 3,
+      },
     ]);
   });
 
   it("giữ nguyên thứ tự repository trả về", async () => {
     const { service } = setup([
-      { id: "b", name: "B", slug: "b", description: null, _count: { posts: 0 } },
-      { id: "a", name: "A", slug: "a", description: null, _count: { posts: 0 } },
+      { id: "b", name: "B", slug: "b", description: null, color: "blue", _count: { posts: 0 } },
+      { id: "a", name: "A", slug: "a", description: null, color: "rose", _count: { posts: 0 } },
     ]);
 
     const result = await service.list();
 
     expect(result.map((c) => c.id)).toEqual(["b", "a"]);
+  });
+
+  it("màu lạ trong database thì dùng màu mặc định", async () => {
+    const { service } = setup([
+      { id: "c1", name: "A", slug: "a", description: null, color: "teal", _count: { posts: 0 } },
+    ]);
+
+    await expect(service.list()).resolves.toMatchObject([{ color: "amber" }]);
   });
 
   it("trả mảng rỗng khi chưa có danh mục", async () => {

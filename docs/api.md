@@ -87,7 +87,7 @@ Kiểu trong `shared` chỉ bảo vệ lúc build. App đã cài trên điện t
 | DELETE | `/posts/:id`                                        | 🔒  | Xóa bài của mình                                                                               |
 | GET    | `/me/posts?status=`                                 | 🔒  | Bài của tôi, mọi trạng thái                                                                    |
 
-`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { id, name, username, image }, category { name, slug }, tags [{ name, slug }]`. `commentCount` chỉ đếm bình luận đang hiện. `author.id` để frontend so với `Me.id`.
+`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { id, name, username, image }, category { name, slug, color }, tags [{ name, slug }]`. `commentCount` chỉ đếm bình luận đang hiện. `author.id` để frontend so với `Me.id`.
 `PostDetail`: `PostListItem` + `content, status, rejectReason, updatedAt`. `rejectReason` là `null` trừ khi bài bị từ chối.
 
 Đường dẫn khớp chính xác: `:slug` (bài, tag) và `:username` phải đúng dạng chuẩn (chữ thường, không khoảng trắng). Sai dạng, kể cả viết hoa (`/posts/Moi-Nhat`), trả 404 như không có, không phải 400: mỗi trang chỉ có một URL. `:id` sai dạng (quá 64 ký tự, có ký tự lạ) cũng trả 404. Bộ lọc trong query (`?category=`, `?tag=`, `?author=`) thì dễ dãi hơn: tự cắt khoảng trắng, đổi chữ thường.
@@ -127,7 +127,9 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 | PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                             |
 | GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)  |
 
+`Category`: `id, name, slug, description, color, postCount`. `postCount` chỉ đếm bài đã đăng.
 `Tag`: `id, name, slug`.
+`color` (trong `Category` và `category` của bài) là khóa màu badge: `amber | blue | green | purple | rose` (`CATEGORY_COLORS` trong `shared`, MASTER mục 2.2). Sau này có thể thêm màu, nên client gặp giá trị lạ thì dùng `toCategoryColor` để về màu mặc định, không báo lỗi.
 `PublicProfile`: `id, name, username, image, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
 
 Ràng buộc `username` trong `shared` (chỉ a-z, 0-9, tối đa 20 ký tự) hẹp hơn cột `user.username` (50 ký tự). Sau này cho người dùng tự đặt username theo quy tắc rộng hơn thì phải nới schema cùng lúc, nếu không `?author=` và `/users/:username` sẽ từ chối username hợp lệ. Nới ra là được phép trong v1, siết lại thì không.

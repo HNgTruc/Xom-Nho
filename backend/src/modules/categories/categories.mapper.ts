@@ -1,4 +1,4 @@
-import type { Category } from "@xom-nho/shared";
+import { type Category, toCategoryColor } from "@xom-nho/shared";
 import type { CategoryListRow } from "./categories.repository.js";
 
 export function toCategory(row: CategoryListRow): Category {
@@ -7,6 +7,7 @@ export function toCategory(row: CategoryListRow): Category {
     name: row.name,
     slug: row.slug,
     description: row.description,
+    color: toCategoryColor(row.color),
     postCount: row._count.posts,
   };
 }

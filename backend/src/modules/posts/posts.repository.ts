@@ -12,7 +12,7 @@ export const postListSelect = {
   publishedAt: true,
   viewCount: true,
   author: { select: { id: true, name: true, username: true, image: true } },
-  category: { select: { name: true, slug: true } },
+  category: { select: { name: true, slug: true, color: true } },
   tags: {
     select: { tag: { select: { name: true, slug: true } } },
     orderBy: { tag: { name: "asc" } },

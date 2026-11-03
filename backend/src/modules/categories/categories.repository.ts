@@ -6,6 +6,7 @@ export const categoryListSelect = {
   name: true,
   slug: true,
   description: true,
+  color: true,
   _count: { select: { posts: { where: { status: "PUBLISHED" } } } },
 } as const;
 
@@ -14,6 +15,7 @@ export type CategoryListRow = {
   name: string;
   slug: string;
   description: string | null;
+  color: string;
   _count: { posts: number };
 };
 

@@ -112,6 +112,8 @@ model Category {
   name        String   @unique @db.VarChar(50)
   slug        String   @unique @db.VarChar(60)
   description String?  @db.VarChar(300)
+  // Khóa màu badge: amber | blue | green | purple | rose (shared/src/constants/category-colors.ts)
+  color       String   @default("amber") @db.VarChar(20)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

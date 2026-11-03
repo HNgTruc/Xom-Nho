@@ -15,7 +15,7 @@ function listRow(overrides: Partial<PostListRow> = {}): PostListRow {
     publishedAt,
     viewCount: 12,
     author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null },
-    category: { name: "Ẩm thực", slug: "am-thuc" },
+    category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
     tags: [
       { tag: { name: "Ăn vặt", slug: "an-vat" } },
       { tag: { name: "Hà Nội", slug: "ha-noi" } },
@@ -86,7 +86,7 @@ describe("PostsService.list", () => {
         viewCount: 12,
         commentCount: 3,
         author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null },
-        category: { name: "Ẩm thực", slug: "am-thuc" },
+        category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
         tags: [
           { name: "Ăn vặt", slug: "an-vat" },
           { name: "Hà Nội", slug: "ha-noi" },
@@ -208,7 +208,7 @@ describe("PostsService.getBySlug", () => {
       username: "lananh",
       image: null,
     });
-    expect(post.category).toEqual({ name: "Ẩm thực", slug: "am-thuc" });
+    expect(post.category).toEqual({ name: "Ẩm thực", slug: "am-thuc", color: "rose" });
   });
 });
 
