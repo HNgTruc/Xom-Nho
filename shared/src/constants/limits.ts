@@ -10,6 +10,8 @@ export const LIMITS = {
   USER_NAME_MIN: 2,
   USER_NAME_MAX: 50,
   USER_BIO_MAX: 500,
+  /** Username tự sinh từ tên: chỉ a-z, 0-9 */
+  USERNAME_MAX: 20,
   URL_MAX: 500,
 
   POST_TITLE_MIN: 5,
@@ -20,4 +22,8 @@ export const LIMITS = {
 
   CATEGORY_NAME_MAX: 50,
   TAG_NAME_MAX: 30,
+  /** Số tag gợi ý tối đa khi gõ (`GET /tags?q=`) */
+  TAG_SUGGEST_MAX: 10,
+
+  SEARCH_QUERY_MAX: 100,
 } as const;

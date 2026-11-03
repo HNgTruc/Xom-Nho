@@ -1,0 +1,115 @@
+import { describe, expect, it } from "vitest";
+import { slugify } from "../utils/slugify.js";
+import {
+  pathIdSchema,
+  pathSlugSchema,
+  pathUsernameSchema,
+  slugSchema,
+  usernameSchema,
+} from "./common.js";
+import { listPostsQuerySchema } from "./post.js";
+import { searchQuerySchema } from "./search.js";
+import { tagSuggestQuerySchema } from "./tag.js";
+
+describe("slugSchema", () => {
+  it("nhận mọi slug do slugify tạo từ tiếng Việt", () => {
+    for (const title of ["Đồ ăn ngon ở Hà Nội!", "Bàn tròn cuối tuần", "Ăn vặt 2026"]) {
+      expect(slugSchema.safeParse(slugify(title)).success).toBe(true);
+    }
+  });
+
+  it("đổi sang chữ thường và bỏ khoảng trắng thừa", () => {
+    expect(slugSchema.parse("  Ban-Tron ")).toBe("ban-tron");
+  });
+
+  it.each(["", "ban tron", "ban--tron", "-ban", "bàn-tròn", "../admin", "a".repeat(221)])(
+    "từ chối %j",
+    (value) => {
+      expect(slugSchema.safeParse(value).success).toBe(false);
+    },
+  );
+});
+
+describe("usernameSchema", () => {
+  it("nhận chữ thường và số", () => {
+    expect(usernameSchema.parse("LanAnh2")).toBe("lananh2");
+  });
+
+  it.each(["lan-anh", "lan anh", "lân", "a".repeat(21)])("từ chối %j", (value) => {
+    expect(usernameSchema.safeParse(value).success).toBe(false);
+  });
+});
+
+describe("schema đường dẫn (pathSlugSchema, pathUsernameSchema, pathIdSchema)", () => {
+  it("nhận đúng dạng chuẩn", () => {
+    expect(pathSlugSchema.safeParse(slugify("Bàn tròn cuối tuần")).success).toBe(true);
+    expect(pathUsernameSchema.safeParse("lananh2").success).toBe(true);
+    expect(pathIdSchema.safeParse("cmh3x9k2a0000qz8l5v7f1b2c").success).toBe(true);
+  });
+
+  it.each(["Ban-Tron", " ban-tron", "ban-tron ", "ban tron"])(
+    "slug không đổi chữ hoa hay cắt khoảng trắng: từ chối %j",
+    (value) => {
+      expect(pathSlugSchema.safeParse(value).success).toBe(false);
+    },
+  );
+
+  it.each(["LanAnh", " lananh", "lan-anh"])("username: từ chối %j", (value) => {
+    expect(pathUsernameSchema.safeParse(value).success).toBe(false);
+  });
+
+  it.each(["", "a b", "../x", "x".repeat(65)])("id: từ chối %j", (value) => {
+    expect(pathIdSchema.safeParse(value).success).toBe(false);
+  });
+});
+
+describe("listPostsQuerySchema", () => {
+  it("query trống thì trang 1, 10 bài, sắp mới nhất", () => {
+    expect(listPostsQuerySchema.parse({})).toEqual({ page: 1, pageSize: 10, sort: "new" });
+  });
+
+  it("ép chuỗi từ URL sang số và giữ bộ lọc", () => {
+    expect(
+      listPostsQuerySchema.parse({ page: "3", sort: "top", category: "doi-song", tag: "an-vat" }),
+    ).toEqual({ page: 3, pageSize: 10, sort: "top", category: "doi-song", tag: "an-vat" });
+  });
+
+  it("bộ lọc rỗng từ URL coi như không lọc", () => {
+    const query = listPostsQuerySchema.parse({ category: "", tag: "", author: "" });
+
+    expect(query.category).toBeUndefined();
+    expect(query.tag).toBeUndefined();
+    expect(query.author).toBeUndefined();
+  });
+
+  it("từ chối cách sắp xếp lạ bằng câu tiếng Việt", () => {
+    const result = listPostsQuerySchema.safeParse({ sort: "random" });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("Cách sắp xếp không hợp lệ");
+  });
+
+  it("từ chối pageSize quá 50", () => {
+    expect(listPostsQuerySchema.safeParse({ pageSize: "51" }).success).toBe(false);
+  });
+});
+
+describe("searchQuerySchema", () => {
+  it("giữ nguyên dấu trong từ khóa (backend mới bỏ dấu), chỉ cắt khoảng trắng", () => {
+    expect(searchQuerySchema.parse({ q: "  Đồ ăn  " }).q).toBe("Đồ ăn");
+  });
+
+  it("không có q thì q rỗng, không báo lỗi", () => {
+    expect(searchQuerySchema.parse({})).toEqual({ page: 1, pageSize: 10, q: "" });
+  });
+
+  it("từ chối từ khóa dài quá 100 ký tự", () => {
+    expect(searchQuerySchema.safeParse({ q: "a".repeat(101) }).success).toBe(false);
+  });
+});
+
+describe("tagSuggestQuerySchema", () => {
+  it("không có q thì q rỗng", () => {
+    expect(tagSuggestQuerySchema.parse({})).toEqual({ q: "" });
+  });
+});
