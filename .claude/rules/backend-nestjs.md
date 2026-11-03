@@ -19,3 +19,4 @@ paths:
 - Không `console.log`; dùng logger trong `infrastructure/logger`.
 - Đăng ký module mới trong `app.module.ts`.
 - Thêm/đổi endpoint: cập nhật `docs/api.md` và `shared/src/api-client` trong cùng thay đổi.
+- Đổi endpoint đang có trong `/api/v1`: theo mục "Quy tắc thay đổi API v1" trong `docs/api.md`; thay đổi phá vỡ client cũ thì làm ở `/api/v2`.

@@ -43,28 +43,68 @@ Interceptor (`common/interceptors/response.interceptor.ts`) bọc `data`/`meta`;
 
 **Phiên bản**: đổi định dạng theo kiểu phá vỡ frontend cũ (nhất là app đã cài trên điện thoại) thì tạo `/api/v2`, không sửa `/api/v1` đang chạy.
 
+### Quy tắc thay đổi API v1
+
+Kiểu trong `shared` chỉ bảo vệ lúc build. App đã cài trên điện thoại vẫn chạy code cũ và có thể không được cập nhật trong nhiều tháng. Vì vậy mọi thay đổi trong `/api/v1` phải để client cũ chạy tiếp được.
+
+**Được làm (không phá client cũ):**
+
+- Thêm trường mới vào phản hồi.
+- Thêm query hoặc trường body **tùy chọn**, có giá trị mặc định giữ nguyên hành vi cũ.
+- Thêm endpoint mới.
+- Thêm giá trị mới vào enum trả về (`sort`, `status`, `role`...), với điều kiện client đã xử lý giá trị lạ (xem bên dưới).
+- Nới giới hạn kiểm tra dữ liệu vào (ví dụ tăng độ dài tối đa).
+
+**Không được làm (phải tạo `/api/v2`):**
+
+- Đổi tên, xóa, đổi kiểu một trường đã trả về (kể cả đổi `string` thành `string | null`).
+- Đổi ý nghĩa một trường hoặc một query đang có.
+- Biến query hoặc trường body tùy chọn thành bắt buộc, hoặc siết giới hạn kiểm tra.
+- Đổi định dạng `{ data, meta }`, `{ error }`, hoặc mã lỗi của một tình huống đã có.
+- Đổi đường dẫn, method, hoặc mã HTTP thành công (`200`, `204`) của endpoint đang có.
+
+**Client phải chịu được thay đổi:**
+
+- Bỏ qua trường không biết trong phản hồi.
+- Gặp giá trị enum lạ thì có nhánh mặc định (hiện như giá trị trung tính, không crash). Trên mobile, đây là điều kiện để thêm giá trị enum mới.
+- Không dựa vào thứ tự trường hay số phần tử cố định trong mảng.
+
+**Khi cần bỏ một thứ cũ:** thêm cái mới bên cạnh, đánh dấu cái cũ là "sắp bỏ" (comment `@deprecated` trong `shared`, ghi chú ở bảng endpoint), chờ bản app mới đủ phổ biến rồi mới xóa ở `/api/v2`.
+
+**Ví dụ đã tính sẵn:** muốn chuyển app sang cuộn bằng con trỏ thì thêm `?cursor=` tùy chọn cạnh `page` (được làm). Đổi `page` thành `cursor` thì không được làm.
+
 ## Dành cho web và mobile-app
 
 ### Bài viết (`modules/posts`)
 
-| Method | Đường dẫn                                   |     | Mô tả                                                            |
-| ------ | ------------------------------------------- | --- | ---------------------------------------------------------------- |
-| GET    | `/posts?page=&category=&tag=&sort=new\|top` | 🌐  | Danh sách bài đã đăng                                            |
-| GET    | `/posts/:slug`                              | 🌐  | Chi tiết bài (Markdown thô). Bài chưa đăng: chỉ tác giả xem được |
-| POST   | `/posts/:id/view`                           | 🌐  | Tăng lượt xem                                                    |
-| POST   | `/posts`                                    | 🔒  | Tạo bài. Body: `createPostSchema`                                |
-| PATCH  | `/posts/:id`                                | 🔒  | Sửa bài của mình. Body: `updatePostSchema`                       |
-| DELETE | `/posts/:id`                                | 🔒  | Xóa bài của mình                                                 |
-| GET    | `/me/posts?status=`                         | 🔒  | Bài của tôi, mọi trạng thái                                      |
+| Method | Đường dẫn                                           |     | Mô tả                                                                                          |
+| ------ | --------------------------------------------------- | --- | ---------------------------------------------------------------------------------------------- |
+| GET    | `/posts?page=&category=&tag=&author=&sort=new\|top` | 🌐  | Danh sách bài đã đăng. Query: `listPostsQuerySchema` (`author` là username)                    |
+| GET    | `/posts/:slug`                                      | 🌐  | Chi tiết bài (Markdown thô). Bài chưa đăng: chỉ tác giả và admin xem được, người khác nhận 404 |
+| POST   | `/posts/:id/view`                                   | 🌐  | Tăng lượt xem. Trả 204. Frontend gọi một lần mỗi phiên cho mỗi bài                             |
+| POST   | `/posts`                                            | 🔒  | Tạo bài. Body: `createPostSchema`                                                              |
+| PATCH  | `/posts/:id`                                        | 🔒  | Sửa bài của mình. Body: `updatePostSchema`                                                     |
+| DELETE | `/posts/:id`                                        | 🔒  | Xóa bài của mình                                                                               |
+| GET    | `/me/posts?status=`                                 | 🔒  | Bài của tôi, mọi trạng thái                                                                    |
 
-`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { name, username, image }, category { name, slug }, tags [{ name, slug }]`.
-`PostDetail`: `PostListItem` + `content, status, rejectReason?, updatedAt`.
+`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { id, name, username, image }, category { name, slug }, tags [{ name, slug }]`. `commentCount` chỉ đếm bình luận đang hiện. `author.id` để frontend so với `Me.id`.
+`PostDetail`: `PostListItem` + `content, status, rejectReason, updatedAt`. `rejectReason` là `null` trừ khi bài bị từ chối.
+
+Đường dẫn khớp chính xác: `:slug` (bài, tag) và `:username` phải đúng dạng chuẩn (chữ thường, không khoảng trắng). Sai dạng, kể cả viết hoa (`/posts/Moi-Nhat`), trả 404 như không có, không phải 400: mỗi trang chỉ có một URL. `:id` sai dạng (quá 64 ký tự, có ký tự lạ) cũng trả 404. Bộ lọc trong query (`?category=`, `?tag=`, `?author=`) thì dễ dãi hơn: tự cắt khoảng trắng, đổi chữ thường.
+
+Cache của `GET /posts/:slug`: mọi phản hồi (cả 404) có `Vary: Cookie`; bài chưa đăng có thêm `Cache-Control: private, no-store` để CDN hay trình duyệt không lưu bản nháp rồi đưa cho người khác.
+
+`sort=top` sắp theo `viewCount`, không có index (cột bị ghi mỗi lượt xem, thêm index thì ghi chậm). MySQL sắp mọi bài đã đăng mỗi lần gọi: ổn với vài nghìn bài, xem lại ở giai đoạn 7. Lượt xem chưa giới hạn tần suất (xem mục Giới hạn tần suất) nên tab "Nhiều người đọc" dễ bị đẩy số tới khi làm giai đoạn 4.
+
+Kiểu khai báo ở `shared/src/types/post.ts`, `user.ts`, `tag.ts`; schema query ở `shared/src/schemas/post.ts`, `search.ts`, `tag.ts`.
 
 ### Tìm kiếm (`modules/search`)
 
-| Method | Đường dẫn                    |     | Mô tả                                                       |
-| ------ | ---------------------------- | --- | ----------------------------------------------------------- |
-| GET    | `/search?q=&category=&page=` | 🌐  | Tìm theo tiêu đề, tóm tắt, tag; có dấu / không dấu đều được |
+| Method | Đường dẫn                    |     | Mô tả                                                                                   |
+| ------ | ---------------------------- | --- | --------------------------------------------------------------------------------------- |
+| GET    | `/search?q=&category=&page=` | 🌐  | Tìm theo tiêu đề, tóm tắt, tag; có dấu / không dấu đều được. Query: `searchQuerySchema` |
+
+Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng mức thì mới nhất trước). Mọi từ đều phải có trong bài. Ký tự ngoài chữ và số (kể cả toán tử boolean của MySQL) bị bỏ. `q` rỗng, hoặc chỉ có ký tự đặc biệt, trả danh sách rỗng, không truy vấn database. `api.search.posts` trả rỗng ngay mà không gọi backend. Cách tìm: `docs/co-so-du-lieu.md`, mục Tìm kiếm tiếng Việt.
 
 ### Bình luận (`modules/comments`)
 
@@ -77,15 +117,20 @@ Interceptor (`common/interceptors/response.interceptor.ts`) bọc `data`/`meta`;
 
 ### Danh mục, tag, người dùng
 
-| Method | Đường dẫn          |     | Mô tả                                                                                                |
-| ------ | ------------------ | --- | ---------------------------------------------------------------------------------------------------- |
-| GET    | `/categories`      | 🌐  | Tất cả danh mục, kèm số bài                                                                          |
-| GET    | `/tags?q=`         | 🌐  | Gợi ý tag khi gõ (tối đa 10)                                                                         |
-| GET    | `/users/:username` | 🌐  | Hồ sơ công khai + bài đã đăng                                                                        |
-| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                       |
-| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                            |
-| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút) |
+| Method | Đường dẫn          |     | Mô tả                                                                                                 |
+| ------ | ------------------ | --- | ----------------------------------------------------------------------------------------------------- |
+| GET    | `/categories`      | 🌐  | Tất cả danh mục, kèm số bài                                                                           |
+| GET    | `/tags?q=`         | 🌐  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất |
+| GET    | `/tags/:slug`      | 🌐  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404             |
+| GET    | `/users/:username` | 🌐  | Hồ sơ công khai (`PublicProfile`). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404 |
+| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                        |
+| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                             |
+| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)  |
 
+`Tag`: `id, name, slug`.
+`PublicProfile`: `id, name, username, image, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
+
+Ràng buộc `username` trong `shared` (chỉ a-z, 0-9, tối đa 20 ký tự) hẹp hơn cột `user.username` (50 ký tự). Sau này cho người dùng tự đặt username theo quy tắc rộng hơn thì phải nới schema cùng lúc, nếu không `?author=` và `/users/:username` sẽ từ chối username hợp lệ. Nới ra là được phép trong v1, siết lại thì không.
 `Me`: `id, name, email, username, image, bio, role, createdAt`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
 
 ### Đăng nhập (`/api/auth/*`, Better Auth)
@@ -169,5 +214,6 @@ Phần đổi vai trò và cấm có thể dùng API của plugin admin trong Be
 - Đăng nhập/đăng ký: giới hạn sẵn của Better Auth.
 - Tạo bài: tối đa 5 bài/giờ với `user`.
 - Bình luận: tối đa 1 bình luận / 10 giây / người.
+- Lượt xem (`POST /posts/:id/view`): hiện chưa giới hạn, ai gọi lặp cũng tăng được. Khi làm `infrastructure/rate-limit` (giai đoạn 4), giới hạn theo IP + bài (ví dụ 1 lần / 30 phút).
 
 Giai đoạn đầu lưu bộ đếm trong bộ nhớ (`infrastructure/rate-limit`); khi chạy nhiều instance thì chuyển sang MySQL hoặc Redis.
