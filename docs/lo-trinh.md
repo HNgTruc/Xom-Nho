@@ -44,8 +44,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] `modules/auth`: `GET /me`, `PATCH /me`
 - [x] Web: đăng ký, đăng nhập email, chuyển tiếp cookie trong Server Components
 - [x] Admin: trang đăng nhập, chặn người không phải admin
-- [ ] Mobile: plugin Expo, đăng nhập email, nhớ phiên (đã code, Metro bundle được; chờ thử trên điện thoại)
-- [ ] Google + GitHub trên web, rồi trên mobile (đã code, nút tự ẩn khi thiếu khóa; cần tạo khóa OAuth để thử)
+- [x] Mobile: plugin Expo, đăng nhập email, nhớ phiên
+- [x] Google + GitHub trên web (đã thử với khóa thật)
 
 **Xong khi:** cùng một tài khoản đăng nhập được ở cả 3 frontend; tài khoản thường không vào được admin.
 
@@ -86,4 +86,5 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Rà soát hiệu năng (agent `kiem-tra-hieu-nang`)
 - [ ] Ảnh chụp màn hình, GIF demo trong README
 - [ ] Deploy: backend + MySQL, web, admin (tên miền con riêng)
+- [ ] Thử đăng nhập Google/GitHub trên app (cần backend có địa chỉ công khai; code và test e2e đã có từ giai đoạn 2, xem `thiet-lap-moi-truong.md` mục 6)
 - [ ] Build app bằng EAS (tùy chọn)

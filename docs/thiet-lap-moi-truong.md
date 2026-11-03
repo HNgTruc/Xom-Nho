@@ -73,6 +73,15 @@ pnpm dev              # tất cả
 | http://localhost:3000               | Web                                                    |
 | http://localhost:5173               | Admin (đăng nhập bằng tài khoản trưởng xóm trong seed) |
 
+Mỗi lúc chỉ chạy một lệnh `pnpm dev…`. App nào không mở được cổng (đang có tiến trình khác giữ) thì dừng và báo lỗi, các app còn lại vẫn chạy (`--continue` trong script). Trên Windows, `Ctrl+C` đôi khi để sót tiến trình Next.js/Nest chạy ngầm; tìm và tắt tiến trình đang giữ cổng (ví dụ 3000):
+
+```powershell
+Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object OwningProcess
+Stop-Process -Id <số OwningProcess>
+```
+
+Hoặc đóng hẳn VS Code rồi mở lại.
+
 Tài khoản mẫu sau khi chạy seed (chỉ ở máy dev), mật khẩu đều là `xomnho123`:
 
 | Email                    | Vai trò              |
@@ -120,7 +129,38 @@ Tài khoản có mật khẩu (đăng ký bằng email) thì dùng gọn hơn: `
 
 IP có thể đổi khi bạn đổi mạng; nếu app báo lỗi mạng, kiểm tra lại bước 2 và 3. Không vào được dù đã làm đủ: thử `npx expo start --tunnel`.
 
-## 6. Claude Code
+## 6. Đăng nhập Google, GitHub (không bắt buộc)
+
+Không có khóa thì nút "Tiếp tục với Google/GitHub" tự ẩn, mọi thứ khác vẫn chạy. Khóa chỉ đặt trong `backend/.env` (không đặt ở frontend). Đường dẫn quay về luôn là **backend**, không phải web: `http://localhost:4000/api/auth/callback/<google|github>`.
+
+### GitHub
+
+1. Vào https://github.com/settings/developers → **OAuth Apps** → **New OAuth App**.
+2. Điền:
+   - Application name: `Xóm Nhỏ (dev)`
+   - Homepage URL: `http://localhost:3000`
+   - Authorization callback URL: `http://localhost:4000/api/auth/callback/github`
+3. Bấm **Register application**, rồi **Generate a new client secret**. Secret chỉ hiện một lần.
+4. Trong `backend/.env`: `GITHUB_CLIENT_ID=<Client ID>`, `GITHUB_CLIENT_SECRET=<Client secret>`.
+
+### Google
+
+1. Vào https://console.cloud.google.com, tạo project (ví dụ `xom-nho-dev`).
+2. **APIs & Services** → **OAuth consent screen**: chọn **External**, điền tên app và email; ở mục **Test users** thêm email Google bạn sẽ dùng để thử (app ở chế độ thử chỉ cho các email này đăng nhập).
+3. **Credentials** → **Create credentials** → **OAuth client ID** → loại **Web application**:
+   - Authorized JavaScript origins: `http://localhost:3000`
+   - Authorized redirect URIs: `http://localhost:4000/api/auth/callback/google`
+4. Trong `backend/.env`: `GOOGLE_CLIENT_ID=<Client ID>`, `GOOGLE_CLIENT_SECRET=<Client secret>`.
+
+### Sau khi điền khóa
+
+- Khởi động lại backend (`Ctrl+C`, chạy lại `pnpm dev`): khóa chỉ được đọc lúc khởi động. Mở http://localhost:3000/dang-nhap thấy nút mới là đúng.
+- Cùng email với tài khoản đã có thì Google/GitHub được gộp vào tài khoản đó (không tạo tài khoản mới). Tài khoản GitHub ẩn email công khai vẫn đăng nhập được: Better Auth hỏi email qua quyền `user:email`.
+- **App điện thoại khi dev**: đăng nhập Google/GitHub **không thử được** với cấu hình trên. Đường dẫn quay về là `BETTER_AUTH_URL` = `http://localhost:4000`, mà trên điện thoại `localhost` là chính điện thoại, nên sau khi bấm Authorize trình duyệt không quay về được backend. Google cũng không nhận đường dẫn quay về dạng IP nội bộ (`192.168.x.x`). Muốn thử trên điện thoại cần backend có địa chỉ HTTPS công khai (deploy, hoặc tunnel như ngrok/Cloudflare Tunnel): đặt `BETTER_AUTH_URL` thành địa chỉ đó, thêm `<địa chỉ>/api/auth/callback/<google|github>` vào app OAuth, và trỏ `EXPO_PUBLIC_API_URL` về cùng địa chỉ. Phần còn lại đã sẵn: trình duyệt trong app mở trang Google/GitHub rồi quay lại app (Expo Go dùng `exp://...`, backend tin khi không chạy production; bản build dùng `xomnho://`). Đăng nhập email trên app không bị ảnh hưởng.
+- Lỗi `redirect_uri_mismatch` (Google) hoặc "The redirect_uri is not associated" (GitHub): đường dẫn quay về đăng ký trên trang nhà cung cấp lệch với `BETTER_AUTH_URL` + `/api/auth/callback/...`. Kiểm tra từng ký tự, kể cả `http` và cổng.
+- Khi deploy: tạo app OAuth riêng cho production với tên miền thật, không dùng chung khóa dev.
+
+## 7. Claude Code
 
 - Mở Claude Code ở thư mục gốc repo. Nó tự đọc `CLAUDE.md` và `.claude/`.
 - Muốn ghi chú riêng cho máy mình: đổi tên `CLAUDE.local.md.example` thành `CLAUDE.local.md`.
