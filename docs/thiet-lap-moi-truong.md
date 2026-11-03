@@ -31,7 +31,7 @@ Mỗi phần đọc biến môi trường ở đâu:
 | admin      | `frontend/admin/.env.local` | `VITE_API_URL`                                         |
 | mobile-app | `frontend/mobile-app/.env`  | `EXPO_PUBLIC_API_URL`                                  |
 
-`.env.example` ở gốc là danh sách đầy đủ; chép phần tương ứng vào từng file. Biến có tiền tố `NEXT_PUBLIC_`, `VITE_`, `EXPO_PUBLIC_` sẽ lộ ra trình duyệt/app, không để bí mật vào đó.
+`.env.example` ở gốc là danh sách đầy đủ; chép phần tương ứng vào từng file. Bắt buộc có `backend/.env` (thiếu `DATABASE_URL` thì backend dừng ngay lúc khởi động và báo thiếu biến nào); cách nhanh nhất là `cp .env backend/.env`, biến thừa được bỏ qua. Khi chạy trên máy, web và admin không cần file riêng (mặc định gọi `http://localhost:4000`), app điện thoại tự đoán IP (xem mục 5). Biến có tiền tố `NEXT_PUBLIC_`, `VITE_`, `EXPO_PUBLIC_` sẽ lộ ra trình duyệt/app, không để bí mật vào đó.
 
 ## 3. Database
 
@@ -74,8 +74,8 @@ pnpm dev              # tất cả
 
 1. Máy tính và điện thoại **cùng một mạng Wi-Fi** (mạng trường/công ty đôi khi chặn các máy nói chuyện với nhau, khi đó dùng điểm phát từ điện thoại).
 2. Lấy IP máy tính: chạy `ipconfig`, xem dòng **IPv4 Address** của card Wi-Fi, ví dụ `192.168.1.5`.
-3. Đặt `EXPO_PUBLIC_API_URL=http://192.168.1.5:4000` trong `frontend/mobile-app/.env`.
-4. Backend phải lắng nghe mọi địa chỉ: trong `backend/src/main.ts` dùng `app.listen(port, "0.0.0.0")`.
+3. Thường **không cần** bước này: không có `EXPO_PUBLIC_API_URL` thì app lấy IP của máy đang chạy Metro (chính là máy chạy backend) và gọi cổng 4000 (`src/lib/api-url.ts`). Chỉ khi máy có nhiều card mạng và app đoán sai IP (màn hình hiện địa chỉ đang gọi), đặt `EXPO_PUBLIC_API_URL=http://192.168.1.5:4000` trong `frontend/mobile-app/.env`.
+4. Backend đã lắng nghe mọi địa chỉ (`app.listen(port, "0.0.0.0")` trong `backend/src/main.ts`), không cần sửa.
 5. Mở cổng trên Windows Firewall (chạy PowerShell **với quyền Administrator**, chỉ cần một lần):
 
    ```powershell
@@ -86,7 +86,7 @@ pnpm dev              # tất cả
    Mạng Wi-Fi trong Windows phải đặt là **Private network**.
 
 6. Kiểm tra: mở trình duyệt trên điện thoại, vào `http://192.168.1.5:4000/api/v1/health`. Thấy JSON là thông.
-7. `pnpm dev:mobile` (hoặc `pnpm --filter mobile-app start` khi backend đã chạy), quét QR bằng Expo Go (Android) hoặc Camera (iPhone).
+7. `pnpm dev:mobile` (hoặc `pnpm --filter mobile-app start` khi backend đã chạy), quét QR bằng Expo Go (Android) hoặc Camera (iPhone). Expo Go trên điện thoại phải hỗ trợ đúng SDK của app (xem `expo` trong `frontend/mobile-app/package.json`); cập nhật Expo Go nếu nó báo không tương thích. Phím tắt của Expo (`r` tải lại, `j` mở debugger) chỉ dùng được khi chạy `pnpm --filter mobile-app start` riêng, không qua turbo.
 
 IP có thể đổi khi bạn đổi mạng; nếu app báo lỗi mạng, kiểm tra lại bước 2 và 3. Không vào được dù đã làm đủ: thử `npx expo start --tunnel`.
 

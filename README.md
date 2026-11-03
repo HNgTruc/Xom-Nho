@@ -46,13 +46,18 @@ TypeScript · NestJS · Prisma · MySQL · Better Auth · Next.js · React + Vit
 Cần: Node.js 22+, pnpm, Docker Desktop, app Expo Go trên điện thoại.
 
 ```bash
-cp .env.example .env            # rồi điền giá trị
+cp .env.example .env            # rồi điền mật khẩu MySQL
+cp .env backend/.env            # backend đọc DATABASE_URL, CORS_ORIGINS từ đây
 docker compose up -d            # MySQL :3307, Adminer http://localhost:8080
-pnpm install
+pnpm install                    # tự sinh Prisma client
 pnpm --filter backend db:migrate
 pnpm --filter backend db:seed
-pnpm dev                        # backend :4000, web :3000, admin :5173, Expo
+pnpm dev                        # backend :4000, web :3000, admin :5173, Expo :8081
 ```
+
+Mở http://localhost:3000 (web) và http://localhost:5173 (admin): thấy "Đã kết nối backend" là cả hệ thống đã nói chuyện được với nhau. App điện thoại: quét mã QR của Expo bằng Expo Go, cùng Wi-Fi với máy tính. Web và admin không cần file `.env` riêng khi chạy trên máy (mặc định gọi `http://localhost:4000`).
+
+Kiểm tra trước khi commit: `pnpm lint && pnpm typecheck && pnpm test` (GitHub Actions chạy đúng ba lệnh này mỗi lần push).
 
 Chi tiết cho Windows và chạy app qua Wi-Fi: [docs/thiet-lap-moi-truong.md](docs/thiet-lap-moi-truong.md).
 

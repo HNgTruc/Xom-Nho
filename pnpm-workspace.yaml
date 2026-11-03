@@ -7,8 +7,14 @@ packages:
 # Một phiên bản cho công cụ dùng chung giữa các package. Package khai báo "catalog:" thay vì số bản.
 catalog:
   "@types/node": ^24.19.2
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
   "@vitest/coverage-v8": ^5.1.0
   oxlint: ^1.90.0
+  # web, admin và ui phải cùng một bản React: component của ui import react từ thư mục ui
+  react: ^19.3.1
+  react-dom: ^19.3.1
+  tailwindcss: ^4.3.3
   typescript: ~6.0.3
   vitest: ^5.1.0
 

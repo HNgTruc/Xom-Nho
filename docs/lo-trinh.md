@@ -13,12 +13,13 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] `shared`: package.json, tsconfig, `src/index.ts`
 - [x] `ui`: package.json, `tokens/`, `styles/theme.css`, shadcn init, vài component đầu tiên
 - [x] `backend`: `nest new`, cổng 4000, endpoint `GET /api/v1/health`
-- [ ] `frontend/web`: `create-next-app`, import theme từ `ui`
-- [ ] `frontend/admin`: Vite React TS, Tailwind, React Router, import theme từ `ui`
-- [ ] `frontend/mobile-app`: `create-expo-app`, `src/theme` đọc token từ `ui`
-- [ ] Mỗi package có script `dev`, `build`, `lint`, `typecheck`, `test` để `turbo` chạy được
-- [ ] `pnpm dev` chạy được cả 4, mỗi frontend gọi được `/api/v1/health`
-- [ ] GitHub Actions: lint + typecheck + test mỗi lần push
+- [x] `frontend/web`: `create-next-app`, import theme từ `ui`
+- [x] `frontend/admin`: Vite React TS, Tailwind, React Router, import theme từ `ui`
+- [x] `frontend/mobile-app`: `create-expo-app`, `src/theme` đọc token từ `ui`
+- [x] Mỗi package có script `dev`, `build`, `lint`, `typecheck`, `test` để `turbo` chạy được (`ui` không có `dev`/`build` vì xuất thẳng TS; mobile không có `build`, build app bằng EAS ở giai đoạn 7)
+- [x] `pnpm dev` chạy được cả 4, mỗi frontend gọi được `/api/v1/health`
+- [ ] GitHub Actions: lint + typecheck + test mỗi lần push (đã viết `.github/workflows/ci.yml`, chờ lần push đầu chạy xanh)
+- [ ] Kiểm tra app trên điện thoại thật bằng Expo Go (đã bundle thử Android thành công; cần quét QR trên máy thật)
 - [x] Commit đầu tiên lên GitHub
 
 **Xong khi:** clone repo về máy khác, làm theo README là thấy cả 4 phần chạy và nói chuyện được với backend.

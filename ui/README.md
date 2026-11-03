@@ -17,7 +17,7 @@ import { Button } from "@xom-nho/ui/components/button";
 @import "@xom-nho/ui/styles/theme.css";
 ```
 
-`theme.css` đã gồm `@import "tailwindcss"`, nên app không import Tailwind lần nữa. Font do app tự nạp (web: `next/font` với `variable: "--font-be-vietnam-pro"` và `"--font-lora"`; admin: `@fontsource`); không có biến thì theme rơi về tên font. Chế độ tối bật bằng class `dark` trên phần tử gốc.
+`theme.css` đã gồm `@import "tailwindcss"`, nên app không import Tailwind lần nữa. Nó cũng import `shadcn/tailwind.css`, vì vậy `shadcn` nằm trong `dependencies` (không phải `devDependencies`) dù cũng là CLI. Font do app tự nạp (web: `next/font` với `variable: "--font-be-vietnam-pro"` và `"--font-lora"`; admin: `@fontsource`); không có biến thì theme rơi về tên font. Chế độ tối bật bằng class `dark` trên phần tử gốc.
 
 Không có bước build: Next.js (`transpilePackages: ["@xom-nho/ui"]`), Vite và Metro đọc thẳng TypeScript.
 

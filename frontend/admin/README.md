@@ -1,20 +1,26 @@
 # frontend/admin
 
-Trang quản trị Xóm Nhỏ (React + Vite). Chưa khởi tạo, xem giai đoạn 0 trong [docs/lo-trinh.md](../../docs/lo-trinh.md).
+Trang quản trị Xóm Nhỏ: React 19 + Vite 8, React Router 8 (data router), TanStack Query, Tailwind CSS v4 qua theme của `@xom-nho/ui`. Quy ước code: [CLAUDE.md](CLAUDE.md).
 
-## Khởi tạo
-
-Chạy trong `frontend/`:
+## Chạy
 
 ```bash
-pnpm create vite@latest admin-tmp --template react-ts
-cp -r admin-tmp/. admin/
-rm -rf admin-tmp
+pnpm dev:admin                   # backend + admin, http://localhost:5173
+pnpm --filter admin build
+pnpm --filter admin typecheck
+pnpm --filter admin lint
 ```
 
-Sau đó:
+Biến môi trường (`.env.local`, không bắt buộc khi chạy trên máy):
 
-1. `package.json`: `"name": "admin"`, thêm `"@xom-nho/shared": "workspace:*"`, `"@xom-nho/ui": "workspace:*"`.
-2. Cài: React Router, TanStack Query, TanStack Table, Tailwind CSS v4 (plugin Vite).
-3. `vite.config.ts`: cổng `5173`, alias `@` → `src`.
-4. Dựng thư mục theo [CLAUDE.md](CLAUDE.md).
+| Biến           | Mặc định                | Ghi chú                                                              |
+| -------------- | ----------------------- | -------------------------------------------------------------------- |
+| `VITE_API_URL` | `http://localhost:4000` | Công khai. Origin của admin phải có trong `CORS_ORIGINS` của backend |
+
+## Ghi chú cài đặt
+
+- Tạo bằng `create-vite@9.3.3 --template react-ts` ở thư mục tạm rồi chép vào. Đổi TypeScript 7 của template về bản 6 dùng chung (catalog), bật `strict` qua `tsconfig.base.json` ở gốc.
+- Tailwind qua plugin `@tailwindcss/vite`; alias `@/*` đọc từ `tsconfig.app.json` (`resolve.tsconfigPaths` của Vite 8).
+- Font Be Vietnam Pro nạp bằng `@fontsource/be-vietnam-pro` trong `src/main.tsx`.
+- Mỗi trang lazy load qua `lazy` của route (xem `src/features/dashboard/index.ts`).
+- Còn thêm khi tới giai đoạn 5: TanStack Table, `AdminLayout`, `require-admin`.
