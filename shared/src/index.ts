@@ -21,6 +21,7 @@ export type * from "./types/post.js";
 export type * from "./types/tag.js";
 export type * from "./types/user.js";
 export * from "./types/result.js";
+export * from "./utils/format-time.js";
 export * from "./utils/remove-vietnamese-tones.js";
 export * from "./utils/slugify.js";
 export * from "./utils/safe-next.js";

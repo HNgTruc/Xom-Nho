@@ -1,44 +1,44 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@xom-nho/ui/components/card";
+import { FEED_MESSAGES } from "@xom-nho/shared";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import { BackendStatus } from "@/components/common/backend-status";
-import { getCurrentUser } from "@/features/auth";
+import { ErrorBoundary } from "@/components/common/error-state";
+import { HomeGreeting } from "@/features/auth";
+import { FeedSidebar, FeedSidebarSkeleton, HomeFeed, PostListSkeleton } from "@/features/posts";
 
-async function Greeting() {
-  // Backend không trả lời thì chào như khách; khối BackendStatus bên dưới đã báo lỗi kết nối
-  const user = await getCurrentUser().catch(() => null);
-  return (
-    <CardDescription>
-      {user
-        ? `Chào ${user.name}, hôm nay xóm có gì mới nè.`
-        : "Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện."}
-    </CardDescription>
-  );
-}
+export const metadata: Metadata = {
+  description:
+    "Bài viết mới nhất của hàng xóm: chuyện đời sống, công nghệ, học tập, kể chuyện, hỏi đáp.",
+};
 
-// Trang chủ tạm: lời chào theo người đăng nhập, kiểm tra kết nối backend. Danh sách bài làm ở giai đoạn 3.
-export default function HomePage() {
+// Bố cục MASTER mục 8: feed một cột 720px, từ 1024px thêm cột phải 300px (danh mục, tag nổi bật)
+export default function HomePage({ searchParams }: PageProps<"/">) {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Xóm Nhỏ</CardTitle>
-          <Suspense fallback={<Skeleton className="h-6 w-72" />}>
-            <Greeting />
-          </Suspense>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<Skeleton className="h-6 w-44" />}>
-            <BackendStatus />
-          </Suspense>
-        </CardContent>
-      </Card>
+    <main className="mx-auto w-full max-w-[1120px] px-4 py-8 md:px-6 md:py-12 lg:px-8">
+      <div className="mx-auto flex max-w-[720px] flex-col gap-8 lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-[minmax(0,720px)_300px] lg:justify-between">
+        <div className="flex min-w-0 flex-col gap-6">
+          <header className="flex flex-col gap-2">
+            <h1 className="text-2xl font-bold md:text-3xl">Bài viết trong xóm</h1>
+            <Suspense fallback={<Skeleton className="h-6 w-72 max-w-full" />}>
+              <HomeGreeting />
+            </Suspense>
+          </header>
+
+          <ErrorBoundary message={FEED_MESSAGES.LOAD_ERROR}>
+            <Suspense fallback={<PostListSkeleton />}>
+              <HomeFeed searchParams={searchParams} />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+
+        <aside aria-label="Danh mục và thẻ" className="hidden lg:block">
+          <div className="sticky top-20">
+            <Suspense fallback={<FeedSidebarSkeleton />}>
+              <FeedSidebar />
+            </Suspense>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

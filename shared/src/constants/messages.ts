@@ -13,3 +13,10 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   RATE_LIMITED: "Từ từ thôi bạn ơi, chờ vài giây rồi gửi tiếp.",
   INTERNAL_ERROR: "Có trục trặc bên mình. Bạn thử lại sau ít phút nhé.",
 };
+
+/** Câu của danh sách bài (trang chủ, danh mục, tag), dùng chung cho web và app. */
+export const FEED_MESSAGES = {
+  EMPTY: "Xóm còn vắng quá. Bạn mở hàng bài đầu tiên nhé?",
+  PAGE_EMPTY: "Trang này chưa có bài nào. Bạn quay về trang đầu xem sao.",
+  LOAD_ERROR: "Chưa tải được bài viết. Bạn thử lại sau ít phút nhé.",
+} as const;

@@ -40,7 +40,7 @@ Tiêu chí:
 
 Tiêu chí:
 
-- [ ] Web có thanh phân trang, URL giữ số trang (`?page=3`)
+- [x] Web có thanh phân trang, URL giữ số trang (`?page=3`)
 - [ ] App cuộn vô hạn, kéo xuống để làm mới
 - [ ] Trang trống có lời nhắn thân thiện (xem `giong-van-va-giao-dien.md`)
 
