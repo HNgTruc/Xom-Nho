@@ -8,6 +8,10 @@ import { DatabaseModule } from "./infrastructure/database/database.module.js";
 import { AuthModule } from "./modules/auth/auth.module.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
+import { PostsModule } from "./modules/posts/posts.module.js";
+import { SearchModule } from "./modules/search/search.module.js";
+import { TagsModule } from "./modules/tags/tags.module.js";
+import { UsersModule } from "./modules/users/users.module.js";
 
 @Module({
   imports: [
@@ -17,6 +21,10 @@ import { HealthModule } from "./modules/health/health.module.js";
     HealthModule,
     AuthModule,
     CategoriesModule,
+    PostsModule,
+    TagsModule,
+    UsersModule,
+    SearchModule,
   ],
   providers: [
     // Thứ tự quan trọng: AuthGuard gắn request.user trước, RolesGuard đọc sau

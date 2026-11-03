@@ -161,7 +161,7 @@ model Post {
 
   @@index([status, publishedAt(sort: Desc)])
   @@index([categoryId, status, publishedAt])
-  @@index([authorId, status])
+  @@index([authorId, status, publishedAt])
   @@fulltext([searchText])
   @@map("post")
 }

@@ -101,11 +101,13 @@ Ghi chú cài đặt:
 | ------- | ----------------------------------- | ------------------------------- |
 | Post    | `(status, publishedAt DESC)`        | Trang chủ: bài mới nhất đã đăng |
 | Post    | `(categoryId, status, publishedAt)` | Lọc theo danh mục               |
-| Post    | `(authorId, status)`                | Bài của tôi, hồ sơ              |
+| Post    | `(authorId, status, publishedAt)`   | Bài của tôi, hồ sơ (`?author=`) |
 | Post    | `FULLTEXT(searchText)`              | Tìm kiếm                        |
 | Comment | `(postId, status, createdAt)`       | Bình luận dưới bài              |
 | Comment | `(parentId)`                        | Trả lời                         |
 | PostTag | `(tagId)`                           | Lọc theo tag                    |
+
+Không có index cho `Post.viewCount` (tab "Nhiều người đọc"): cột bị ghi mỗi lượt xem. Đánh đổi có chủ ý, xem lại ở giai đoạn 7 nếu bài nhiều.
 
 ## Tìm kiếm tiếng Việt
 
@@ -115,7 +117,7 @@ Cách làm:
 
 1. Cột `Post.searchText` = tiêu đề + tóm tắt + tên tag, **chuyển chữ thường, bỏ dấu, đổi `đ` thành `d`**. Chỉ tạo bằng `buildPostSearchText` (`backend/src/modules/posts/posts.search-text.ts`, dùng `toSearchText` của `shared`), không tự ghép ở chỗ khác.
 2. `FULLTEXT` index trên `searchText`, **không dùng stopword**. Docker đặt `innodb_ft_min_token_size=1` để không bỏ sót từ ngắn như "ăn", "đi".
-3. Từ khóa người dùng gõ cũng đi qua `toSearchText`, bỏ các ký tự toán tử boolean (`+ - < > ( ) ~ * " @`), rồi tìm bằng `MATCH ... AGAINST ('+tu1 +tu2' IN BOOLEAN MODE)`.
+3. Từ khóa người dùng gõ đi qua `toBooleanQuery` (`backend/src/modules/search/search.query.ts`): `toSearchText`, đổi mọi ký tự ngoài a-z, 0-9 thành khoảng trắng (nên toán tử boolean `+ - < > ( ) ~ * " @` không lọt vào), bỏ từ trùng, rồi tìm bằng `MATCH ... AGAINST ('+tu1 +tu2' IN BOOLEAN MODE)`. Không còn từ nào thì không truy vấn.
 4. Truy vấn tìm kiếm viết bằng `$queryRaw` dạng tagged template (có tham số, không nối chuỗi).
 
 **Khi nào phải tính lại `searchText`:**
