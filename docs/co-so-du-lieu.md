@@ -113,12 +113,22 @@ Vấn đề: người dùng hay gõ không dấu ("ban tron"), và collation c�
 
 Cách làm:
 
-1. Cột `Post.searchText` = tiêu đề + tóm tắt + tên tag, **chuyển chữ thường, bỏ dấu, đổi `đ` thành `d`** (hàm `removeVietnameseTones` trong `shared`). Cập nhật mỗi khi tạo/sửa bài.
-2. `FULLTEXT` index trên `searchText`. Docker đã đặt `innodb_ft_min_token_size=1` để không bỏ sót từ ngắn như "ăn", "đi".
-3. Từ khóa người dùng gõ cũng đi qua cùng hàm bỏ dấu rồi tìm bằng `MATCH ... AGAINST (... IN BOOLEAN MODE)`.
-4. Nếu Prisma chưa hỗ trợ đủ cú pháp cần dùng, viết truy vấn tìm kiếm bằng `$queryRaw` có tham số (không nối chuỗi).
+1. Cột `Post.searchText` = tiêu đề + tóm tắt + tên tag, **chuyển chữ thường, bỏ dấu, đổi `đ` thành `d`**. Chỉ tạo bằng `buildPostSearchText` (`backend/src/modules/posts/posts.search-text.ts`, dùng `toSearchText` của `shared`), không tự ghép ở chỗ khác.
+2. `FULLTEXT` index trên `searchText`, **không dùng stopword**. Docker đặt `innodb_ft_min_token_size=1` để không bỏ sót từ ngắn như "ăn", "đi".
+3. Từ khóa người dùng gõ cũng đi qua `toSearchText`, bỏ các ký tự toán tử boolean (`+ - < > ( ) ~ * " @`), rồi tìm bằng `MATCH ... AGAINST ('+tu1 +tu2' IN BOOLEAN MODE)`.
+4. Truy vấn tìm kiếm viết bằng `$queryRaw` dạng tagged template (có tham số, không nối chuỗi).
 
-Lưu ý: `innodb_ft_min_token_size` chỉ áp dụng cho index tạo **sau** khi MySQL chạy với cấu hình đó. Nếu đổi cấu hình khi đã có index, phải tạo lại index.
+**Khi nào phải tính lại `searchText`:**
+
+| Thao tác                                     | Giai đoạn | Việc cần làm                                                                                |
+| -------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| Tạo, sửa bài (tiêu đề, tóm tắt, tag)         | 4         | Tính tóm tắt cuối cùng trước (tự lấy 160 ký tự nếu để trống), rồi gọi `buildPostSearchText` |
+| Admin gộp tag (`POST /admin/tags/:id/merge`) | 5         | Tính lại cho mọi bài gắn tag nguồn, trong cùng transaction                                  |
+| Admin xóa tag (`DELETE /admin/tags/:id`)     | 5         | Tính lại cho mọi bài gắn tag đó, trong cùng transaction                                     |
+
+**Stopword.** Danh sách stopword mặc định của InnoDB (`a, an, de, en, i, la...`) trùng với từ tiếng Việt đã bỏ dấu ("ăn", "để", "dễ", "là"). Nếu để mặc định, index bỏ qua các từ này và "do an" không tìm ra "đồ ăn". Migration `rebuild_fulltext_without_stopwords` tạo lại index với `SET SESSION innodb_ft_enable_stopword = OFF`. InnoDB ghi cách xử lý stopword vào index lúc tạo, nên index đúng trên mọi server. Docker cũng đặt `--innodb-ft-enable-stopword=OFF` để index tạo sau này (ví dụ Prisma tạo lại khi đổi cột) không dính stopword. Kiểm tra bằng `backend/test/e2e/search-fulltext.e2e-spec.ts`.
+
+**Server deploy (giai đoạn 7).** MySQL phải khởi động với `innodb_ft_min_token_size=1`. Biến này chỉ đặt được lúc khởi động, migration không thay được, và chỉ áp dụng cho index tạo **sau** khi server chạy với cấu hình đó. Nếu server có sẵn index từ trước khi đặt biến, phải tạo lại index. Nên đặt thêm `innodb_ft_enable_stopword=OFF`.
 
 ## Phân trang
 

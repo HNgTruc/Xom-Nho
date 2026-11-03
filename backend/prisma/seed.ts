@@ -2,11 +2,12 @@
  * Dữ liệu mẫu cho máy dev: `pnpm --filter backend db:seed`. Chạy lại nhiều lần được (upsert theo khóa duy nhất).
  * Mọi tài khoản mẫu đăng nhập bằng `<username>@xomnho.local` / SEED_PASSWORD (chỉ dùng ở máy dev).
  */
-import { slugify, toSearchText } from "@xom-nho/shared";
+import { slugify } from "@xom-nho/shared";
 import { hashPassword } from "better-auth/crypto";
 import { loadEnv } from "../src/config/load-env.js";
 import { type PostStatus } from "../src/generated/prisma/client.js";
 import { createPrismaClient } from "../src/infrastructure/database/create-prisma-client.js";
+import { buildPostSearchText } from "../src/modules/posts/posts.search-text.js";
 
 const env = loadEnv();
 if (env.NODE_ENV === "production") throw new Error("Không chạy seed trên production.");
@@ -190,7 +191,11 @@ async function main() {
       title,
       excerpt,
       content: contentOf(title),
-      searchText: toSearchText([title, excerpt, ...tagIndexes.map((i) => tags[i])].join(" ")),
+      searchText: buildPostSearchText({
+        title,
+        excerpt,
+        tagNames: tagIndexes.map((i) => tags[i]!),
+      }),
       status,
       rejectReason:
         status === "REJECTED" ? "Bài còn ngắn, bạn bổ sung thêm trải nghiệm thật nhé." : null,

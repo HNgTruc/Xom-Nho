@@ -22,6 +22,9 @@ services:
       # Tiếng Việt có nhiều từ 1-2 ký tự ("bà", "đi", "ăn"); mặc định FULLTEXT bỏ qua từ < 3 ký tự
       - --innodb-ft-min-token-size=1
       - --ft-min-word-len=1
+      # Stopword mặc định của InnoDB (an, de, la, i...) trùng từ tiếng Việt đã bỏ dấu (ăn, để, là...).
+      # Migration rebuild_fulltext_without_stopwords đã tạo index không stopword; cờ này giữ cho index tạo sau cũng vậy.
+      - --innodb-ft-enable-stopword=OFF
     ports:
       - "3307:3306"
     volumes:
