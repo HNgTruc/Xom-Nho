@@ -1,12 +1,12 @@
 // Bản code của docs/design-system/xom-nho/MASTER.md mục 2.4 (kính mờ). Đổi giá trị thì sửa cả MASTER và
 // styles/theme.css (test styles/theme.test.ts báo lỗi nếu lệch). Tương phản đã tính ở năm mức sáng của ảnh nền
-// sau khi làm mờ, từ chỗ tối nhất (mặt biển, bụi cây) tới chỗ sáng nhất (mây).
+// sau khi làm mờ 6px, từ chỗ tối nhất (mặt biển, bụi cây) tới chỗ sáng nhất (mây).
 
 /**
  * Các lớp kính:
  * - `shell`: khung lớn bao cả trang, làm mờ ảnh nền phía sau. Không đặt chữ thẳng lên nên rất trong.
  * - `surface`: tấm nội dung trong khung (thẻ bài, đầu trang), không làm mờ thêm.
- * - `strong`: tấm gần đặc cho chỗ đọc lâu (bài viết, form), thanh header, cột phải tối.
+ * - `strong`: tấm gần đặc cho chỗ đọc lâu (bài viết, form), thanh header, menu thả xuống.
  * - `button`: nút phụ, tab, chip: kính mỏng tự làm mờ. `primary`: nút chính, kính màu `primary`.
  */
 export const glass = {
@@ -41,4 +41,4 @@ export const glass = {
 } as const;
 
 /** Độ làm mờ (px): khung làm mờ ảnh nền, thanh header và nút kính trôi trên nội dung. Mobile: pages/mobile.md. */
-export const glassBlur = { shell: 28, bar: 16, button: 12 } as const;
+export const glassBlur = { shell: 6, bar: 10, button: 6 } as const;

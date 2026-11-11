@@ -15,7 +15,7 @@
 ## Kính mờ (MASTER 2.4)
 
 - Không dùng ảnh nền và khung kính lớn như web: bảng dày chữ nhỏ trên kính khó quét, và kính trong vùng cuộn dài tốn hiệu năng. Nền trang là `background`; bảng dữ liệu, thẻ số liệu, form dùng `Card` đặc (`bg-card`, `shadow-card`).
-- Giữ chung với web: màu nhấn đen + xanh nhạt, nút và điều hướng dạng viên thuốc, `animate-rise-in` cho thẻ số liệu. Sidebar có thể là tấm tối (`dark` + `bg-card`) như cột phải của web.
+- Giữ chung với web: màu nhấn đen + xanh nhạt, nút và điều hướng dạng viên thuốc, `animate-rise-in` cho thẻ số liệu. Sidebar có thể là tấm tối (`dark` + `bg-card`).
 
 ## Khoảng cách (density 8)
 

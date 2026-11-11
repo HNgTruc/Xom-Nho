@@ -80,39 +80,41 @@ Nền tối đặc như badge danh mục (trộn 14% trên `#18181B`). Không d�
 
 Bố cục theo mẫu tham khảo của chủ dự án (dashboard kính mờ trên ảnh nội thất): ảnh nền phủ cả màn hình, **một khung kính lớn** làm mờ ảnh, bên trong là các tấm kính. Token: `frontend/ui/src/tokens/glass.ts`; CSS: `theme.css`.
 
-**Ảnh nền**: biển và mây (`frontend/web/src/assets/backdrop/bien-may.jpg`, ảnh của Tuấn Vũ trên Pexels, giấy phép Pexels cho dùng miễn phí, không bắt buộc ghi nguồn). Hiển thị bằng `next/image` (tự sinh WebP/AVIF theo cỡ màn hình, có bản mờ khi đang tải); chế độ tối giảm sáng ảnh 25%. Sau khi làm mờ 28px, ảnh trải từ `#071111` (mặt biển, bụi cây) đến `#E3E6E2` (mây): mọi tương phản dưới đây tính ở cả năm mức (tối nhất, 5%, 50%, 95%, sáng nhất), số ghi là mức thấp nhất. **Đổi ảnh thì đo lại** (script đo bằng canvas: ghi trong mục "Nguồn và điều chỉnh").
+**Ảnh nền**: biển và mây (`frontend/web/src/assets/backdrop/bien-may.jpg`, ảnh của Tuấn Vũ trên Pexels, giấy phép Pexels cho dùng miễn phí, không bắt buộc ghi nguồn). Hiển thị bằng `next/image` (tự sinh WebP/AVIF theo cỡ màn hình, có bản mờ khi đang tải); chế độ tối giảm sáng ảnh 25%. Sau khi làm mờ 6px, ảnh trải từ `#061011` (mặt biển, bụi cây) đến `#F1F2ED` (mây): mọi tương phản dưới đây tính ở cả năm mức (tối nhất, 5%, 50%, 95%, sáng nhất), số ghi là mức thấp nhất. **Đổi ảnh thì đo lại** (script đo bằng canvas: ghi trong mục "Nguồn và điều chỉnh").
 
 | Lớp (utility)   | Sáng                               | Tối                                  | Làm mờ | Dùng cho                                                                                      |
 | --------------- | ---------------------------------- | ------------------------------------ | ------ | --------------------------------------------------------------------------------------------- |
-| `glass-shell`   | trắng 30%                          | `#09090B` 45%                        | 28px   | Khung lớn bao cả trang (`SiteShell`), rất trong. Không đặt chữ thẳng lên                      |
+| `glass-shell`   | trắng 30%                          | `#09090B` 45%                        | 6px    | Khung lớn bao cả trang (`SiteShell`), rất trong. Không đặt chữ thẳng lên                      |
 | `glass`         | trắng 75%                          | `#09090B` 68%                        | không  | Tấm trong khung: thẻ bài, đầu trang, hồ sơ, khung trống                                       |
-| `glass-strong`  | trắng 85%                          | `#09090B` 85%                        | không  | Chỗ đọc lâu: khung bài viết, cài đặt, 404/lỗi; hover của thẻ; cột phải tối                    |
-| `glass-bar`     | trắng 85%                          | `#09090B` 85%                        | 16px   | Thứ trôi trên nội dung (header dính, menu thả xuống) hoặc nằm thẳng trên ảnh (form đăng nhập) |
-| `glass-button`  | trắng 45%, hover 70%               | `#18181B` 45%, hover 70% (`#27272A`) | 12px   | Nút phụ, thanh tab, thanh phân trang, chip thẻ, nút mở menu tài khoản. Chữ dùng `foreground`  |
-| `glass-primary` | `#18181B` 82%, hover `#3F3F46` 90% | `#FAFAFA` 88%, hover `#D4D4D8` 92%   | 12px   | Nút chính, mục đang chọn (tab, điều hướng, trang hiện tại)                                    |
+| `glass-strong`  | trắng 85%                          | `#09090B` 85%                        | không  | Chỗ đọc lâu: khung bài viết, cài đặt, 404/lỗi; hover của thẻ                                  |
+| `glass-bar`     | trắng 85%                          | `#09090B` 85%                        | 10px   | Thứ trôi trên nội dung (header dính, menu thả xuống) hoặc nằm thẳng trên ảnh (form đăng nhập) |
+| `glass-button`  | trắng 45%, hover 70%               | `#18181B` 45%, hover 70% (`#27272A`) | 6px    | Nút phụ, thanh tab, thanh phân trang, chip thẻ, nút mở menu tài khoản. Chữ dùng `foreground`  |
+| `glass-primary` | `#18181B` 82%, hover `#3F3F46` 90% | `#FAFAFA` 88%, hover `#D4D4D8` 92%   | 6px    | Nút chính, mục đang chọn (tab, điều hướng, trang hiện tại)                                    |
+
+Không giảm làm mờ dưới 6px: chữ phụ trên `glass` tối đã sát 5.0, ảnh càng rõ thì chỗ mây càng sáng.
 
 Viền kính `glass-border` (trắng 55% / trắng 10%), viền hover `glass-border-hover` (`#71717A` 45% / trắng 24%), bóng `glass-shadow`, `glass-shadow-hover`, `glass-shell-shadow` (bóng lớn + vệt sáng mép trên). `glass-button` dùng viền `glass-border-hover`: viền trắng không thấy được khi nút nằm trên tấm trắng.
 
-Tương phản thấp nhất trên ảnh nền (đổi 2026-11-11: khung trong hơn theo yêu cầu, các tấm có chữ đặc hơn để bù):
+Tương phản thấp nhất trên ảnh nền (đổi 2026-11-11: khung trong hơn, làm mờ giảm từ 28px xuống 6px để ảnh rõ theo yêu cầu; tính với ảnh làm mờ 6px):
 
-| Chỗ                          | Chữ chính                              | Chữ phụ     | `link` | `input` | `ring` |
-| ---------------------------- | -------------------------------------- | ----------- | ------ | ------- | ------ |
-| `glass`, sáng                | 12.1                                   | 5.3         | 5.2    | 3.3     | 4.0    |
-| `glass-strong`, sáng         | 14.2                                   | 6.2         | 6.1    | 3.9     | 4.7    |
-| `glass`, tối                 | 12.7                                   | 5.2         | 7.9    | 3.9     | 6.2    |
-| `glass-strong`, tối          | 16.5                                   | 6.7         | 10.3   | 5.1     | 8.0    |
-| Cột phải tối trên khung sáng | 13.5                                   | 5.5         | 8.5    | 4.2     | 6.6    |
-| `glass-button`, sáng         | 7.0                                    | (không đặt) |        |         |        |
-| `glass-button`, tối          | 7.4                                    | (không đặt) |        |         |        |
-| `glass-primary`              | 10.6 / 13.1 (chữ `primary-foreground`) |             |        |         |        |
+| Chỗ                              | Chữ chính   | Chữ phụ     | `link` | `input` | `ring` |
+| -------------------------------- | ----------- | ----------- | ------ | ------- | ------ |
+| `glass`, sáng                    | 12.1        | 5.3         | 5.1    | 3.3     | 4.0    |
+| `glass-strong`, sáng             | 14.2        | 6.2         | 6.0    | 3.9     | 4.7    |
+| `glass`, tối                     | 12.3        | 5.0         | 7.7    | 3.8     | 6.0    |
+| `glass-strong`, tối              | 16.3        | 6.6         | 10.2   | 5.0     | 7.9    |
+| Tấm tối (`dark`) trên khung sáng | 13.3        | 5.4         | 8.3    | 4.1     | 6.5    |
+| `glass-button`, sáng / tối       | 7.0 / 7.0   | (không đặt) |        |         |        |
+| `glass-primary`, sáng / tối      | 10.4 / 13.1 |             |        |         |        |
 
 Quy tắc:
 
 - Không đặt chữ thẳng lên ảnh nền hay lên khung (khung chỉ còn 30%). Chữ nằm trên tấm `glass` trở lên, hoặc trên `glass-button` nếu là chữ chính (`foreground`); **chữ phụ không đặt trên `glass-button`**.
 - Nút kính tối dùng màu sẫm (`#18181B` 45%), không dùng trắng mờ: trắng 10% trên khung tối ở chỗ mây chỉ đạt 3.1.
-- **Tấm tối giữa trang sáng**: thêm class `dark` cho tấm (ví dụ cột phải `dark glass-strong text-foreground`), mọi token bên trong đổi sang bộ tối. Đã tính: chữ ≥ 13.3, chữ phụ ≥ 5.4 ở mọi chỗ ảnh.
+- **Tấm tối giữa trang sáng**: thêm class `dark` cho tấm (ví dụ `dark glass-strong text-foreground`), mọi token bên trong đổi sang bộ tối. Đã tính: chữ ≥ 13.3, chữ phụ ≥ 5.4 ở mọi chỗ ảnh.
 - Chỉ khung lớn, `glass-bar`, `glass-button`, `glass-primary` làm mờ. Tấm nội dung bên trong không làm mờ lần nữa (đỡ tốn GPU, khung đã làm mờ ảnh rồi).
-- Dự phòng: trình duyệt không có `backdrop-filter`, hoặc người dùng bật `prefers-reduced-transparency`, thì khung thành `background`, các tấm thành `card` đặc.
+- Dự phòng: trình duyệt không có `backdrop-filter`, hoặc thiết bị báo `prefers-reduced-transparency: reduce` (Windows tắt "Transparency effects"), thì khung thành `background`, các tấm thành `card` đặc.
+- Người dùng ghi đè trong **Hiển thị và trợ năng** (menu ảnh đại diện, `frontend/ui/src/lib/display-preferences.ts`): `<html data-transparency="on">` luôn hiện kính, `"off"` luôn đặc; `data-motion="reduce"` tắt chuyển động như cài đặt hệ thống; chế độ tối Tắt / Bật / Tự động đổi class `dark` trên `<html>`. Script trong `<head>` áp dụng trước khi trang vẽ.
 - Kính lồng trong kính có blur: chỉ chấp nhận thứ trôi trên nội dung (header dính, menu thả xuống) và nút kính (nhỏ).
 
 Đổi giá trị nào ở đây thì tính lại tương phản ở cả năm mức sáng của ảnh, cho cả hai chế độ, trước khi sửa token.
@@ -157,7 +159,7 @@ Nhịp 4/8. Density 5 (chuẩn): khoảng cách khối 16 đến 64.
 | `space-4` | 16px    |     | `space-16` | 64px    |
 
 - Khung lớn rộng gần hết màn hình: cách mép 8px (điện thoại), 12px (tablet), 16px (desktop), không giới hạn bề rộng. Nội dung bên trong căn giữa, tối đa 1320px; lề 12 đến 32px; cột đọc bài và cài đặt 760px.
-- Bo góc: `radius-sm` 6px (badge, ô nhập), `radius-md` 10px (khối con trong tấm), `radius-lg` 14px, `radius-xl` 20px (mọi tấm kính: thẻ bài, đầu trang, cột phải, khung bài viết), `radius-2xl` 28px (khung lớn, form đăng nhập), `radius-full` (nút, điều hướng, tab, phân trang, badge thẻ, avatar: dạng viên thuốc như mẫu).
+- Bo góc: `radius-sm` 6px (badge, ô nhập), `radius-md` 10px (khối con trong tấm), `radius-lg` 14px, `radius-xl` 20px (mọi tấm kính: thẻ bài, đầu trang, hồ sơ, khung bài viết), `radius-2xl` 28px (khung lớn, form đăng nhập), `radius-full` (nút, điều hướng, tab, phân trang, badge thẻ, avatar: dạng viên thuốc như mẫu).
 - Đổ bóng: tấm kính dùng `glass-shadow`, hover `glass-shadow-hover`; khung lớn `glass-shell-shadow`. `shadow-card` (`0 1px 2px rgb(24 24 27 / 0.06), 0 4px 12px rgb(24 24 27 / 0.06)`, chế độ tối dùng viền) giữ cho `Card` đặc của admin.
 
 ## 5. Chuyển động
@@ -173,9 +175,9 @@ Motion 5/10 (đổi từ 2/10 ngày 2026-11-11, theo mẫu tham khảo): mỗi k
 | stagger         | 60ms mỗi bậc, tối đa 8 bậc                 | Khối sau hiện trễ hơn khối trước                  |
 | easing          | `cubic-bezier(0.2, 0, 0, 1)` cho tương tác |                                                   |
 
-Thứ tự hiện ra trên trang danh sách: header (bậc 0) → đầu trang (0) → tab sắp xếp (1) → cột phải (2) → thẻ bài thứ i (bậc i + 2). Trang bài viết, form, 404: một khối, bậc 0. Dùng `animate-rise-in` và đặt `--stagger` trên chính phần tử.
+Thứ tự hiện ra trên trang danh sách: header (bậc 0) → đầu trang (0) → tab sắp xếp (1) → thẻ bài thứ i (bậc i + 2). Trang bài viết, form, 404: một khối, bậc 0. Dùng `animate-rise-in` và đặt `--stagger` trên chính phần tử.
 
-- Hover thẻ bài: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (200ms). Hover viên số trong cột phải, thẻ tag: sang nền `accent`.
+- Hover thẻ bài: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (200ms). Hover thẻ tag: chữ đậm lên và gạch chân.
 - Chỉ animate `opacity` và `transform` (`translate`, `scale`), không animate `width`/`height`.
 - Tôn trọng `prefers-reduced-motion` (web) và "Reduce Motion" (mobile): bỏ trễ, bỏ chuyển động, hiện ngay trạng thái cuối.
 - Không cuộn vô hạn có hiệu ứng nhảy; spinner chỉ dùng cho trạng thái đang tải.
@@ -219,7 +221,7 @@ Nút chính là `glass-primary`, nút viền (Secondary) là `glass-button`, nú
 
 ### Menu thả xuống
 
-- Tấm `glass-bar` bo `radius-xl`, rộng tối thiểu 208px (không ăn theo bề ngang nút mở). Mục cao ≥ 40px, chữ 16px, có biểu tượng Lucide 16px; mục đang chọn bằng bàn phím nền `accent`.
+- Tấm `glass-bar` bo `radius-xl`, rộng tối thiểu 208px (không ăn theo bề ngang nút mở). Trang con (như "Hiển thị và trợ năng") thay nội dung menu, mục đầu là nút quay lại có mũi tên; đổi trang thì đưa focus vào mục đầu. Nhóm lựa chọn dùng `DropdownMenuRadioGroup`, chọn không đóng menu. Mục cao ≥ 40px, chữ 16px, có biểu tượng Lucide 16px; mục đang chọn bằng bàn phím nền `accent`.
 
 ### Form
 
@@ -236,7 +238,7 @@ Mọi danh sách và trang dữ liệu đều có đủ: đang tải (skeleton c
 - Mobile-first. Điểm ngắt kiểm tra: 375, 768, 1024, 1440.
 - Ảnh nền cố định phủ màn hình; `SiteShell` là khung kính lớn bao header và nội dung, chừa viền ảnh quanh khung.
 - Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng danh mục (viên; mục đang xem là viên `glass-primary`), bên phải là nút Đăng nhập / Đăng ký hoặc **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai, cuộn ngang bên trong thanh.
-- Feed một cột + cột phải 320px (tấm kính tối: danh mục kèm viên số, thẻ nổi bật) từ 1024px; dưới 1024px bỏ cột phải.
+- Feed một cột ở giữa, rộng tối đa 860px, ở mọi bề rộng. Không có cột phải (bỏ ngày 2026-11-11 theo yêu cầu): danh mục đã có trên thanh điều hướng của header.
 - Tab sắp xếp và phân trang: thanh `glass-button` dạng viên thuốc, mục đang chọn là viên `glass-primary`.
 - Hồ sơ `/u/<username>`: tấm `glass` có ảnh bìa (chưa có thì dải màu `accent`), ảnh đại diện 96 đến 112px viền `card` đè lên mép ảnh bìa, tên, viên vai trò `accent`, giới thiệu, ngày tham gia, số bài; bên dưới là feed bài của người đó.
 - Không cuộn ngang trang ở bất kỳ kích thước nào (chỉ hàng điều hướng tự cuộn bên trong); không chặn phóng to.

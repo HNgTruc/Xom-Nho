@@ -225,9 +225,9 @@
   --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Độ làm mờ (tokens/glass.ts: glassBlur) */
-  --blur-glass-shell: 28px;
-  --blur-glass-bar: 16px;
-  --blur-glass-button: 12px;
+  --blur-glass-shell: 6px;
+  --blur-glass-bar: 10px;
+  --blur-glass-button: 6px;
 }
 
 /*
@@ -321,9 +321,14 @@
   }
 }
 
+/*
+ * Giảm trong suốt: theo thiết bị (`prefers-reduced-transparency`), trừ khi người dùng chọn "Luôn bật" trong
+ * Hiển thị và trợ năng (`<html data-transparency="on">`); chọn "Tắt" (`data-transparency="off"`) thì luôn đặc.
+ * Bộ chọn có `:root[...]` nên thắng khối `.dark` dù đứng trước hay sau.
+ */
 @media (prefers-reduced-transparency: reduce) {
-  :root,
-  .dark {
+  :root:not([data-transparency="on"]),
+  :root:not([data-transparency="on"]) .dark {
     --glass-shell: var(--background);
     --glass-surface: var(--card);
     --glass-strong: var(--card);
@@ -332,6 +337,17 @@
     --glass-primary: var(--primary);
     --glass-primary-hover: color-mix(in srgb, var(--primary), var(--primary-foreground) 14%);
   }
+}
+
+:root[data-transparency="off"],
+:root[data-transparency="off"] .dark {
+  --glass-shell: var(--background);
+  --glass-surface: var(--card);
+  --glass-strong: var(--card);
+  --glass-button: var(--card);
+  --glass-button-hover: var(--muted);
+  --glass-primary: var(--primary);
+  --glass-primary-hover: color-mix(in srgb, var(--primary), var(--primary-foreground) 14%);
 }
 
 @layer base {
@@ -360,4 +376,15 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Giảm chuyển động chọn trong Hiển thị và trợ năng (`<html data-motion="reduce">`): như cài đặt của thiết bị */
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] ::before,
+:root[data-motion="reduce"] ::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
