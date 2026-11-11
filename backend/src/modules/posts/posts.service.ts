@@ -1,24 +1,86 @@
 import { Injectable } from "@nestjs/common";
 import {
+  COMPOSER_MESSAGES,
+  CONTENT_FORMATS,
+  type CreatePostInput,
+  FILE_MESSAGES,
   type ListPostsQuery,
   POST_STATUSES,
   type PostDetail,
   type PostListItem,
   pathIdSchema,
   pathSlugSchema,
+  withSlugSuffix,
 } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import { paginate, type Paginated } from "../../common/types/paginated.js";
 import type { SessionUser } from "../../common/types/session-user.js";
+import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
+import { baseSlug, excerptFromContent } from "./posts.compose.js";
 import { toPostDetail, toPostListItem } from "./posts.mapper.js";
 import { PostsPolicy } from "./posts.policy.js";
 import { PostsRepository } from "./posts.repository.js";
+import { buildPostSearchText } from "./posts.search-text.js";
 
 const POST_NOT_FOUND = "Không tìm thấy bài viết này. Có thể bài đã được gỡ hoặc đường dẫn bị sai.";
+const CATEGORY_GONE = "Danh mục này không còn. Bạn chọn danh mục khác nhé.";
+
+/** 10 bài mỗi 10 phút mỗi người: thoải mái cho người thật, chặn spam. */
+const CREATE_RATE = {
+  limit: 10,
+  windowMs: 10 * 60 * 1000,
+  message: COMPOSER_MESSAGES.RATE_LIMITED,
+};
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly postsRepository: PostsRepository) {}
+  constructor(
+    private readonly postsRepository: PostsRepository,
+    private readonly rateLimiter: RateLimiter,
+  ) {}
+
+  /**
+   * Đăng bài soạn kiểu mạng xã hội (docs/tinh-nang.md mục 2.3). Mọi thành viên đăng thẳng (ADR 0008), người bị
+   * cấm đã bị AuthGuard chặn. Tiêu đề tùy chọn; tóm tắt, slug tự tính; ảnh, video gắn theo thứ tự `mediaIds`.
+   */
+  async create(user: SessionUser, input: CreatePostInput): Promise<PostDetail> {
+    this.rateLimiter.consume(`post:${user.id}`, CREATE_RATE);
+
+    const excerpt = excerptFromContent(input.content);
+    const result = await this.postsRepository.createWithMedia(
+      {
+        title: input.title,
+        slug: await this.uniqueSlug(baseSlug(input.title, input.content)),
+        excerpt,
+        content: input.content,
+        contentFormat: CONTENT_FORMATS.PLAIN,
+        searchText: buildPostSearchText({ title: input.title, excerpt, tagNames: [] }),
+        status: POST_STATUSES.PUBLISHED,
+        publishedAt: new Date(),
+        authorId: user.id,
+        categorySlug: input.category,
+      },
+      input.mediaIds,
+    );
+
+    if (!result.ok) {
+      const categoryGone = result.reason === "CATEGORY_NOT_FOUND";
+      const message = categoryGone ? CATEGORY_GONE : FILE_MESSAGES.NOT_ATTACHABLE;
+      throw new AppException("VALIDATION_ERROR", message, {
+        [categoryGone ? "category" : "mediaIds"]: message,
+      });
+    }
+    return this.getBySlug(user, result.slug);
+  }
+
+  /** `base` nếu chưa ai dùng, không thì `base-2`, `base-3`... (số nhỏ nhất còn trống). */
+  private async uniqueSlug(base: string): Promise<string> {
+    const taken = new Set(await this.postsRepository.findSlugsStartingWith(base));
+    if (!taken.has(base)) return base;
+    let n = 2;
+    while (taken.has(withSlugSuffix(base, n))) n++;
+    return withSlugSuffix(base, n);
+  }
 
   /** Danh sách công khai: chỉ bài đã đăng, ai cũng xem được. */
   async list(query: ListPostsQuery): Promise<Paginated<PostListItem>> {

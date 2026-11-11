@@ -1,5 +1,6 @@
 import {
   type CategoryRef,
+  type MediaItem,
   POST_STATUSES,
   toCategoryColor,
   type PostDetail,
@@ -19,6 +20,10 @@ function toCategoryRef(category: PostListRow["category"]): CategoryRef {
   return { name: category.name, slug: category.slug, color: toCategoryColor(category.color) };
 }
 
+function toMediaItem(media: PostListRow["media"][number]): MediaItem {
+  return { id: media.id, kind: media.kind, mimeType: media.mimeType };
+}
+
 function toTagRef({ tag }: PostListRow["tags"][number]): TagRef {
   return { name: tag.name, slug: tag.slug };
 }
@@ -35,6 +40,7 @@ export function toPostListItem(row: PostListRow): PostListItem {
     author: toUserSummary(row.author),
     category: toCategoryRef(row.category),
     tags: row.tags.map(toTagRef),
+    media: row.media.map(toMediaItem),
   };
 }
 
@@ -42,6 +48,7 @@ export function toPostDetail(row: PostDetailRow): PostDetail {
   return {
     ...toPostListItem(row),
     content: row.content,
+    contentFormat: row.contentFormat,
     status: row.status,
     // Lý do cũ có thể còn trong DB sau khi bài được gửi lại và duyệt; chỉ trả khi bài đang bị từ chối
     rejectReason: row.status === POST_STATUSES.REJECTED ? row.rejectReason : null,

@@ -1,5 +1,17 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Res } from "@nestjs/common";
 import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Res,
+} from "@nestjs/common";
+import {
+  type CreatePostInput,
+  createPostSchema,
   type ListPostsQuery,
   listPostsQuerySchema,
   POST_STATUSES,
@@ -22,6 +34,15 @@ export class PostsController {
     @Query(new ZodValidationPipe(listPostsQuerySchema)) query: ListPostsQuery,
   ): Promise<Paginated<PostListItem>> {
     return this.postsService.list(query);
+  }
+
+  /** Đăng bài (ADR 0008: mọi thành viên đăng thẳng). Trả 201 kèm bài vừa đăng. */
+  @Post()
+  create(
+    @CurrentUser() user: SessionUser,
+    @Body(new ZodValidationPipe(createPostSchema)) input: CreatePostInput,
+  ): Promise<PostDetail> {
+    return this.postsService.create(user, input);
   }
 
   /** Bài đã đăng: mọi thành viên. Bài chưa đăng: chủ bài và trưởng xóm (PostsPolicy.canView). */

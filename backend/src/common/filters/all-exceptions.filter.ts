@@ -6,7 +6,13 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
-import { type ApiErrorBody, ERROR_CODES, ERROR_MESSAGES, type ErrorCode } from "@xom-nho/api";
+import {
+  type ApiErrorBody,
+  ERROR_CODES,
+  ERROR_MESSAGES,
+  type ErrorCode,
+  FILE_MESSAGES,
+} from "@xom-nho/api";
 import type { Response } from "express";
 import { AppException } from "../exceptions/app-exception.js";
 
@@ -50,6 +56,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
+      // Multer báo file vượt giới hạn (`POST /files`): nói rõ giới hạn thay vì câu chung
+      if (status === HttpStatus.PAYLOAD_TOO_LARGE) {
+        return {
+          status,
+          body: {
+            error: { code: ERROR_CODES.VALIDATION_ERROR, message: FILE_MESSAGES.TOO_LARGE },
+          },
+        };
+      }
       const code = STATUS_TO_CODE[status];
       if (code) {
         // Câu của Nest là tiếng Anh: thay bằng câu tiếng Việt mặc định của mã lỗi

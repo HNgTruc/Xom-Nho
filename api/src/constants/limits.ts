@@ -19,6 +19,15 @@ export const LIMITS = {
   SLUG_MAX: 220,
   POST_EXCERPT_MAX: 160,
   POST_TAGS_MAX: 5,
+  /** Nội dung bài soạn kiểu mạng xã hội (chữ thường) */
+  POST_PLAIN_CONTENT_MAX: 10_000,
+  /** Số ảnh, video tối đa mỗi bài */
+  POST_MEDIA_MAX: 10,
+
+  /** Ảnh tải lên: 5 MB (ADR 0005) */
+  IMAGE_MAX_BYTES: 5 * 1024 * 1024,
+  /** Video tải lên: 25 MB (ADR 0005) */
+  VIDEO_MAX_BYTES: 25 * 1024 * 1024,
 
   CATEGORY_NAME_MAX: 50,
   TAG_NAME_MAX: 30,

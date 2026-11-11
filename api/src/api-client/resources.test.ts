@@ -44,6 +44,38 @@ describe("api.posts", () => {
   });
 });
 
+describe("api.posts.create và api.files", () => {
+  it("create gửi JSON bằng POST", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+    const input = { title: "", content: "Chào", category: "doi-song", mediaIds: ["m1"] };
+
+    await api.posts.create(input);
+
+    expect(calledUrl()).toBe("http://x/api/v1/posts");
+    expect(calledInit().method).toBe("POST");
+    expect(JSON.parse(calledInit().body as string)).toEqual(input);
+    expect(new Headers(calledInit().headers).get("Content-Type")).toBe("application/json");
+  });
+
+  it("upload gửi multipart trường file, không tự đặt Content-Type", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+
+    await api.files.upload(new Blob(["abc"], { type: "image/png" }), "anh.png");
+
+    expect(calledUrl()).toBe("http://x/api/v1/files");
+    expect(calledInit().method).toBe("POST");
+    const body = calledInit().body as FormData;
+    expect(body).toBeInstanceOf(FormData);
+    expect((body.get("file") as File).name).toBe("anh.png");
+    expect(new Headers(calledInit().headers).has("Content-Type")).toBe(false);
+  });
+
+  it("fileUrl ghép đúng đường dẫn, mã hóa id", async () => {
+    const { fileUrl } = await import("./index.js");
+    expect(fileUrl("http://x/", "a b")).toBe("http://x/api/v1/files/a%20b");
+  });
+});
+
 describe("api.search", () => {
   it.each(["", "   "])("từ khóa %j trả trang rỗng, không gọi backend", async (q) => {
     const { api, fetchMock } = setup();

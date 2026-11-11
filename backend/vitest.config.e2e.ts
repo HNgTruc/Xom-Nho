@@ -1,4 +1,6 @@
 import { existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { defineConfig } from "vitest/config";
 
 // E2e chạy trên database riêng `<tên db>_test`, không bao giờ đụng database dev.
@@ -29,6 +31,8 @@ export default defineConfig({
       GOOGLE_CLIENT_SECRET: "",
       GITHUB_CLIENT_ID: "",
       GITHUB_CLIENT_SECRET: "",
+      // File tải lên trong test nằm ở thư mục tạm, không lẫn vào backend/uploads
+      UPLOAD_DIR: join(tmpdir(), "xom-nho-e2e-uploads"),
     },
   },
 });

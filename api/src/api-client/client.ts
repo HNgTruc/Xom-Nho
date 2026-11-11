@@ -21,6 +21,8 @@ export interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   query?: Record<string, QueryValue>;
   body?: unknown;
+  /** Gửi multipart (tải file). Không đặt `Content-Type`: `fetch` tự thêm kèm boundary. Dùng thay cho `body`. */
+  formData?: FormData;
   signal?: AbortSignal;
 }
 
@@ -60,14 +62,16 @@ export function createRequest(options: ClientOptions): RequestFn {
       typeof options.headers === "function" ? await options.headers() : options.headers;
     const headers = new Headers(extraHeaders);
     headers.set("Accept", "application/json");
-    if (init.body !== undefined) headers.set("Content-Type", "application/json");
+    if (init.body !== undefined && !init.formData) headers.set("Content-Type", "application/json");
+    const requestBody =
+      init.formData ?? (init.body === undefined ? undefined : JSON.stringify(init.body));
 
     let response: Response;
     try {
       response = await fetchFn(buildUrl(options.baseUrl, path, init.query), {
         method: init.method ?? "GET",
         headers,
-        body: init.body === undefined ? undefined : JSON.stringify(init.body),
+        body: requestBody,
         credentials: options.credentials,
         signal: init.signal,
       });

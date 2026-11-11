@@ -64,6 +64,45 @@ export const WELCOME_MESSAGES = {
   ],
 } as const;
 
+/** Ô tạo bài ở trang chủ và hộp soạn bài (docs/tinh-nang.md mục 2.3). */
+export const COMPOSER_MESSAGES = {
+  DIALOG_TITLE: "Tạo bài viết",
+  TITLE_PLACEHOLDER: "Tiêu đề (không bắt buộc)",
+  CONTENT_PLACEHOLDER: "Bạn muốn kể gì với xóm?",
+  CONTENT_LABEL: "Nội dung",
+  CATEGORY_LABEL: "Danh mục",
+  CATEGORY_PLACEHOLDER: "Chọn danh mục",
+  ADD_MEDIA: "Ảnh/Video",
+  MEDIA_HINT: "Ảnh JPG, PNG, WebP đến 5 MB. Video MP4, WebM đến 25 MB. Tối đa 10 file.",
+  UPLOADING: "Đang tải lên",
+  REMOVE_MEDIA: "Gỡ file này",
+  SUBMIT: "Đăng bài",
+  PUBLISHED: "Bài của bạn đã lên xóm.",
+  DISCARD_CONFIRM: "Bỏ bài đang viết dở?",
+  WAIT_UPLOAD: "Chờ ảnh, video tải lên xong rồi đăng nhé.",
+  TOO_MANY: "Mỗi bài tối đa 10 ảnh, video.",
+  RATE_LIMITED: "Bạn đăng nhiều bài quá, nghỉ tay vài phút rồi đăng tiếp nhé.",
+} as const;
+
+/** Tải ảnh, video lên (`POST /files`, ADR 0005): backend báo lỗi, frontend kiểm tra trước bằng cùng câu. */
+export const FILE_MESSAGES = {
+  MISSING: "Chọn một ảnh hoặc video để tải lên.",
+  UNSUPPORTED: "File này không phải ảnh JPG, PNG, WebP hay video MP4, WebM.",
+  IMAGE_TOO_LARGE: "Ảnh lớn hơn 5 MB. Bạn chọn ảnh nhỏ hơn nhé.",
+  VIDEO_TOO_LARGE: "Video lớn hơn 25 MB. Bạn chọn video ngắn hơn nhé.",
+  TOO_LARGE: "File lớn quá. Ảnh tối đa 5 MB, video tối đa 25 MB.",
+  RATE_LIMITED: "Bạn tải lên nhiều quá, nghỉ tay vài phút rồi thử lại nhé.",
+  NOT_FOUND: "Không tìm thấy ảnh, video này.",
+  UPLOAD_FAILED: "Chưa tải lên được. Bạn thử lại nhé.",
+  /** Ảnh, video gửi kèm bài không còn (đã gắn bài khác, của người khác, hoặc không có) */
+  NOT_ATTACHABLE: "Có ảnh, video không dùng được nữa. Bạn gỡ ra rồi thêm lại nhé.",
+} as const;
+
+/** Lời mời viết bài trên trang chủ, theo tên người đang xem. */
+export function composerPrompt(name: string): string {
+  return `Chào ${name}, hôm nay có chuyện gì?`;
+}
+
 /** Ô tìm ở header và trang `/tim-kiem` (docs/tinh-nang.md mục 2.5). */
 export const SEARCH_MESSAGES = {
   TITLE: "Tìm kiếm",

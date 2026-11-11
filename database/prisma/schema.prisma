@@ -25,6 +25,17 @@ enum CommentStatus {
   HIDDEN
 }
 
+// MARKDOWN: bài kiểu diễn đàn (có trước). PLAIN: bài soạn kiểu mạng xã hội, chữ thường giữ xuống dòng
+enum ContentFormat {
+  MARKDOWN
+  PLAIN
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+}
+
 // Cột lõi theo Better Auth (+ plugin admin: role, banned, banReason, banExpires).
 // Id do Better Auth sinh (32 ký tự), không dùng cuid().
 model User {
@@ -46,6 +57,7 @@ model User {
   posts         Post[]    @relation("PostAuthor")
   reviewedPosts Post[]    @relation("PostReviewer")
   comments      Comment[]
+  media         Media[]
   sessions      Session[]
   accounts      Account[]
 
@@ -136,23 +148,24 @@ model Tag {
 }
 
 model Post {
-  id           String     @id @default(cuid())
-  title        String     @db.VarChar(200)
-  slug         String     @unique @db.VarChar(220)
-  excerpt      String     @db.VarChar(160)
+  id            String        @id @default(cuid())
+  title         String        @db.VarChar(200)
+  slug          String        @unique @db.VarChar(220)
+  excerpt       String        @db.VarChar(160)
   // MEDIUMTEXT (16 MB): TEXT chỉ 64 KB, bài tiếng Việt dài dễ vượt
-  content      String     @db.MediumText
+  content       String        @db.MediumText
+  contentFormat ContentFormat @default(MARKDOWN)
   // Tiêu đề + tóm tắt + tên tag, đã bỏ dấu và chữ thường (toSearchText trong api)
-  searchText   String     @db.Text
-  status       PostStatus @default(DRAFT)
-  rejectReason String?    @db.VarChar(500)
-  viewCount    Int        @default(0)
-  authorId     String     @db.VarChar(36)
-  categoryId   String
-  reviewerId   String?    @db.VarChar(36)
-  publishedAt  DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  searchText    String        @db.Text
+  status        PostStatus    @default(DRAFT)
+  rejectReason  String?       @db.VarChar(500)
+  viewCount     Int           @default(0)
+  authorId      String        @db.VarChar(36)
+  categoryId    String
+  reviewerId    String?       @db.VarChar(36)
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   // Không xóa người dùng hay danh mục khi còn bài
   author   User      @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Restrict)
@@ -160,12 +173,37 @@ model Post {
   reviewer User?     @relation("PostReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
   tags     PostTag[]
   comments Comment[]
+  media    Media[]
 
   @@index([status, publishedAt(sort: Desc)])
   @@index([categoryId, status, publishedAt])
   @@index([authorId, status, publishedAt])
   @@fulltext([searchText])
   @@map("post")
+}
+
+// Ảnh, video người dùng tải lên (ADR 0005), lưu trên ổ đĩa backend. Tải lên trước (postId null),
+// gắn vào bài khi đăng. File trên đĩa tên theo storageKey (ngẫu nhiên), không dùng tên gốc.
+model Media {
+  id         String    @id @default(cuid())
+  kind       MediaKind
+  mimeType   String    @db.VarChar(50)
+  sizeBytes  Int
+  storageKey String    @unique @db.VarChar(100)
+  ownerId    String    @db.VarChar(36)
+  postId     String?
+  // Thứ tự hiển thị trong bài, từ 0
+  position   Int       @default(0)
+  createdAt  DateTime  @default(now())
+
+  owner User  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  // Xóa bài thì xóa dòng media (file trên đĩa do service dọn)
+  post  Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, position])
+  // File chưa gắn bài của một người: kiểm tra khi đăng, dọn file bỏ dở
+  @@index([ownerId, postId, createdAt])
+  @@map("media")
 }
 
 model PostTag {

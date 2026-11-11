@@ -1,5 +1,6 @@
 import type { PostStatus, Role } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
+import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import type { PostDetailRow, PostListRow, PostsRepository } from "./posts.repository.js";
 import { PostsService } from "./posts.service.js";
 
@@ -21,6 +22,7 @@ function listRow(overrides: Partial<PostListRow> = {}): PostListRow {
       { tag: { name: "Hà Nội", slug: "ha-noi" } },
     ],
     _count: { comments: 3 },
+    media: [{ id: "m1", kind: "IMAGE", mimeType: "image/png" }],
     ...overrides,
   };
 }
@@ -29,6 +31,7 @@ function detailRow(status: PostStatus = "PUBLISHED", rejectReason: string | null
   return {
     ...listRow(),
     content: "# Xin chào",
+    contentFormat: "MARKDOWN" as const,
     status,
     rejectReason,
     updatedAt,
@@ -45,8 +48,13 @@ function setup() {
     findByIds: vi.fn().mockResolvedValue([]),
     findBySlug: vi.fn().mockResolvedValue(null),
     incrementViewCount: vi.fn().mockResolvedValue(1),
+    findSlugsStartingWith: vi.fn().mockResolvedValue([]),
+    createWithMedia: vi.fn().mockResolvedValue({ ok: true, slug: "ban-tron-cuoi-tuan" }),
   };
-  const service = new PostsService(repository as unknown as PostsRepository);
+  const service = new PostsService(
+    repository as unknown as PostsRepository,
+    new RateLimiter(() => 0),
+  );
   return { service, repository };
 }
 
@@ -91,6 +99,7 @@ describe("PostsService.list", () => {
           { name: "Ăn vặt", slug: "an-vat" },
           { name: "Hà Nội", slug: "ha-noi" },
         ],
+        media: [{ id: "m1", kind: "IMAGE", mimeType: "image/png" }],
       },
     ]);
   });
@@ -113,6 +122,7 @@ describe("PostsService.getBySlug", () => {
 
     expect(post).toMatchObject({
       content: "# Xin chào",
+      contentFormat: "MARKDOWN",
       status: "PUBLISHED",
       rejectReason: null,
       updatedAt: "2026-11-02T09:30:00.000Z",
@@ -252,5 +262,101 @@ describe("PostsService.listPublishedByIds", () => {
 
     await expect(service.listPublishedByIds([])).resolves.toEqual([]);
     expect(repository.findByIds).not.toHaveBeenCalled();
+  });
+});
+
+describe("PostsService.create", () => {
+  const input = {
+    title: "",
+    content: "Hôm nay xóm mình có chợ phiên ở đầu ngõ\nAi rảnh ghé chơi nhé",
+    category: "doi-song",
+    mediaIds: ["m1", "m2"],
+  };
+
+  beforeEach(() => vi.useFakeTimers({ now: new Date("2026-11-11T10:00:00.000Z") }));
+  afterEach(() => vi.useRealTimers());
+
+  it.each(["user", "author", "admin"] as const)(
+    "%s đăng thẳng: bài PUBLISHED, có ngày đăng, chữ thường (ADR 0008)",
+    async (role) => {
+      const { service, repository } = setup();
+      repository.findBySlug.mockResolvedValue(detailRow());
+
+      await service.create(userOf(role), input);
+
+      const [data, mediaIds] = repository.createWithMedia.mock.calls[0]!;
+      expect(data).toMatchObject({
+        status: "PUBLISHED",
+        publishedAt: new Date("2026-11-11T10:00:00.000Z"),
+        contentFormat: "PLAIN",
+        authorId: `id-${role}`,
+        categorySlug: "doi-song",
+        title: "",
+      });
+      expect(mediaIds).toEqual(["m1", "m2"]);
+    },
+  );
+
+  it("không có tiêu đề: slug và tóm tắt lấy từ nội dung, searchText có nội dung bỏ dấu", async () => {
+    const { service, repository } = setup();
+    repository.findBySlug.mockResolvedValue(detailRow());
+
+    await service.create(userOf("user"), input);
+
+    const [data] = repository.createWithMedia.mock.calls[0]!;
+    expect(data.slug).toMatch(/^hom-nay-xom-minh-co-cho-phien/);
+    expect(data.excerpt).toBe("Hôm nay xóm mình có chợ phiên ở đầu ngõ Ai rảnh ghé chơi nhé");
+    expect(data.searchText).toContain("cho phien");
+  });
+
+  it("slug trùng thì thêm hậu tố nhỏ nhất còn trống", async () => {
+    const { service, repository } = setup();
+    repository.findSlugsStartingWith.mockResolvedValue(["ban-tron", "ban-tron-2", "ban-tron-tiep"]);
+    repository.findBySlug.mockResolvedValue(detailRow());
+
+    await service.create(userOf("user"), { ...input, title: "Bàn tròn" });
+
+    expect(repository.createWithMedia.mock.calls[0]![0].slug).toBe("ban-tron-3");
+  });
+
+  it("trả bài vừa đăng (đọc lại theo slug)", async () => {
+    const { service, repository } = setup();
+    repository.findBySlug.mockResolvedValue(detailRow());
+
+    const post = await service.create(userOf("user"), input);
+
+    expect(repository.findBySlug).toHaveBeenCalledWith("ban-tron-cuoi-tuan");
+    expect(post.slug).toBe("ban-tron-cuoi-tuan");
+  });
+
+  it("danh mục không còn thì VALIDATION_ERROR ở trường category", async () => {
+    const { service, repository } = setup();
+    repository.createWithMedia.mockResolvedValue({ ok: false, reason: "CATEGORY_NOT_FOUND" });
+
+    await expect(service.create(userOf("user"), input)).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      fields: { category: expect.any(String) },
+    });
+  });
+
+  it("ảnh, video không gắn được (của người khác, đã gắn bài khác) thì VALIDATION_ERROR ở mediaIds", async () => {
+    const { service, repository } = setup();
+    repository.createWithMedia.mockResolvedValue({ ok: false, reason: "MEDIA_NOT_ATTACHABLE" });
+
+    await expect(service.create(userOf("user"), input)).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      fields: { mediaIds: expect.any(String) },
+    });
+  });
+
+  it("quá 10 bài trong 10 phút thì RATE_LIMITED, không tạo thêm", async () => {
+    const { service, repository } = setup();
+    repository.findBySlug.mockResolvedValue(detailRow());
+    for (let i = 0; i < 10; i++) await service.create(userOf("user"), input);
+
+    await expect(service.create(userOf("user"), input)).rejects.toMatchObject({
+      code: "RATE_LIMITED",
+    });
+    expect(repository.createWithMedia).toHaveBeenCalledTimes(10);
   });
 });

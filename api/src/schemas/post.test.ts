@@ -7,7 +7,7 @@ import {
   slugSchema,
   usernameSchema,
 } from "./common.js";
-import { listPostsQuerySchema } from "./post.js";
+import { createPostSchema, listPostsQuerySchema } from "./post.js";
 import { searchQuerySchema } from "./search.js";
 import { tagSuggestQuerySchema } from "./tag.js";
 
@@ -111,5 +111,55 @@ describe("searchQuerySchema", () => {
 describe("tagSuggestQuerySchema", () => {
   it("không có q thì q rỗng", () => {
     expect(tagSuggestQuerySchema.parse({})).toEqual({ q: "" });
+  });
+});
+
+describe("createPostSchema", () => {
+  const base = { category: "doi-song" };
+
+  it("chỉ có nội dung: tiêu đề rỗng, không có ảnh", () => {
+    expect(createPostSchema.parse({ ...base, content: "  Chào cả xóm  " })).toEqual({
+      title: "",
+      content: "Chào cả xóm",
+      category: "doi-song",
+      mediaIds: [],
+    });
+  });
+
+  it("chỉ có ảnh, không có chữ vẫn đăng được", () => {
+    expect(createPostSchema.safeParse({ ...base, mediaIds: ["abc123"] }).success).toBe(true);
+  });
+
+  it("không chữ, không ảnh thì báo ở ô nội dung", () => {
+    const result = createPostSchema.safeParse({ ...base, content: "   " });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["content"]);
+  });
+
+  it.each([undefined, "", "   "])("thiếu danh mục (%j) thì báo chọn danh mục", (category) => {
+    const result = createPostSchema.safeParse({ content: "Chào", category });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("Chọn danh mục cho bài");
+  });
+
+  it("quá 10 ảnh, video thì lỗi", () => {
+    const mediaIds = Array.from({ length: 11 }, (_, i) => `m${i}`);
+    expect(createPostSchema.safeParse({ ...base, mediaIds }).success).toBe(false);
+  });
+
+  it("id ảnh trùng hoặc sai dạng thì lỗi", () => {
+    expect(createPostSchema.safeParse({ ...base, mediaIds: ["a", "a"] }).success).toBe(false);
+    expect(createPostSchema.safeParse({ ...base, mediaIds: ["../etc"] }).success).toBe(false);
+  });
+
+  it("nội dung giữ nguyên xuống dòng và chữ tiếng Việt", () => {
+    const content = "Dòng một\n\nĐồ ăn ngon";
+    expect(createPostSchema.parse({ ...base, content }).content).toBe(content);
+  });
+
+  it("nội dung quá dài thì lỗi", () => {
+    expect(createPostSchema.safeParse({ ...base, content: "a".repeat(10_001) }).success).toBe(
+      false,
+    );
   });
 });
