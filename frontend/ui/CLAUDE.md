@@ -39,7 +39,7 @@ components.json            cấu hình shadcn CLI cho thư mục này
 - Cấu hình shadcn (`components.json`): style `radix-nova`, alias `@xom-nho/ui/*` (tsconfig `paths` trỏ về `./src/*`), `rsc: true` để component cần client tự có `"use client"` cho Next.js. Component import `cn` thẳng từ package `cn` (thay cho clsx + tailwind-merge).
 - `react`, `react-dom`, `tailwindcss` là `peerDependencies`: mỗi app chỉ có một bản React.
 - Đổi màu phải chạy `pnpm --filter @xom-nho/ui test`: test so từng biến trong `theme.css` với `tokens/colors.ts`.
-- Màu hover của nút có nền: `color-mix` với `foreground` 12%, không dùng `/90` (xem MASTER mục 7 "Nút").
+- Màu hover của nút có nền: `color-mix` với `foreground` 12% (nút chính: `primary-foreground` 14%, vì `primary` trùng `foreground`), không dùng `/90` (xem MASTER mục 7 "Nút").
 - Chữ mặc định trong component (nếu có, ví dụ "Đóng" của Dialog) viết tiếng Việt.
 - Mỗi component có `aria-*` đúng chuẩn; giữ nguyên khả năng tiếp cận của Radix.
 - Đổi API của component đang dùng: tìm chỗ dùng trong `frontend/web` và `frontend/admin`, sửa cùng lúc.

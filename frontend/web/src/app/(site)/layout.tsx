@@ -1,11 +1,6 @@
 import type { ReactNode } from "react";
-import { SiteHeader } from "@/components/layout/site-header";
+import { SiteShell } from "@/components/layout/site-shell";
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <SiteHeader />
-      {children}
-    </>
-  );
+  return <SiteShell>{children}</SiteShell>;
 }

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
 import { getPost } from "../api/get-post";
-import { initials } from "../lib/initials";
+import { initials } from "@/lib/initials";
 import { CategoryBadge } from "./category-badge";
 import { PostStatusNote } from "./post-status-note";
 import { TableOfContents } from "./table-of-contents";
@@ -15,7 +15,8 @@ const numberFormat = new Intl.NumberFormat("vi-VN");
 
 /**
  * Trang bài viết (MASTER mục 7, thread view): danh mục, tiêu đề, tác giả và ngày, mục lục nếu bài dài,
- * nội dung Markdown font Lora, danh sách thẻ. Khối bình luận thêm ở giai đoạn 4.
+ * nội dung Markdown font Lora, danh sách thẻ. Cả bài nằm trên kính đặc (MASTER 2.4) để đọc lâu không mỏi.
+ * Khối bình luận thêm ở giai đoạn 4.
  * Đọc `params` và cookie nên phải nằm trong `<Suspense>`. Không có hoặc không được xem thì 404.
  */
 export async function PostDetailView({ params }: { params: Promise<{ slug: string }> }) {
@@ -27,7 +28,7 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
   const published = post.status === POST_STATUSES.PUBLISHED;
 
   return (
-    <article className="flex flex-col gap-8">
+    <article className="glass-strong flex animate-rise-in flex-col gap-8 rounded-xl p-5 sm:p-8">
       <header className="flex flex-col gap-4">
         <PostStatusNote post={post} />
         <CategoryBadge category={post.category} />

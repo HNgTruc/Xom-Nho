@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { categoryColors, colors, statusColors } from "../tokens";
+import { categoryColors, colors, glass, glassBlur, statusColors } from "../tokens";
 
 const css = readFileSync(new URL("./theme.css", import.meta.url), "utf8");
 
@@ -37,4 +37,12 @@ describe.each([
     expect(vars.get(`status-${name}`)).toBe(tones[scheme].fg.toLowerCase());
     expect(vars.get(`status-${name}-bg`)).toBe(tones[scheme].bg.toLowerCase());
   });
+
+  it.each(Object.entries(glass[scheme]))("kính %s", (name, value) => {
+    expect(vars.get(`glass-${kebab(name)}`)).toBe(value.toLowerCase());
+  });
+});
+
+it.each(Object.entries(glassBlur))("độ làm mờ %s khớp tokens", (name, px) => {
+  expect(css).toContain(`--blur-glass-${name}: ${px}px;`);
 });

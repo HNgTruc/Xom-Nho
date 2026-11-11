@@ -8,7 +8,7 @@ function ErrorFallback({ message }: { message?: string }, { retry }: ErrorInfo) 
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-4 rounded-md border border-border bg-card px-6 py-12 text-center"
+      className="flex flex-col items-center gap-4 glass rounded-xl px-6 py-12 text-center"
     >
       <p className="text-base text-muted-foreground">{message ?? ERROR_MESSAGES.INTERNAL_ERROR}</p>
       <Button variant="outline" onClick={() => retry()}>

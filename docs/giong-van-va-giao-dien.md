@@ -52,7 +52,7 @@ Toàn bộ quyết định giao diện (màu, chữ, khoảng cách, chuyển đ
 Tóm tắt nhanh:
 
 - Phong cách Minimalism & Swiss, pattern Feed + Thread View, ấm và thân thiện.
-- Màu chủ đạo gạch nung `#C2410C` (tối: `#FB923C`), nền giấy kem `#FBF8F3`, mỗi danh mục một màu riêng.
+- Nhấn **đen** `#18181B` cho hành động chính (tối: trắng `#FAFAFA`) và **xanh nhạt** `#BAE6FD` cho điểm nhấn nhỏ (tối: `#7DD3FC`); nền là ảnh biển nhìn qua khung kính mờ; mỗi danh mục một màu riêng. Chi tiết: MASTER mục 2.
 - Font Be Vietnam Pro (giao diện) + Lora (nội dung bài), cả hai có đủ dấu tiếng Việt.
 - Biểu tượng Lucide, không dùng emoji làm biểu tượng.
 

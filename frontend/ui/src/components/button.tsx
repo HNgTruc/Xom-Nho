@@ -8,22 +8,24 @@ import { Slot } from "radix-ui";
 //   Primary → default · Secondary (viền input, nền trong) → outline · Ghost → ghost · Destructive → destructive
 // `secondary` là nút màu lá (điểm nhấn phụ), ít dùng. Cao tối thiểu 40px nên không có cỡ thấp hơn h-10.
 // Hover nút có nền: trộn 12% foreground (sáng thì đậm lên, tối thì sáng lên) để chữ vẫn ≥ 4.5:1;
-// không làm nhạt bằng độ mờ 90% vì chữ trắng trên primary chỉ còn 4.4.
+// không làm nhạt bằng độ mờ 90%. Nút chính (đen ở chế độ sáng, trắng ở chế độ tối) trùng màu foreground,
+// Nút chính và nút viền là kính (MASTER 2.4): `glass-primary` (đen 82% / trắng 88%, chữ ≥ 10.6) và
+// `glass-button` (kính mỏng tự làm mờ, chữ foreground ≥ 7.0). Hover sang mức kính đậm hơn đã tính sẵn.
+// Dạng viên thuốc (rounded-full) như thanh điều hướng, MASTER mục 7.
 const buttonVariants = cva(
-  "group/button relative inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-transparent text-sm font-medium whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button relative inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-transparent text-sm font-medium whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground hover:bg-[color-mix(in_srgb,var(--primary),var(--foreground)_12%)]",
-        outline:
-          "border-input bg-transparent text-foreground hover:bg-muted aria-expanded:bg-muted",
+        default: "glass-primary hover:bg-glass-primary-hover",
+        outline: "glass-button hover:bg-glass-button-hover aria-expanded:bg-glass-button-hover",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_srgb,var(--secondary),var(--foreground)_12%)]",
-        ghost: "text-foreground hover:bg-muted aria-expanded:bg-muted",
+        ghost:
+          "text-foreground hover:bg-glass-button hover:backdrop-blur-glass-button aria-expanded:bg-glass-button",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-[color-mix(in_srgb,var(--destructive),var(--foreground)_12%)] focus-visible:ring-destructive",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-link underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4",

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
+import { SiteBackdrop } from "@/components/layout/site-backdrop";
 import "@/styles/globals.css";
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -29,7 +30,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`}>
-      <body>{children}</body>
+      <body>
+        <SiteBackdrop />
+        {children}
+      </body>
     </html>
   );
 }

@@ -19,7 +19,7 @@ const badgeVariants = cva(
         destructive: "bg-destructive/10 text-destructive [a]:hover:underline",
         outline: "border-border text-foreground [a]:hover:bg-muted",
         ghost: "hover:bg-muted",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-link underline-offset-4 hover:underline",
       },
     },
     defaultVariants: {

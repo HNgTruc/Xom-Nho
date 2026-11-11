@@ -5,10 +5,7 @@ export function PostListSkeleton({ count = 5 }: { count?: number }) {
   return (
     <div aria-busy="true" aria-label="Đang tải bài viết" className="flex flex-col gap-4">
       {Array.from({ length: count }, (_, index) => (
-        <div
-          key={index}
-          className="flex flex-col gap-3 rounded-md border border-border bg-card p-4 sm:p-5"
-        >
+        <div key={index} className="flex flex-col gap-3 glass rounded-xl p-4 sm:p-5">
           <Skeleton className="h-6 w-20 rounded-sm" />
           <Skeleton className="h-7 w-3/4" />
           <div className="flex flex-col gap-2">

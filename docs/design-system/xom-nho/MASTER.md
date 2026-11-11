@@ -3,59 +3,62 @@
 Nguồn sự thật cho mọi quyết định giao diện của web, admin và mobile-app. File override trong `pages/` (nếu có) được ưu tiên hơn file này cho trang/ứng dụng tương ứng.
 
 - Token trong code: `frontend/ui/src/tokens/*` (TS) và `frontend/ui/src/styles/theme.css` (CSS). Hai nơi đó phải khớp file này.
-- Lập bằng skill **ui-ux-pro-max** (xem mục "Nguồn và điều chỉnh" cuối file), ngày 2026-11-01.
+- Lập bằng skill **ui-ux-pro-max** (xem mục "Nguồn và điều chỉnh" cuối file), ngày 2026-11-01. Đổi sang kính mờ trên ảnh nền, màu nhấn đen + xanh nhạt, ngày 2026-11-11 (mục 2.4).
 
 ## 1. Định hướng
 
-| Mục            | Quyết định                                                                                       |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| Loại sản phẩm  | Forum / Discussion Board                                                                         |
-| Phong cách     | Minimalism & Swiss Style: sạch, nhiều khoảng trắng, phân cấp chữ rõ, lưới đều                    |
-| Pattern        | Feed (danh sách bài) + Thread View (bài + bình luận)                                             |
-| Chiến lược màu | Ấm, thân thiện; nền giấy kem; màu riêng cho từng danh mục; trạng thái bài luôn nhìn thấy         |
-| Chế độ         | Sáng và tối, cả hai đều phải đạt tương phản                                                      |
-| Dial           | Variance 3/10 (tối giản, căn giữa) · Motion 2/10 (rất nhẹ) · Density 5/10 (chuẩn) cho web/mobile |
-| Cảm giác       | Một quán nhỏ đầu ngõ: nội dung là chính, trang trí ít, đọc lâu không mỏi                         |
+| Mục            | Quyết định                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Loại sản phẩm  | Forum / Discussion Board                                                                                                                   |
+| Phong cách     | **Glassmorphism trên ảnh nền**: một khung kính lớn làm mờ ảnh biển, bên trong là các tấm kính; điều hướng và nút dạng viên thuốc (mục 2.4) |
+| Pattern        | Feed (danh sách bài) + Thread View (bài + bình luận)                                                                                       |
+| Chiến lược màu | Trung tính lạnh hợp ảnh biển; nhấn **đen** (hành động chính, mục đang chọn) và **xanh nhạt** (điểm nhấn nhỏ); màu riêng cho từng danh mục  |
+| Chế độ         | Sáng và tối, cả hai đều phải đạt tương phản ở mọi chỗ của ảnh nền                                                                          |
+| Dial           | Variance 4/10 · Motion 5/10 (khối hiện ra lần lượt, hover nổi lên) · Density 5/10 (chuẩn) cho web/mobile                                   |
+| Cảm giác       | Ngồi trong xóm nhìn ra biển qua ô kính: nội dung là chính, đọc lâu không mỏi                                                               |
 
 ## 2. Màu
 
-Mọi cặp chữ/nền dưới đây đã tính tương phản theo WCAG 2.x.
+Mọi cặp chữ/nền dưới đây đã tính tương phản theo WCAG 2.x. Chữ nằm trên kính nên tương phản thật còn tùy chỗ ảnh nền; mục 2.4 có số tính trên kính.
 
 ### 2.1 Màu nền tảng
 
-| Token                    | Sáng      | Tối       | Dùng cho                                     | Tương phản                                       |
-| ------------------------ | --------- | --------- | -------------------------------------------- | ------------------------------------------------ |
-| `background`             | `#FBF8F3` | `#1C1917` | Nền trang                                    |                                                  |
-| `foreground`             | `#292524` | `#F5F5F4` | Chữ chính                                    | 14.3 / 16.0                                      |
-| `card`                   | `#FFFFFF` | `#292524` | Thẻ bài, hộp thoại                           |                                                  |
-| `card-foreground`        | `#292524` | `#F5F5F4` | Chữ trên thẻ                                 |                                                  |
-| `muted`                  | `#F3EFE8` | `#292524` | Nền phụ, ô code, hàng chọn                   |                                                  |
-| `muted-foreground`       | `#6B635E` | `#A8A29E` | Chữ phụ: ngày, tác giả, gợi ý                | 5.1 trên muted, 5.6 trên nền / 6.0 trên card tối |
-| `primary`                | `#C2410C` | `#FB923C` | Nút chính, liên kết, điểm nhấn (gạch nung)   | 4.9 / 7.7 trên nền                               |
-| `primary-foreground`     | `#FFFFFF` | `#1C1917` | Chữ trên nút chính                           | 5.2 / 7.7                                        |
-| `secondary`              | `#15803D` | `#4ADE80` | Điểm nhấn phụ (lá), trạng thái tích cực      | 4.7 / 10.0                                       |
-| `secondary-foreground`   | `#FFFFFF` | `#1C1917` | Chữ trên nền `secondary`                     | 5.0 / 10.0                                       |
-| `border`                 | `#E7E5E4` | `#44403C` | Viền trang trí, đường phân cách              | (trang trí, không mang thông tin)                |
-| `input`                  | `#8F8883` | `#78716C` | Viền ô nhập, checkbox, thành phần điều khiển | 3.3 / 3.7 (≥ 3:1 cho UI)                         |
-| `ring`                   | `#C2410C` | `#FB923C` | Viền focus khi dùng bàn phím                 | 4.9 / 7.7                                        |
-| `destructive`            | `#B91C1C` | `#F87171` | Xóa, cấm, lỗi                                | trắng trên `#B91C1C`: 6.5                        |
-| `destructive-foreground` | `#FFFFFF` | `#1C1917` |                                              |                                                  |
+| Token                    | Sáng      | Tối       | Dùng cho                                                | Tương phản (sáng / tối, trên `card`) |
+| ------------------------ | --------- | --------- | ------------------------------------------------------- | ------------------------------------ |
+| `background`             | `#E6EEF0` | `#0B1214` | Màu nền khi ảnh chưa tải, khung kính khi tắt trong suốt |                                      |
+| `foreground`             | `#18181B` | `#FAFAFA` | Chữ chính                                               | 17.7 / 17.0                          |
+| `card`                   | `#FFFFFF` | `#18181B` | `Card` đặc (admin), hộp thoại                           |                                      |
+| `card-foreground`        | `#18181B` | `#FAFAFA` | Chữ trên thẻ                                            |                                      |
+| `muted`                  | `#F1F4F5` | `#27272A` | Nền phụ, ô code, hover trong thanh điều hướng           |                                      |
+| `muted-foreground`       | `#52525B` | `#A1A1AA` | Chữ phụ: ngày, tác giả, gợi ý                           | 7.7 / 6.9 (trên `muted`: 7.0 / 5.8)  |
+| `primary`                | `#18181B` | `#FAFAFA` | Nút chính, mục đang chọn (viên đen / viên trắng)        |                                      |
+| `primary-foreground`     | `#FFFFFF` | `#18181B` | Chữ trên `primary`                                      | 17.7 / 17.0                          |
+| `accent`                 | `#BAE6FD` | `#7DD3FC` | Điểm nhấn xanh nhạt: viên số bình luận, hover thẻ tag   |                                      |
+| `accent-foreground`      | `#18181B` | `#09090B` | Chữ trên `accent`                                       | 13.4 / 11.9                          |
+| `link`                   | `#075985` | `#7DD3FC` | Liên kết trong bài, trong form (luôn có gạch chân)      | 7.6 / 10.6                           |
+| `secondary`              | `#15803D` | `#4ADE80` | Điểm nhấn phụ (lá), trạng thái tích cực                 |                                      |
+| `secondary-foreground`   | `#FFFFFF` | `#18181B` | Chữ trên `secondary`                                    | 5.0 / 10.2                           |
+| `border`                 | `#E4E4E7` | `#3F3F46` | Viền trang trí, đường phân cách                         | (trang trí)                          |
+| `input`                  | `#71717A` | `#8B8B94` | Viền ô nhập, checkbox, thành phần điều khiển            | 4.8 / 5.2 (≥ 3:1 cho UI)             |
+| `ring`                   | `#0369A1` | `#38BDF8` | Viền focus khi dùng bàn phím                            | 5.9 / 8.3                            |
+| `destructive`            | `#B91C1C` | `#F87171` | Xóa, cấm, lỗi                                           | chữ trên nền: 6.5 / 6.4              |
+| `destructive-foreground` | `#FFFFFF` | `#18181B` |                                                         |                                      |
 
-Không dùng `#78716C` cho chữ nhỏ trên nền `muted` (chỉ đạt 4.2).
+`primary` trùng màu `foreground`, nên liên kết **không** dùng `primary` (trông như chữ thường): dùng `link` kèm gạch chân.
 
 ### 2.2 Màu danh mục (topic accent)
 
 Mỗi danh mục một màu để nhận ra nhanh trong feed. Màu chỉ là tín hiệu phụ: **luôn kèm tên danh mục bằng chữ**.
 
-| Danh mục      | Token    | Chữ (sáng) | Nền badge (sáng) | Chữ (tối) | Tương phản |
-| ------------- | -------- | ---------- | ---------------- | --------- | ---------- |
-| Đời sống      | `amber`  | `#B45309`  | `#FEF3C7`        | `#FBBF24` | 4.5 / 7.0  |
-| Công nghệ     | `blue`   | `#1D4ED8`  | `#DBEAFE`        | `#60A5FA` | 5.5 / 4.9  |
-| Học tập       | `green`  | `#047857`  | `#D1FAE5`        | `#34D399` | 4.8 / 6.2  |
-| Góc kể chuyện | `purple` | `#7E22CE`  | `#F3E8FF`        | `#C084FC` | 5.9 / 4.7  |
-| Hỏi đáp       | `rose`   | `#BE123C`  | `#FFE4E6`        | `#FB7185` | 5.2 / 4.7  |
+| Danh mục      | Token    | Chữ (sáng) | Nền badge (sáng) | Chữ (tối) | Nền badge (tối) | Tương phản |
+| ------------- | -------- | ---------- | ---------------- | --------- | --------------- | ---------- |
+| Đời sống      | `amber`  | `#B45309`  | `#FEF3C7`        | `#FBBF24` | `#382F1C`       | 4.5 / 7.9  |
+| Công nghệ     | `blue`   | `#1D4ED8`  | `#DBEAFE`        | `#60A5FA` | `#222C3A`       | 5.5 / 5.6  |
+| Học tập       | `green`  | `#047857`  | `#D1FAE5`        | `#34D399` | `#1C322D`       | 4.8 / 7.1  |
+| Góc kể chuyện | `purple` | `#7E22CE`  | `#F3E8FF`        | `#C084FC` | `#30273B`       | 5.9 / 5.4  |
+| Hỏi đáp       | `rose`   | `#BE123C`  | `#FFE4E6`        | `#FB7185` | `#38242A`       | 5.2 / 5.4  |
 
-Badge chế độ tối: chữ màu "tối" ở trên, nền là chính màu đó với độ mờ **12%** (hex thêm `1F`, ví dụ `#C084FC1F`); tương phản ở bảng tính trên `card`, trên `background` còn cao hơn. Không tăng lên 15%: `purple` và `rose` sẽ rơi xuống 4.5 (đã tính lại 2026-11-03).
+Nền badge tối là **màu đặc**: màu chữ trộn 14% trên `#18181B` (đổi 2026-11-11). Trước đó là màu chữ mờ 12%, nhưng nằm trên kính thì nền mờ đổi theo chỗ ảnh nền, và ở chỗ ảnh sáng (mây) `purple`, `rose` tụt dưới 4.5.
 
 Token đặt theo sắc độ, không theo tên danh mục: danh mục lưu khóa màu (`amber`, `blue`...), nên đổi tên hay thêm danh mục không phải sửa token. Danh mục mới chọn trong 5 màu này; muốn thêm màu thứ sáu thì phải tính tương phản cả hai chế độ trước.
 
@@ -63,17 +66,56 @@ Token đặt theo sắc độ, không theo tên danh mục: danh mục lưu khó
 
 Trạng thái phải **luôn hiển thị** cho tác giả và admin (skill cảnh báo: "hidden post state" là anti-pattern của forum).
 
-| Trạng thái | Token       | Chữ (sáng) | Nền (sáng) | Chữ (tối) | Tương phản | Kèm biểu tượng |
-| ---------- | ----------- | ---------- | ---------- | --------- | ---------- | -------------- |
-| Bản nháp   | `draft`     | `#57534E`  | `#E7E5E4`  | `#D6D3D1` | 6.1 / 7.5  | bút chì        |
-| Chờ duyệt  | `pending`   | `#92400E`  | `#FEF3C7`  | `#FCD34D` | 6.4 / 7.8  | đồng hồ        |
-| Đã đăng    | `published` | `#166534`  | `#DCFCE7`  | `#86EFAC` | 6.5 / 8.0  | dấu tích       |
-| Bị từ chối | `rejected`  | `#991B1B`  | `#FEE2E2`  | `#FCA5A5` | 6.8 / 6.3  | dấu x          |
-| Đã ẩn      | `hidden`    | `#57534E`  | `#F5F5F4`  | `#A8A29E` | 7.0 / 4.9  | mắt gạch chéo  |
+| Trạng thái | Token       | Chữ (sáng) | Nền (sáng) | Chữ (tối) | Nền (tối) | Tương phản | Kèm biểu tượng |
+| ---------- | ----------- | ---------- | ---------- | --------- | --------- | ---------- | -------------- |
+| Bản nháp   | `draft`     | `#52525B`  | `#E4E4E7`  | `#D4D4D8` | `#323235` | 6.1 / 8.7  | bút chì        |
+| Chờ duyệt  | `pending`   | `#92400E`  | `#FEF3C7`  | `#FCD34D` | `#383222` | 6.4 / 8.8  | đồng hồ        |
+| Đã đăng    | `published` | `#166534`  | `#DCFCE7`  | `#86EFAC` | `#27362F` | 6.5 / 9.0  | dấu tích       |
+| Bị từ chối | `rejected`  | `#991B1B`  | `#FEE2E2`  | `#FCA5A5` | `#382C2E` | 6.8 / 7.1  | dấu x          |
+| Đã ẩn      | `hidden`    | `#52525B`  | `#F4F4F5`  | `#A1A1AA` | `#2B2B2F` | 7.0 / 5.5  | mắt gạch chéo  |
 
-Chế độ tối dùng cùng cách với badge danh mục: nền là màu chữ mờ 12% (thêm 2026-11-03, trước đó MASTER chỉ có màu sáng).
+Nền tối đặc như badge danh mục (trộn 14% trên `#18181B`). Không dựa vào màu đơn thuần: badge luôn có chữ, nên có thêm biểu tượng.
 
-Không dựa vào màu đơn thuần: badge luôn có chữ, nên có thêm biểu tượng.
+### 2.4 Kính mờ trên ảnh nền
+
+Bố cục theo mẫu tham khảo của chủ dự án (dashboard kính mờ trên ảnh nội thất): ảnh nền phủ cả màn hình, **một khung kính lớn** làm mờ ảnh, bên trong là các tấm kính. Token: `frontend/ui/src/tokens/glass.ts`; CSS: `theme.css`.
+
+**Ảnh nền**: biển và mây (`frontend/web/src/assets/backdrop/bien-may.jpg`, ảnh của Tuấn Vũ trên Pexels, giấy phép Pexels cho dùng miễn phí, không bắt buộc ghi nguồn). Hiển thị bằng `next/image` (tự sinh WebP/AVIF theo cỡ màn hình, có bản mờ khi đang tải); chế độ tối giảm sáng ảnh 25%. Sau khi làm mờ 28px, ảnh trải từ `#071111` (mặt biển, bụi cây) đến `#E3E6E2` (mây): mọi tương phản dưới đây tính ở cả năm mức (tối nhất, 5%, 50%, 95%, sáng nhất), số ghi là mức thấp nhất. **Đổi ảnh thì đo lại** (script đo bằng canvas: ghi trong mục "Nguồn và điều chỉnh").
+
+| Lớp (utility)   | Sáng                               | Tối                                  | Làm mờ | Dùng cho                                                                                      |
+| --------------- | ---------------------------------- | ------------------------------------ | ------ | --------------------------------------------------------------------------------------------- |
+| `glass-shell`   | trắng 30%                          | `#09090B` 45%                        | 28px   | Khung lớn bao cả trang (`SiteShell`), rất trong. Không đặt chữ thẳng lên                      |
+| `glass`         | trắng 75%                          | `#09090B` 68%                        | không  | Tấm trong khung: thẻ bài, đầu trang, hồ sơ, khung trống                                       |
+| `glass-strong`  | trắng 85%                          | `#09090B` 85%                        | không  | Chỗ đọc lâu: khung bài viết, cài đặt, 404/lỗi; hover của thẻ; cột phải tối                    |
+| `glass-bar`     | trắng 85%                          | `#09090B` 85%                        | 16px   | Thứ trôi trên nội dung (header dính, menu thả xuống) hoặc nằm thẳng trên ảnh (form đăng nhập) |
+| `glass-button`  | trắng 45%, hover 70%               | `#18181B` 45%, hover 70% (`#27272A`) | 12px   | Nút phụ, thanh tab, thanh phân trang, chip thẻ, nút mở menu tài khoản. Chữ dùng `foreground`  |
+| `glass-primary` | `#18181B` 82%, hover `#3F3F46` 90% | `#FAFAFA` 88%, hover `#D4D4D8` 92%   | 12px   | Nút chính, mục đang chọn (tab, điều hướng, trang hiện tại)                                    |
+
+Viền kính `glass-border` (trắng 55% / trắng 10%), viền hover `glass-border-hover` (`#71717A` 45% / trắng 24%), bóng `glass-shadow`, `glass-shadow-hover`, `glass-shell-shadow` (bóng lớn + vệt sáng mép trên). `glass-button` dùng viền `glass-border-hover`: viền trắng không thấy được khi nút nằm trên tấm trắng.
+
+Tương phản thấp nhất trên ảnh nền (đổi 2026-11-11: khung trong hơn theo yêu cầu, các tấm có chữ đặc hơn để bù):
+
+| Chỗ                          | Chữ chính                              | Chữ phụ     | `link` | `input` | `ring` |
+| ---------------------------- | -------------------------------------- | ----------- | ------ | ------- | ------ |
+| `glass`, sáng                | 12.1                                   | 5.3         | 5.2    | 3.3     | 4.0    |
+| `glass-strong`, sáng         | 14.2                                   | 6.2         | 6.1    | 3.9     | 4.7    |
+| `glass`, tối                 | 12.7                                   | 5.2         | 7.9    | 3.9     | 6.2    |
+| `glass-strong`, tối          | 16.5                                   | 6.7         | 10.3   | 5.1     | 8.0    |
+| Cột phải tối trên khung sáng | 13.5                                   | 5.5         | 8.5    | 4.2     | 6.6    |
+| `glass-button`, sáng         | 7.0                                    | (không đặt) |        |         |        |
+| `glass-button`, tối          | 7.4                                    | (không đặt) |        |         |        |
+| `glass-primary`              | 10.6 / 13.1 (chữ `primary-foreground`) |             |        |         |        |
+
+Quy tắc:
+
+- Không đặt chữ thẳng lên ảnh nền hay lên khung (khung chỉ còn 30%). Chữ nằm trên tấm `glass` trở lên, hoặc trên `glass-button` nếu là chữ chính (`foreground`); **chữ phụ không đặt trên `glass-button`**.
+- Nút kính tối dùng màu sẫm (`#18181B` 45%), không dùng trắng mờ: trắng 10% trên khung tối ở chỗ mây chỉ đạt 3.1.
+- **Tấm tối giữa trang sáng**: thêm class `dark` cho tấm (ví dụ cột phải `dark glass-strong text-foreground`), mọi token bên trong đổi sang bộ tối. Đã tính: chữ ≥ 13.3, chữ phụ ≥ 5.4 ở mọi chỗ ảnh.
+- Chỉ khung lớn, `glass-bar`, `glass-button`, `glass-primary` làm mờ. Tấm nội dung bên trong không làm mờ lần nữa (đỡ tốn GPU, khung đã làm mờ ảnh rồi).
+- Dự phòng: trình duyệt không có `backdrop-filter`, hoặc người dùng bật `prefers-reduced-transparency`, thì khung thành `background`, các tấm thành `card` đặc.
+- Kính lồng trong kính có blur: chỉ chấp nhận thứ trôi trên nội dung (header dính, menu thả xuống) và nút kính (nhỏ).
+
+Đổi giá trị nào ở đây thì tính lại tương phản ở cả năm mức sáng của ảnh, cho cả hai chế độ, trước khi sửa token.
 
 ## 3. Chữ
 
@@ -114,23 +156,28 @@ Nhịp 4/8. Density 5 (chuẩn): khoảng cách khối 16 đến 64.
 | `space-3` | 12px    |     | `space-12` | 48px    |
 | `space-4` | 16px    |     | `space-16` | 64px    |
 
-- Lề ngang: 16px (điện thoại), 24px (tablet), 32px (desktop). Nội dung tối đa 1120px; cột đọc bài 720px.
-- Bo góc: `radius-sm` 6px (badge, ô nhập), `radius-md` 10px (nút, thẻ), `radius-lg` 14px (hộp thoại, bottom sheet), `radius-full` (avatar).
-- Đổ bóng: chỉ một mức nhẹ cho thẻ nổi và hộp thoại: `0 1px 2px rgb(41 37 36 / 0.06), 0 4px 12px rgb(41 37 36 / 0.06)`. Chế độ tối dùng viền `border` thay cho bóng.
+- Khung lớn rộng gần hết màn hình: cách mép 8px (điện thoại), 12px (tablet), 16px (desktop), không giới hạn bề rộng. Nội dung bên trong căn giữa, tối đa 1320px; lề 12 đến 32px; cột đọc bài và cài đặt 760px.
+- Bo góc: `radius-sm` 6px (badge, ô nhập), `radius-md` 10px (khối con trong tấm), `radius-lg` 14px, `radius-xl` 20px (mọi tấm kính: thẻ bài, đầu trang, cột phải, khung bài viết), `radius-2xl` 28px (khung lớn, form đăng nhập), `radius-full` (nút, điều hướng, tab, phân trang, badge thẻ, avatar: dạng viên thuốc như mẫu).
+- Đổ bóng: tấm kính dùng `glass-shadow`, hover `glass-shadow-hover`; khung lớn `glass-shell-shadow`. `shadow-card` (`0 1px 2px rgb(24 24 27 / 0.06), 0 4px 12px rgb(24 24 27 / 0.06)`, chế độ tối dùng viền) giữ cho `Card` đặc của admin.
 
 ## 5. Chuyển động
 
-Motion 2/10: chỉ phản hồi tương tác, không có hiệu ứng trang trí, **không dùng GSAP**.
+Motion 5/10 (đổi từ 2/10 ngày 2026-11-11, theo mẫu tham khảo): mỗi khối hiện ra lần lượt khi trang tải, phản hồi rõ khi hover. Vẫn **không dùng GSAP**, chỉ CSS.
 
-| Token           | Thời gian                                           | Dùng cho                      |
-| --------------- | --------------------------------------------------- | ----------------------------- |
-| `duration-fast` | 120ms                                               | Đổi màu hover, nhấn nút       |
-| `duration-base` | 200ms                                               | Mở dropdown, tooltip, đổi tab |
-| `duration-slow` | 280ms                                               | Hộp thoại, bottom sheet vào   |
-| easing          | `cubic-bezier(0.2, 0, 0, 1)` vào, rời nhanh hơn vào |                               |
+| Token           | Thời gian                                  | Dùng cho                                          |
+| --------------- | ------------------------------------------ | ------------------------------------------------- |
+| `duration-fast` | 120ms                                      | Đổi màu chữ, nhấn nút                             |
+| `duration-base` | 200ms                                      | Hover thẻ (nổi lên), đổi tab, mở dropdown         |
+| `duration-slow` | 280ms                                      | Hộp thoại, bottom sheet vào                       |
+| `rise-in`       | 520ms, `cubic-bezier(0.16, 1, 0.3, 1)`     | Khối hiện ra: mờ → rõ, trượt lên 12px, 99% → 100% |
+| stagger         | 60ms mỗi bậc, tối đa 8 bậc                 | Khối sau hiện trễ hơn khối trước                  |
+| easing          | `cubic-bezier(0.2, 0, 0, 1)` cho tương tác |                                                   |
 
-- Chỉ animate `opacity` và `transform`, không animate `width`/`height`.
-- Tôn trọng `prefers-reduced-motion` (web) và "Reduce Motion" (mobile): tắt chuyển động không thiết yếu, hiện ngay trạng thái cuối.
+Thứ tự hiện ra trên trang danh sách: header (bậc 0) → đầu trang (0) → tab sắp xếp (1) → cột phải (2) → thẻ bài thứ i (bậc i + 2). Trang bài viết, form, 404: một khối, bậc 0. Dùng `animate-rise-in` và đặt `--stagger` trên chính phần tử.
+
+- Hover thẻ bài: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (200ms). Hover viên số trong cột phải, thẻ tag: sang nền `accent`.
+- Chỉ animate `opacity` và `transform` (`translate`, `scale`), không animate `width`/`height`.
+- Tôn trọng `prefers-reduced-motion` (web) và "Reduce Motion" (mobile): bỏ trễ, bỏ chuyển động, hiện ngay trạng thái cuối.
 - Không cuộn vô hạn có hiệu ứng nhảy; spinner chỉ dùng cho trạng thái đang tải.
 
 ## 6. Biểu tượng
@@ -146,12 +193,13 @@ Motion 2/10: chỉ phản hồi tương tác, không có hiệu ứng trang trí
 ### Thẻ bài trong feed
 
 - Thứ tự đọc: badge danh mục → tiêu đề (`text-lg`, 600) → tóm tắt 2 dòng (`muted-foreground`) → hàng metadata (avatar 24, tên, "2 giờ trước", số bình luận).
-- Cả thẻ bấm được (một liên kết bao ngoài), vùng bấm đủ lớn; hover đổi nền sang `muted` trong `duration-fast`.
+- Tấm `glass`, bo `radius-xl`. Cả thẻ bấm được (một liên kết bao ngoài), vùng bấm đủ lớn; hover theo mục 5.
+- Số bình luận trong viên `accent` (xanh nhạt, chữ đen), như viên màu nhấn của mẫu.
 - Bài chưa đăng (chỉ tác giả thấy): badge trạng thái ở góc phải.
 
 ### Trang chi tiết bài (thread view)
 
-- Tiêu đề, metadata, nội dung Markdown font Lora, danh sách tag, rồi khối bình luận.
+- Cả bài trên một tấm `glass-strong`: tiêu đề, metadata, nội dung Markdown font Lora, danh sách tag, rồi khối bình luận.
 - Bình luận: avatar 32, tên, thời gian, nội dung `text-base`. Trả lời thụt vào 1 cấp (40px trên web, 24px trên mobile) với đường dọc `border` bên trái; không lồng sâu hơn.
 - Bình luận bị ẩn: admin thấy mờ (opacity 60%) kèm nhãn "Đã ẩn"; người thường không thấy.
 - Có dấu hiệu kiểm duyệt rõ ràng (skill cảnh báo "no moderation cues" là anti-pattern): bài bị từ chối hiện lý do trong hộp màu `destructive` nhạt cho tác giả.
@@ -165,9 +213,13 @@ Motion 2/10: chỉ phản hồi tương tác, không có hiệu ứng trang trí
 | Ghost                               | Hành động trong danh sách, thanh công cụ                      |
 | Destructive                         | Xóa, cấm, từ chối                                             |
 
-Cao tối thiểu 40px (web), 44pt (mobile). Trạng thái đang gửi: khóa nút, hiện spinner nhỏ và giữ nguyên bề rộng.
+Dạng viên thuốc (`rounded-full`). Cao tối thiểu 40px (web), 44pt (mobile). Trạng thái đang gửi: khóa nút, hiện spinner nhỏ và giữ nguyên bề rộng.
 
-Hover nút có nền màu: trộn 12% `foreground` vào màu nút (`color-mix(in srgb, var(--primary), var(--foreground) 12%)`), chế độ sáng đậm lên, chế độ tối sáng lên; chữ trên nút đạt ≥ 5.7 ở mọi trường hợp. **Không** làm nhạt bằng độ mờ (`bg-primary/90`): chữ trắng trên primary chỉ còn 4.4, secondary còn 4.2 (đã tính 2026-11-03).
+Nút chính là `glass-primary`, nút viền (Secondary) là `glass-button`, nút ghost khi hover hiện `glass-button`; hover sang mức kính đã tính sẵn ở mục 2.4. Nút `secondary`, `destructive` vẫn là màu đặc: hover trộn 12% `foreground` (`color-mix(in srgb, var(--secondary), var(--foreground) 12%)`). **Không** tự làm mờ bằng `bg-primary/90`: độ mờ chưa tính tương phản.
+
+### Menu thả xuống
+
+- Tấm `glass-bar` bo `radius-xl`, rộng tối thiểu 208px (không ăn theo bề ngang nút mở). Mục cao ≥ 40px, chữ 16px, có biểu tượng Lucide 16px; mục đang chọn bằng bàn phím nền `accent`.
 
 ### Form
 
@@ -182,9 +234,12 @@ Mọi danh sách và trang dữ liệu đều có đủ: đang tải (skeleton c
 ## 8. Bố cục và responsive
 
 - Mobile-first. Điểm ngắt kiểm tra: 375, 768, 1024, 1440.
-- Web desktop: feed một cột giữa (720px) + cột phải 300px (danh mục, tag nổi bật) từ 1024px trở lên; dưới 1024px bỏ cột phải.
-- Không cuộn ngang ở bất kỳ kích thước nào; không chặn phóng to (`user-scalable` giữ mặc định).
-- Header web cố định mỏng (56px): logo, ô tìm kiếm, nút "Viết bài", avatar.
+- Ảnh nền cố định phủ màn hình; `SiteShell` là khung kính lớn bao header và nội dung, chừa viền ảnh quanh khung.
+- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng danh mục (viên; mục đang xem là viên `glass-primary`), bên phải là nút Đăng nhập / Đăng ký hoặc **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai, cuộn ngang bên trong thanh.
+- Feed một cột + cột phải 320px (tấm kính tối: danh mục kèm viên số, thẻ nổi bật) từ 1024px; dưới 1024px bỏ cột phải.
+- Tab sắp xếp và phân trang: thanh `glass-button` dạng viên thuốc, mục đang chọn là viên `glass-primary`.
+- Hồ sơ `/u/<username>`: tấm `glass` có ảnh bìa (chưa có thì dải màu `accent`), ảnh đại diện 96 đến 112px viền `card` đè lên mép ảnh bìa, tên, viên vai trò `accent`, giới thiệu, ngày tham gia, số bài; bên dưới là feed bài của người đó.
+- Không cuộn ngang trang ở bất kỳ kích thước nào (chỉ hàng điều hướng tự cuộn bên trong); không chặn phóng to.
 
 ## 9. Tránh (anti-patterns)
 
@@ -195,17 +250,23 @@ Mọi danh sách và trang dữ liệu đều có đủ: đang tải (skeleton c
 - Emoji làm biểu tượng, trộn nhiều bộ biểu tượng
 - Màu là tín hiệu duy nhất (trạng thái, danh mục)
 - Mã màu viết thẳng trong component thay vì token
+- Chữ đặt thẳng trên ảnh nền; chữ phụ, liên kết đặt thẳng trên khung kính (mục 2.4)
+- Tấm trong khung tự làm mờ lần nữa; đổi ảnh nền mà không đo lại tương phản
+- Liên kết dùng màu `primary` (trùng màu chữ, không nhận ra là liên kết)
 
 ## 10. Checklist trước khi giao
 
 - [ ] Dùng token, không mã màu cứng
 - [ ] Chữ thường ≥ 4.5:1, thành phần UI và biểu tượng có nghĩa ≥ 3:1, kiểm tra **riêng** chế độ tối
+- [ ] Chữ phụ, liên kết, điều khiển nằm trên tấm `glass` trở lên; tương phản tính ở cả năm mức sáng của ảnh nền (mục 2.4)
+- [ ] Tắt `backdrop-filter` (hoặc bật `prefers-reduced-transparency`) trang vẫn đọc được
+- [ ] Chụp màn hình kiểm tra kính bằng trình duyệt headless: giả lập `prefers-reduced-transparency: no-preference` (headless mặc định báo `reduce`, ảnh chụp sẽ là bản dự phòng đặc chứ không phải kính)
 - [ ] Focus nhìn thấy được khi dùng bàn phím; thứ tự tab hợp lý
 - [ ] Nút biểu tượng có nhãn tiếng Việt; ảnh có `alt`
 - [ ] Vùng bấm ≥ 44×44 (mobile), khoảng cách giữa vùng bấm ≥ 8px
 - [ ] `cursor-pointer` cho phần tử bấm được (web); hover chuyển trong 120 đến 200ms
 - [ ] Đủ 4 trạng thái: tải, lỗi, trống, dữ liệu; skeleton không làm xô bố cục
-- [ ] `prefers-reduced-motion` được tôn trọng
+- [ ] Khối mới có `animate-rise-in` và `--stagger` đúng thứ tự (mục 5); `prefers-reduced-motion` tắt hết trễ và chuyển động
 - [ ] Kiểm tra ở 375, 768, 1024, 1440; không cuộn ngang
 - [ ] Tiếng Việt hiển thị đủ dấu với cả hai font
 
@@ -224,4 +285,6 @@ Lấy từ skill ui-ux-pro-max:
 - **Màu**: skill gợi ý xám xanh + xanh dương; đổi sang bảng màu ấm (gạch nung, lá, giấy kem) để khớp chiến lược "warm, welcoming" và tên Xóm Nhỏ. Mọi cặp màu đã tính tương phản lại; chữ phụ đổi từ `#78716C` sang `#6B635E`, thêm token `input` cho viền ô nhập đạt 3:1.
 - **Biểu tượng**: skill ưu tiên Phosphor; chọn Lucide vì shadcn/ui dùng Lucide bên trong và có bản React Native, giữ được một bộ biểu tượng trên mọi bề mặt.
 - **Chuyển động**: bỏ gợi ý GSAP scroll reveal; motion 2/10 chỉ cần CSS transition.
+- **Phong cách (2026-11-11)**: chủ dự án chọn Glassmorphism, rồi đưa mẫu tham khảo (video TikTok, ảnh chụp: dashboard kính mờ trên ảnh nội thất, điều hướng viên thuốc, chip đen, màu nhấn vàng, khối hiện ra lần lượt). Chủ dự án chọn màu nhấn **đen + xanh nhạt** thay cho vàng, và ảnh nền biển của Tuấn Vũ (Pexels). Tra `--domain style "glassmorphism"`: blur 10 đến 20px, kính trắng 15 đến 30%, viền sáng 1px. Điều chỉnh: kính đặc hơn nhiều (60%, 85%) vì ảnh có chỗ gần đen lẫn gần trắng; bỏ bảng màu ấm (gạch nung, giấy kem) sang trung tính lạnh hợp ảnh biển. Không chạy lại `--design-system --persist --force`.
+- **Đo ảnh nền**: vẽ ảnh lên canvas 1440×960 trong trình duyệt headless, `filter: blur(24px)`, bỏ mép 48px, lấy màu tối nhất, phân vị 5%, 50%, 95%, sáng nhất theo độ sáng tương đối; rồi tính tương phản chữ trên từng lớp kính trộn trên năm màu đó.
 - Tra quy tắc riêng cho luồng bình luận lồng nhau không có kết quả khớp (đã thử lại một lần), nên quy tắc ở mục 7 dựa trên `docs/tinh-nang.md` chứ không lấy từ dữ liệu của skill.

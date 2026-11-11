@@ -91,7 +91,7 @@ export function SignUpForm({ next, providers }: { next: string; providers: AuthP
         Đã có tài khoản?{" "}
         <Link
           href={{ pathname: "/dang-nhap", query: next === "/" ? {} : { next } }}
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-medium text-link underline underline-offset-4 hover:decoration-2"
         >
           Đăng nhập
         </Link>

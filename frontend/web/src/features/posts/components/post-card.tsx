@@ -2,25 +2,26 @@ import { formatDate, formatRelativeTime, type PostListItem } from "@xom-nho/api"
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { initials } from "../lib/initials";
+import { initials } from "@/lib/initials";
 import { CategoryBadge } from "./category-badge";
 
 /**
  * Thẻ bài trong feed (MASTER mục 7): badge danh mục, tiêu đề, tóm tắt 2 dòng, rồi tác giả, thời gian, số bình luận.
  * Cả thẻ bấm được nhờ liên kết tiêu đề phủ kín thẻ (`after:inset-0`); badge danh mục, tag nằm trên lớp đó
  * (`relative z-10`) nên vẫn bấm riêng được, không lồng thẻ `<a>` trong nhau.
- * Hover đổi cả viền: chế độ tối nền muted trùng nền card, chỉ đổi nền thì không thấy gì.
+ * Tấm `glass` (MASTER 2.4). Hover: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (MASTER 5).
+ * Số bình luận nằm trong viên `accent` (xanh nhạt), điểm nhấn như viên màu trong mẫu thiết kế.
  */
 export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
   return (
-    <article className="relative flex flex-col gap-3 rounded-md border border-border bg-card p-4 transition-colors duration-[120ms] hover:border-input hover:bg-muted has-[[data-card-link]:focus-visible]:ring-2 has-[[data-card-link]:focus-visible]:ring-ring has-[[data-card-link]:focus-visible]:ring-offset-2 has-[[data-card-link]:focus-visible]:ring-offset-background sm:p-5">
+    <article className="glass relative flex flex-col gap-3 rounded-xl p-4 transition-[translate,background-color,border-color,box-shadow] duration-200 ease-standard hover:-translate-y-0.5 hover:border-glass-border-hover hover:bg-glass-strong hover:shadow-glass-hover has-[[data-card-link]:focus-visible]:ring-2 has-[[data-card-link]:focus-visible]:ring-ring has-[[data-card-link]:focus-visible]:ring-offset-2 has-[[data-card-link]:focus-visible]:ring-offset-background sm:p-5">
       <CategoryBadge category={post.category} className="relative z-10" />
 
       <h2 className="text-lg font-semibold text-card-foreground">
         <Link
           href={`/bai-viet/${post.slug}`}
           data-card-link
-          className="after:absolute after:inset-0 after:rounded-md focus-visible:outline-none"
+          className="after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none"
         >
           {post.title}
         </Link>
@@ -36,7 +37,7 @@ export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
             <li key={tag.slug}>
               <Link
                 href={`/tag/${tag.slug}`}
-                className="rounded-sm text-sm text-muted-foreground hover:text-primary hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="rounded-sm text-sm text-muted-foreground hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 {tag.name}
               </Link>
@@ -50,7 +51,16 @@ export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
           {post.author.image && <AvatarImage src={post.author.image} alt="" />}
           <AvatarFallback>{initials(post.author.name)}</AvatarFallback>
         </Avatar>
-        <span className="font-medium text-card-foreground">{post.author.name}</span>
+        {post.author.username ? (
+          <Link
+            href={`/u/${post.author.username}`}
+            className="relative z-10 rounded-sm font-medium text-card-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          >
+            {post.author.name}
+          </Link>
+        ) : (
+          <span className="font-medium text-card-foreground">{post.author.name}</span>
+        )}
         {post.publishedAt && (
           <>
             <span aria-hidden="true">·</span>
@@ -60,7 +70,7 @@ export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
           </>
         )}
         <span aria-hidden="true">·</span>
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex h-6 items-center gap-1 rounded-full bg-accent px-2 font-medium text-accent-foreground">
           <MessageCircle aria-hidden="true" className="size-4" strokeWidth={1.75} />
           {post.commentCount}
           <span className="sr-only"> bình luận</span>

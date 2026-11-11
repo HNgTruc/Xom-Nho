@@ -9,10 +9,7 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
   if (items.length < TOC_MIN_ITEMS) return null;
 
   return (
-    <nav
-      aria-labelledby="toc-heading"
-      className="rounded-md border border-border bg-card p-4 sm:p-5"
-    >
+    <nav aria-labelledby="toc-heading" className="rounded-md border border-border p-4 sm:p-5">
       <h2 id="toc-heading" className="text-sm font-semibold text-foreground">
         Trong bài này
       </h2>
@@ -21,7 +18,7 @@ export function TableOfContents({ items }: { items: TocItem[] }) {
           <li key={item.id} className={cn(item.depth === 3 && "pl-4")}>
             <a
               href={`#${item.id}`}
-              className="flex min-h-10 items-center rounded-sm px-2 text-base text-muted-foreground transition-colors duration-[120ms] hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              className="flex min-h-10 items-center rounded-sm px-2 text-base text-muted-foreground transition-colors duration-120 hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               {item.text}
             </a>
