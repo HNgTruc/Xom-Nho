@@ -6,6 +6,7 @@ export { CategoryBadge } from "./components/category-badge";
 export { CategoryNav, CategoryNavSkeleton } from "./components/category-nav";
 export { ArchiveViewSkeleton, CategoryView } from "./components/category-view";
 export { FeedLayout } from "./components/feed-layout";
+export { HomeComposer, HomeComposerSkeleton } from "./components/home-composer";
 export { PostCard } from "./components/post-card";
 export { PostDetailView } from "./components/post-detail";
 export { PostDetailSkeleton } from "./components/post-detail-skeleton";

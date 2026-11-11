@@ -1,4 +1,4 @@
-import { formatDate, POST_STATUSES } from "@xom-nho/api";
+import { CONTENT_FORMATS, formatDate, POST_STATUSES } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { notFound } from "next/navigation";
@@ -8,6 +8,8 @@ import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
 import { getPost } from "../api/get-post";
 import { initials } from "@/lib/initials";
 import { CategoryBadge } from "./category-badge";
+import { PlainContent } from "./plain-content";
+import { PostMediaGallery } from "./post-media";
 import { PostStatusNote } from "./post-status-note";
 import { TableOfContents } from "./table-of-contents";
 import { ViewTracker } from "./view-tracker";
@@ -27,7 +29,9 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
   const post = await getPost(slug);
   if (!post) notFound();
 
-  const { element, toc } = renderMarkdown(post.content);
+  // Bài soạn kiểu mạng xã hội là chữ thường: không qua Markdown, không có mục lục
+  const plain = post.contentFormat === CONTENT_FORMATS.PLAIN;
+  const markdown = plain ? null : renderMarkdown(post.content);
   const published = post.status === POST_STATUSES.PUBLISHED;
 
   return (
@@ -35,7 +39,11 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
       <header className="flex flex-col gap-4">
         <PostStatusNote post={post} />
         <CategoryBadge category={post.category} />
-        <h1 className="text-3xl font-bold md:text-4xl">{post.title}</h1>
+        {post.title ? (
+          <h1 className="text-3xl font-bold md:text-4xl">{post.title}</h1>
+        ) : (
+          <h1 className="sr-only">Bài của {post.author.name}</h1>
+        )}
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
           <Avatar>
@@ -58,9 +66,16 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
         </div>
       </header>
 
-      <TableOfContents items={toc} />
+      {markdown ? (
+        <>
+          <TableOfContents items={markdown.toc} />
+          <MarkdownContent>{markdown.element}</MarkdownContent>
+        </>
+      ) : (
+        <PlainContent text={post.content} />
+      )}
 
-      <MarkdownContent>{element}</MarkdownContent>
+      <PostMediaGallery media={post.media} authorName={post.author.name} />
 
       {post.tags.length > 0 && (
         <footer className="border-t border-border pt-6">

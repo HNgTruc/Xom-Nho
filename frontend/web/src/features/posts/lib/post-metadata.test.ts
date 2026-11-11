@@ -13,13 +13,27 @@ const post: PostDetail = {
   author: { id: "u1", name: "Lan Anh", username: "lananh", image: null },
   category: { name: "Đời sống", slug: "doi-song", color: "amber" },
   tags: [{ name: "Ăn vặt", slug: "an-vat" }],
+  media: [],
   content: "# Xin chào",
+  contentFormat: "MARKDOWN",
   status: "PUBLISHED",
   rejectReason: null,
   updatedAt: "2026-11-02T09:30:00.000Z",
 };
 
 describe("postMetadata", () => {
+  it("bài không có tiêu đề: lấy đầu tóm tắt, cắt ở ranh giới từ", () => {
+    const excerpt = "Hôm nay xóm mình có chợ phiên ở đầu ngõ, ai rảnh thì ghé chơi nhé, vui lắm đó";
+    const meta = postMetadata({ ...post, title: "", excerpt });
+
+    expect(meta.title).toBe("Hôm nay xóm mình có chợ phiên ở đầu ngõ, ai rảnh thì ghé…");
+    expect(meta.openGraph?.title).toBe(meta.title);
+  });
+
+  it("bài chỉ có ảnh: tiêu đề là Bài của <tên>", () => {
+    expect(postMetadata({ ...post, title: "", excerpt: "" }).title).toBe("Bài của Lan Anh");
+  });
+
   it("tiêu đề, mô tả, canonical và Open Graph kiểu bài viết", () => {
     expect(postMetadata(post)).toMatchObject({
       title: "Bàn tròn cuối tuần",
