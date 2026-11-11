@@ -18,7 +18,16 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 export const FEED_MESSAGES = {
   EMPTY: "Xóm còn vắng quá. Bạn mở hàng bài đầu tiên nhé?",
   PAGE_EMPTY: "Trang này chưa có bài nào. Bạn quay về trang đầu xem sao.",
+  CATEGORY_EMPTY: "Danh mục này chưa có bài nào. Bạn mở hàng bài đầu tiên nhé?",
+  TAG_EMPTY: "Chưa có bài nào gắn thẻ này.",
+  PROFILE_EMPTY: "Hàng xóm này chưa đăng bài nào.",
   LOAD_ERROR: "Chưa tải được bài viết. Bạn thử lại sau ít phút nhé.",
+} as const;
+
+/** Câu của trang cài đặt tài khoản (docs/tinh-nang.md mục 1.4). */
+export const SETTINGS_MESSAGES = {
+  SAVED: "Đã lưu hồ sơ của bạn.",
+  NO_CHANGE: "Bạn chưa thay đổi gì.",
 } as const;
 
 /**

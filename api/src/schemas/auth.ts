@@ -34,18 +34,23 @@ const httpUrl = z
   .url({ protocol: /^https?$/, error: "Đường dẫn ảnh phải bắt đầu bằng http:// hoặc https://" })
   .max(LIMITS.URL_MAX, `Đường dẫn tối đa ${LIMITS.URL_MAX} ký tự`);
 
+/**
+ * Các ô của hồ sơ, đủ cả: form cài đặt dùng (`profileFieldsSchema.pick(...)`), backend dùng qua `updateMeSchema`.
+ * Một nguồn quy tắc cho cả hai phía.
+ */
+export const profileFieldsSchema = z.object({
+  name,
+  bio: z
+    .string()
+    .trim()
+    .max(LIMITS.USER_BIO_MAX, `Giới thiệu tối đa ${LIMITS.USER_BIO_MAX} ký tự`)
+    .transform((value) => value || null)
+    .nullable(),
+  image: z.union([z.literal("").transform(() => null), httpUrl]).nullable(),
+});
+
 /** `PATCH /api/v1/me`: sửa tên, giới thiệu, ảnh đại diện (ảnh qua URL ở giai đoạn đầu). */
-export const updateMeSchema = z
-  .object({
-    name,
-    bio: z
-      .string()
-      .trim()
-      .max(LIMITS.USER_BIO_MAX, `Giới thiệu tối đa ${LIMITS.USER_BIO_MAX} ký tự`)
-      .transform((value) => value || null)
-      .nullable(),
-    image: z.union([z.literal("").transform(() => null), httpUrl]).nullable(),
-  })
+export const updateMeSchema = profileFieldsSchema
   .partial()
   .refine((value) => Object.keys(value).length > 0, "Bạn chưa thay đổi gì");
 
