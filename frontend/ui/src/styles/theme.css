@@ -304,8 +304,10 @@
   }
 }
 
+/* `backwards`, không `both`: chạy xong thì bỏ hẳn opacity/transform của animation. Giữ lại (both) thì Chrome coi
+   phần tử là ranh giới làm mờ, kính `glass-bar` bên trong (bảng "Chủ đề" ở header) không làm mờ được trang. */
 @utility animate-rise-in {
-  animation: rise-in 360ms var(--ease-enter) calc(min(var(--stagger, 0), 6) * 35ms) both;
+  animation: rise-in 360ms var(--ease-enter) calc(min(var(--stagger, 0), 6) * 35ms) backwards;
 }
 
 /* Trình duyệt không làm mờ được, hoặc người dùng muốn bớt trong suốt: khung và tấm thành màu đặc */

@@ -67,7 +67,13 @@ function MemberNavSkeleton() {
 export function SiteHeader({ guest = false }: { guest?: boolean }) {
   return (
     <header className="sticky top-2 z-20 px-2 pt-2 sm:top-4 sm:px-4 sm:pt-4">
-      <div className="glass-bar relative grid animate-rise-in grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1 rounded-xl p-1.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:rounded-full">
+      <div className="relative isolate grid animate-rise-in grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1 rounded-xl p-1.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:rounded-full">
+        {/* Kính của header là lớp nền riêng nằm sau, không đặt lên chính thanh: phần tử có backdrop-filter thì
+            bảng thả xuống bên trong (Chủ đề) không làm mờ được nội dung trang phía sau nữa. */}
+        <div
+          aria-hidden="true"
+          className="glass-bar pointer-events-none absolute inset-0 -z-10 rounded-[inherit]"
+        />
         <Link
           href="/"
           className="inline-flex h-10 items-center rounded-full border border-input/50 px-4 text-base font-bold tracking-tight text-foreground transition-colors duration-200 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"

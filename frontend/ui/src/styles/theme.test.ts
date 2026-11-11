@@ -58,7 +58,7 @@ it.each(Object.entries(glassBlur))("độ làm mờ %s khớp tokens", (name, px
 
 it("hiệu ứng hiện ra (rise-in) khớp tokens chuyển động", () => {
   expect(css).toContain(
-    `rise-in ${duration.enter}ms var(--ease-enter) calc(min(var(--stagger, 0), ${stagger.maxSteps}) * ${stagger.step}ms) both`,
+    `rise-in ${duration.enter}ms var(--ease-enter) calc(min(var(--stagger, 0), ${stagger.maxSteps}) * ${stagger.step}ms) backwards`,
   );
   expect(css).toContain(`transform: translateY(${enterOffset}px);`);
 });

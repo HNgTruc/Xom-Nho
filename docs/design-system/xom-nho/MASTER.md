@@ -242,6 +242,7 @@ Nút chính là `glass-primary`, nút viền (Secondary) là `glass-button`, nú
 
 ### Menu thả xuống
 
+- Menu ở header (Tin nhắn, Thông báo, tài khoản) dùng `modal={false}`: không khóa cuộn trang. Khóa cuộn làm thanh cuộn (Windows 15px) biến mất, ảnh nền cố định giãn ra, cả trang giật một cái mỗi lần mở, đóng menu. Hộp thoại vẫn khóa cuộn; lớp `fixed` phủ màn hình (ảnh nền) phải có class `right-scroll-bar-position` để giữ nguyên bề rộng khi khóa.
 - Tấm `glass-bar` bo `radius-xl`, rộng tối thiểu 208px (không ăn theo bề ngang nút mở). Trang con (như "Hiển thị và trợ năng") thay nội dung menu, mục đầu là nút quay lại có mũi tên; đổi trang thì đưa focus vào mục đầu. Nhóm lựa chọn dùng `DropdownMenuRadioGroup`, chọn không đóng menu. Mục cao ≥ 40px, chữ 16px, có biểu tượng Lucide 16px; mục đang chọn bằng bàn phím nền `accent`.
 
 ### Form
@@ -258,9 +259,10 @@ Mọi danh sách và trang dữ liệu đều có đủ: đang tải (skeleton c
 
 - Mobile-first. Điểm ngắt kiểm tra: 375, 768, 1024, 1440.
 - Ảnh nền cố định phủ màn hình; `SiteShell` là khung kính lớn bao header và nội dung, chừa viền ảnh quanh khung.
-- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng danh mục (viên; mục đang xem là viên `glass-primary`; **chỉ khi đã đăng nhập**), bên phải là nút Đăng nhập / Đăng ký (khách: header chỉ có logo và hai nút này), hoặc (đã đăng nhập) **ô tìm kiếm**, nút tròn **Tin nhắn**, **Thông báo** rồi **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai, cuộn ngang bên trong thanh.
+- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng gồm hai viên **Trang chủ** và **Chủ đề** (mục đang xem là viên `glass-primary`; đang ở một danh mục thì "Chủ đề" là viên `glass-primary`; **chỉ khi đã đăng nhập**), bên phải là nút Đăng nhập / Đăng ký (khách: header chỉ có logo và hai nút này), hoặc (đã đăng nhập) **ô tìm kiếm**, nút tròn **Tin nhắn**, **Thông báo** rồi **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai.
+- **Chủ đề** (`NavigationMenu` của `@xom-nho/ui`): rê chuột vào thì sau 200ms thả xuống tấm `glass-bar` liệt kê danh mục (chấm màu danh mục + tên, mục đang xem in đậm); rời cả nút lẫn bảng thì đóng. Bấm (cảm ứng), Enter, Space cũng mở; mũi tên xuống vào danh sách, Esc đóng. Rê chuột đã mở rồi bấm thì giữ bảng mở. Kính của header là lớp nền riêng nằm sau thanh (không đặt `backdrop-filter` lên chính thanh), và `animate-rise-in` dùng `backwards`: phần tử cha có `backdrop-filter` hay còn giữ `opacity` của animation thì kính bên trong không làm mờ được trang.
 - Trang chào mừng của khách (`/`): cột 860px căn giữa theo chiều dọc; tấm `glass-strong` lớn (viên nhãn `accent`, tiêu đề `text-3xl` đến `text-5xl`, đoạn giới thiệu, nút chính **Tham gia xóm** và nút viền **Đăng nhập**, xếp dọc rộng hết trên điện thoại), dưới là ba tấm `glass` (biểu tượng Lucide trong vòng tròn `accent`, tiêu đề `text-lg`, một câu), ba cột từ 768px. Hiện ra lần lượt: tấm lớn bậc 0, ba tấm nhỏ bậc 1 đến 3.
-- Feed một cột ở giữa, rộng tối đa 860px, ở mọi bề rộng. Không có cột phải (bỏ ngày 2026-11-11 theo yêu cầu): danh mục đã có trên thanh điều hướng của header.
+- Feed một cột ở giữa, rộng tối đa 860px, ở mọi bề rộng. Không có cột phải (bỏ ngày 2026-11-11 theo yêu cầu): danh mục nằm trong "Chủ đề" trên header.
 - Tab sắp xếp và phân trang: thanh `glass-button` dạng viên thuốc, mục đang chọn là viên `glass-primary`.
 - Hồ sơ `/u/<username>`: tấm `glass` có ảnh bìa (chưa có thì dải màu `accent`), ảnh đại diện 96 đến 112px viền `card` đè lên mép ảnh bìa, tên, viên vai trò `accent`, giới thiệu, ngày tham gia, số bài; bên dưới là feed bài của người đó.
 - Không cuộn ngang trang ở bất kỳ kích thước nào (chỉ hàng điều hướng tự cuộn bên trong); không chặn phóng to.
