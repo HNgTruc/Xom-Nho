@@ -53,7 +53,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 - [x] Backend: `posts` (danh sách, chi tiết), `categories`, `tags`, `users` (hồ sơ), `search`
 - [x] Test service + policy cho từng vai trò
-- [ ] Web: trang chủ có phân trang, chi tiết bài (Markdown an toàn), danh mục, tag, hồ sơ, tìm kiếm
+- [x] Web: trang chủ có phân trang, chi tiết bài (Markdown an toàn), danh mục, tag, hồ sơ, tìm kiếm (ô tìm ở header, trang `/tim-kiem`)
 - [ ] Web: metadata, Open Graph (không làm sitemap: khách không đọc được bài, ADR 0007)
 - [x] Chỉ thành viên đọc được: backend bỏ `@Public()` ở route đọc, web có `proxy.ts` và trang chào mừng cho khách (ADR 0007)
 - [x] Web: giao diện kính trên ảnh nền, header viên thuốc, chuyển động (MASTER 2.4, 5)

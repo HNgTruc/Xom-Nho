@@ -1,6 +1,7 @@
 export { getCategories, getCategory } from "./api/get-category";
 export { getPost } from "./api/get-post";
 export { getTag } from "./api/get-tag";
+export { ArchiveHeader, ArchiveHeaderSkeleton } from "./components/archive-header";
 export { CategoryBadge } from "./components/category-badge";
 export { CategoryNav, CategoryNavSkeleton } from "./components/category-nav";
 export { ArchiveViewSkeleton, CategoryView } from "./components/category-view";

@@ -225,6 +225,13 @@ Nút chính là `glass-primary`, nút viền (Secondary) là `glass-button`, nú
 - Số chưa đọc: chấm `destructive` góc trên phải, chữ `text-xs` đậm, quá 99 ghi "99+"; chỉ để nhìn (`aria-hidden`).
 - Bấm mở bảng `glass-bar` rộng 320px: tiêu đề, danh sách; trống thì một câu theo `docs/giong-van-va-giao-dien.md`.
 
+### Ô tìm kiếm ở header
+
+- Chỉ thành viên thấy. Từ 1024px: viên viền `input` 60% (giống viên logo) nền trong suốt, rộng 224px (1280px trở lên 288px), biểu tượng kính lúp 16px bên trái, chữ gợi ý "Tìm trong xóm" màu `muted-foreground` (nằm trên `glass-bar` nên đủ tương phản, không phải trên `glass-button`). Hover viền đậm lên, focus viền và vòng `ring`.
+- Dưới 1024px: nút tròn kính lúp như Tin nhắn; bấm vào thì ô tìm nền `card` (đặc, để không lẫn với logo phía dưới) phủ ngang hàng trên của thanh, có nút ✕ đóng; Esc hoặc bấm ra ngoài cũng đóng, focus về nút kính lúp.
+- Phím `/` đưa con trỏ vào ô (trừ khi đang gõ trong ô khác). Từ khóa rỗng thì Enter không đi đâu.
+- Trang `/tim-kiem`: đầu trang `glass` (nhãn "Tìm kiếm", từ khóa trong ngoặc kép làm `h1`, số bài), thanh lọc danh mục `glass-button` như tab sắp xếp (cuộn ngang bên trong thanh), thẻ bài như feed, phân trang.
+
 ### Menu thả xuống
 
 - Tấm `glass-bar` bo `radius-xl`, rộng tối thiểu 208px (không ăn theo bề ngang nút mở). Trang con (như "Hiển thị và trợ năng") thay nội dung menu, mục đầu là nút quay lại có mũi tên; đổi trang thì đưa focus vào mục đầu. Nhóm lựa chọn dùng `DropdownMenuRadioGroup`, chọn không đóng menu. Mục cao ≥ 40px, chữ 16px, có biểu tượng Lucide 16px; mục đang chọn bằng bàn phím nền `accent`.
@@ -243,7 +250,7 @@ Mọi danh sách và trang dữ liệu đều có đủ: đang tải (skeleton c
 
 - Mobile-first. Điểm ngắt kiểm tra: 375, 768, 1024, 1440.
 - Ảnh nền cố định phủ màn hình; `SiteShell` là khung kính lớn bao header và nội dung, chừa viền ảnh quanh khung.
-- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng danh mục (viên; mục đang xem là viên `glass-primary`; **chỉ khi đã đăng nhập**), bên phải là nút Đăng nhập / Đăng ký (khách: header chỉ có logo và hai nút này), hoặc (đã đăng nhập) nút tròn **Tin nhắn**, **Thông báo** rồi **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai, cuộn ngang bên trong thanh.
+- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng danh mục (viên; mục đang xem là viên `glass-primary`; **chỉ khi đã đăng nhập**), bên phải là nút Đăng nhập / Đăng ký (khách: header chỉ có logo và hai nút này), hoặc (đã đăng nhập) **ô tìm kiếm**, nút tròn **Tin nhắn**, **Thông báo** rồi **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai, cuộn ngang bên trong thanh.
 - Trang chào mừng của khách (`/`): cột 860px căn giữa theo chiều dọc; tấm `glass-strong` lớn (viên nhãn `accent`, tiêu đề `text-3xl` đến `text-5xl`, đoạn giới thiệu, nút chính **Tham gia xóm** và nút viền **Đăng nhập**, xếp dọc rộng hết trên điện thoại), dưới là ba tấm `glass` (biểu tượng Lucide trong vòng tròn `accent`, tiêu đề `text-lg`, một câu), ba cột từ 768px. Hiện ra lần lượt: tấm lớn bậc 0, ba tấm nhỏ bậc 1 đến 3.
 - Feed một cột ở giữa, rộng tối đa 860px, ở mọi bề rộng. Không có cột phải (bỏ ngày 2026-11-11 theo yêu cầu): danh mục đã có trên thanh điều hướng của header.
 - Tab sắp xếp và phân trang: thanh `glass-button` dạng viên thuốc, mục đang chọn là viên `glass-primary`.

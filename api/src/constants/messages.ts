@@ -64,6 +64,23 @@ export const WELCOME_MESSAGES = {
   ],
 } as const;
 
+/** Ô tìm ở header và trang `/tim-kiem` (docs/tinh-nang.md mục 2.5). */
+export const SEARCH_MESSAGES = {
+  TITLE: "Tìm kiếm",
+  PLACEHOLDER: "Tìm trong xóm",
+  INPUT_LABEL: "Tìm bài viết",
+  OPEN: "Mở ô tìm kiếm",
+  CLOSE: "Đóng ô tìm kiếm",
+  PROMPT: "Gõ từ khóa vào ô tìm ở trên nhé. Có dấu hay không dấu đều được.",
+  ALL_CATEGORIES: "Tất cả",
+  LOAD_ERROR: "Có trục trặc khi tìm. Bạn thử lại sau ít phút nhé.",
+} as const;
+
+/** Câu mẫu "Tìm không ra" ở docs/giong-van-va-giao-dien.md. */
+export function searchEmptyMessage(q: string): string {
+  return `Không thấy bài nào khớp "${q}". Thử từ khác xem sao.`;
+}
+
 /** Câu của trang cài đặt tài khoản (docs/tinh-nang.md mục 1.4). */
 export const SETTINGS_MESSAGES = {
   SAVED: "Đã lưu hồ sơ của bạn.",

@@ -141,15 +141,18 @@ Tiêu chí:
 
 ### 2.5 Tìm kiếm 🌐📱
 
-- Ô tìm ở thanh trên (web) và tab Tìm kiếm (app).
+- Ô tìm ở thanh trên (web, chỉ thành viên) và tab Tìm kiếm (app). Web: từ 1024px ô luôn hiện giữa thanh danh mục và nút Tin nhắn; nhỏ hơn là nút kính lúp, bấm vào ô tìm phủ ngang hàng trên của header. Phím `/` đưa con trỏ vào ô.
+- Enter thì sang `/tim-kiem?q=`: từ khóa, số bài, lọc theo danh mục, kết quả như feed.
 - Gõ có dấu hay không dấu đều ra kết quả. Lọc thêm theo danh mục.
 
 Tiêu chí:
 
-- [ ] "ban tron" tìm ra bài có chữ "bàn tròn"
-- [ ] "do an" tìm ra "đồ ăn"
-- [ ] Từ khóa rỗng không gọi truy vấn
-- [ ] Có phân trang
+- [x] "ban tron" tìm ra bài có chữ "bàn tròn" (backend: `public-read.e2e-spec.ts`)
+- [x] "do an" tìm ra "đồ ăn"
+- [x] Từ khóa rỗng không gọi truy vấn (api-client trả trang rỗng; web chỉ nhắc gõ từ khóa)
+- [x] Có phân trang (web: `?page=`, giữ từ khóa và danh mục)
+- [x] Không tìm ra thì hiện câu mẫu "Tìm không ra"
+- [ ] App: tab Tìm kiếm
 
 ## 3. Bình luận 🌐📱
 
