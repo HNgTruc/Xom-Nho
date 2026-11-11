@@ -82,7 +82,12 @@ export function SignUpScreen() {
         replace
         style={[
           text.base,
-          { color: colors.primary, fontWeight: weight.semibold, paddingVertical: 12 },
+          {
+            color: colors.link,
+            fontWeight: weight.semibold,
+            paddingVertical: 12,
+            textDecorationLine: "underline",
+          },
         ]}
       >
         Đã có tài khoản? Đăng nhập

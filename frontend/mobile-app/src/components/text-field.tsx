@@ -55,7 +55,7 @@ export function TextField({ label, error, hint, secure, style, ...props }: Props
             hitSlop={8}
             style={({ pressed }) => [styles.toggle, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Text style={[text.sm, { color: colors.primary, fontWeight: weight.semibold }]}>
+            <Text style={[text.sm, { color: colors.link, fontWeight: weight.semibold }]}>
               {visible ? "Ẩn" : "Hiện"}
             </Text>
           </Pressable>

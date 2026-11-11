@@ -72,7 +72,12 @@ export function SignInScreen() {
         replace
         style={[
           text.base,
-          { color: colors.primary, fontWeight: weight.semibold, paddingVertical: 12 },
+          {
+            color: colors.link,
+            fontWeight: weight.semibold,
+            paddingVertical: 12,
+            textDecorationLine: "underline",
+          },
         ]}
       >
         Chưa có tài khoản? Đăng ký
