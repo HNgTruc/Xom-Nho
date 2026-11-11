@@ -1,5 +1,5 @@
 export { getCategories, getCategory } from "./api/get-category";
-export { getPublicPost } from "./api/get-post";
+export { getPost } from "./api/get-post";
 export { getTag } from "./api/get-tag";
 export { CategoryBadge } from "./components/category-badge";
 export { CategoryNav, CategoryNavSkeleton } from "./components/category-nav";

@@ -1,13 +1,13 @@
 import type { Category } from "@xom-nho/api";
 import { cache } from "react";
-import { publicApi } from "@/lib/server-api";
+import { serverApi } from "@/lib/server-api";
 
 /**
  * Tất cả danh mục theo thứ tự hiển thị. `cache`: header và trang danh mục dùng chung một lần gọi trong cùng
  * request. Lỗi ném tiếp; chỗ chỉ là phần phụ (thanh điều hướng của header) tự bắt và hiện rỗng.
  */
 export const getCategories = cache(async (): Promise<Category[]> => {
-  const { data } = await publicApi.categories.list();
+  const { data } = await serverApi.categories.list();
   return data;
 });
 

@@ -1,16 +1,13 @@
-import { getCurrentUser } from "../api/get-current-user";
+import { requireUser } from "../api/get-current-user";
 
 /**
- * Lời chào trên trang chủ theo người đang xem (câu mẫu ở docs/giong-van-va-giao-dien.md). Đọc cookie nên phải
- * nằm trong `<Suspense>`. Backend không trả lời thì chào như khách: lời chào không được làm hỏng trang.
+ * Lời chào trên trang chủ của thành viên (câu mẫu ở docs/giong-van-va-giao-dien.md). Đọc cookie nên phải
+ * nằm trong `<Suspense>`. Khách không tới được đây (`proxy.ts` cho xem trang chào mừng); cookie còn mà phiên
+ * đã hết hay bị khóa thì sang trang đăng nhập.
  */
 export async function HomeGreeting() {
-  const user = await getCurrentUser().catch(() => null);
+  const user = await requireUser("/");
   return (
-    <p className="text-base text-muted-foreground">
-      {user
-        ? `Chào ${user.name}, hôm nay xóm có gì mới nè.`
-        : "Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện."}
-    </p>
+    <p className="text-base text-muted-foreground">{`Chào ${user.name}, hôm nay xóm có gì mới nè.`}</p>
   );
 }

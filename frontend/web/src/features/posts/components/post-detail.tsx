@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avat
 import { Badge } from "@xom-nho/ui/components/badge";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { requireUser } from "@/features/auth";
 import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
 import { getPost } from "../api/get-post";
 import { initials } from "@/lib/initials";
@@ -17,10 +18,12 @@ const numberFormat = new Intl.NumberFormat("vi-VN");
  * Trang bài viết (MASTER mục 7, thread view): danh mục, tiêu đề, tác giả và ngày, mục lục nếu bài dài,
  * nội dung Markdown font Lora, danh sách thẻ. Cả bài nằm trên kính đặc (MASTER 2.4) để đọc lâu không mỏi.
  * Khối bình luận thêm ở giai đoạn 4.
- * Đọc `params` và cookie nên phải nằm trong `<Suspense>`. Không có hoặc không được xem thì 404.
+ * Chỉ cho thành viên (ADR 0007). Đọc `params` và cookie nên phải nằm trong `<Suspense>`.
+ * Không có hoặc không được xem thì 404.
  */
 export async function PostDetailView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  await requireUser(`/bai-viet/${slug}`);
   const post = await getPost(slug);
   if (!post) notFound();
 

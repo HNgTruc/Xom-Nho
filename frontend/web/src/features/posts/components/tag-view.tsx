@@ -2,6 +2,7 @@ import { FEED_MESSAGES } from "@xom-nho/api";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/common/error-state";
+import { requireUser } from "@/features/auth";
 import type { RawSearchParams } from "@/lib/search-params";
 import { getTag } from "../api/get-tag";
 import { ArchiveHeader } from "./archive-header";
@@ -10,7 +11,7 @@ import { PostListSkeleton } from "./post-list-skeleton";
 
 /**
  * Trang `/tag/<slug>` (docs/tinh-nang.md mục 2.4): đầu trang thẻ rồi feed lọc theo thẻ.
- * Thẻ chưa có bài vẫn hiện trang (lời nhắn trống), chỉ thẻ không tồn tại mới 404.
+ * Chỉ cho thành viên (ADR 0007). Thẻ chưa có bài vẫn hiện trang (lời nhắn trống), chỉ thẻ không tồn tại mới 404.
  */
 export async function TagView({
   params,
@@ -20,6 +21,7 @@ export async function TagView({
   searchParams: Promise<RawSearchParams>;
 }) {
   const { slug } = await params;
+  await requireUser(`/tag/${slug}`);
   const tag = await getTag(slug);
   if (!tag) notFound();
 

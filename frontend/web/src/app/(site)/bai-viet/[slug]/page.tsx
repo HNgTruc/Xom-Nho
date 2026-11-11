@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { POST_STATUSES } from "@xom-nho/api";
 import {
-  getPublicPost,
+  getPost,
   HIDDEN_POST_METADATA,
   PostDetailSkeleton,
   PostDetailView,
   postMetadata,
 } from "@/features/posts";
 
-// Thẻ meta lấy theo góc nhìn của khách: bản nháp không lộ tiêu đề, và không được lập chỉ mục
+// Chỉ thành viên đọc được bài (ADR 0007): thẻ meta lấy theo người đang xem, dùng chung lần gọi với trang.
+// Bài chưa đăng (chủ bài, trưởng xóm đang xem) dùng tiêu đề chung, không lập chỉ mục.
 export async function generateMetadata({
   params,
 }: PageProps<"/bai-viet/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPublicPost(slug).catch(() => null);
-  return post ? postMetadata(post) : HIDDEN_POST_METADATA;
+  const post = await getPost(slug).catch(() => null);
+  return post?.status === POST_STATUSES.PUBLISHED ? postMetadata(post) : HIDDEN_POST_METADATA;
 }
 
 // Cột đọc 720px (MASTER mục 4)

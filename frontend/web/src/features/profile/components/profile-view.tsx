@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/common/error-state";
-import { getCurrentUser } from "@/features/auth";
+import { getCurrentUser, requireUser } from "@/features/auth";
 import { PostFeed, PostListSkeleton } from "@/features/posts";
 import type { RawSearchParams } from "@/lib/search-params";
 import { getProfile } from "../api/get-profile";
@@ -28,7 +28,7 @@ async function OwnerActions({ profileId }: { profileId: string }) {
 
 /**
  * Trang `/u/<username>` (docs/tinh-nang.md mục 1.3): đầu trang hồ sơ rồi các bài đã đăng của người này.
- * Đọc `params` nên phải nằm trong `<Suspense>`. Không có người này thì 404.
+ * Chỉ cho thành viên (ADR 0007). Đọc `params` nên phải nằm trong `<Suspense>`. Không có người này thì 404.
  */
 export async function ProfileView({
   params,
@@ -38,6 +38,7 @@ export async function ProfileView({
   searchParams: Promise<RawSearchParams>;
 }) {
   const { username } = await params;
+  await requireUser(`/u/${username}`);
   const profile = await getProfile(username);
   if (!profile?.username) notFound();
 

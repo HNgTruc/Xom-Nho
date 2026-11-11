@@ -1,6 +1,5 @@
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/features/auth";
+import { requireUser } from "@/features/auth";
 import { ProfileSettingsForm } from "./profile-settings-form";
 
 /**
@@ -8,8 +7,7 @@ import { ProfileSettingsForm } from "./profile-settings-form";
  * rồi quay lại đây. Quyền thật vẫn do backend quyết (`PATCH /me` cần phiên). Đọc cookie nên nằm trong `<Suspense>`.
  */
 export async function SettingsView() {
-  const me = await getCurrentUser();
-  if (!me) redirect(`/dang-nhap?next=${encodeURIComponent("/cai-dat")}`);
+  const me = await requireUser("/cai-dat");
 
   return (
     <section

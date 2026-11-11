@@ -37,6 +37,33 @@ export const INBOX_MESSAGES = {
   EMPTY: "Bạn chưa có tin nhắn nào. Ghé hồ sơ một hàng xóm để bắt chuyện nhé.",
 } as const;
 
+/**
+ * Trang chào mừng: thứ duy nhất khách thấy (ADR 0007, docs/tinh-nang.md mục 2.0).
+ * Mỗi điểm trong `POINTS` là một tấm nhỏ: tiêu đề và một câu.
+ */
+export const WELCOME_MESSAGES = {
+  EYEBROW: "Diễn đàn nhỏ của hàng xóm",
+  TITLE: "Chào mừng đến Xóm Nhỏ",
+  INTRO:
+    "Nơi hàng xóm kể chuyện thường ngày, hỏi han nhau và chia sẻ điều mình biết. Đăng ký để vào xóm đọc bài và cùng trò chuyện.",
+  JOIN: "Tham gia xóm",
+  SIGN_IN: "Đăng nhập",
+  POINTS: [
+    {
+      TITLE: "Đọc chuyện trong xóm",
+      TEXT: "Bài của hàng xóm theo danh mục: đời sống, công nghệ, học tập, kể chuyện, hỏi đáp.",
+    },
+    {
+      TITLE: "Viết bài của bạn",
+      TEXT: "Hàng xóm mới gửi bài để trưởng xóm duyệt, cây bút thì đăng thẳng.",
+    },
+    {
+      TITLE: "Cùng trò chuyện",
+      TEXT: "Bình luận dưới bài, ghé hồ sơ của nhau. Chỉ người trong xóm mới đọc được.",
+    },
+  ],
+} as const;
+
 /** Câu của trang cài đặt tài khoản (docs/tinh-nang.md mục 1.4). */
 export const SETTINGS_MESSAGES = {
   SAVED: "Đã lưu hồ sơ của bạn.",
