@@ -77,18 +77,18 @@ Kiểu trong `api` chỉ bảo vệ lúc build. App đã cài trên điện tho�
 
 ### Bài viết (`modules/posts`)
 
-| Method | Đường dẫn                                           |     | Mô tả                                                                                          |
-| ------ | --------------------------------------------------- | --- | ---------------------------------------------------------------------------------------------- |
-| GET    | `/posts?page=&category=&tag=&author=&sort=new\|top` | 🔒  | Danh sách bài đã đăng. Query: `listPostsQuerySchema` (`author` là username)                    |
-| GET    | `/posts/:slug`                                      | 🔒  | Chi tiết bài (Markdown thô). Bài chưa đăng: chỉ tác giả và admin xem được, người khác nhận 404 |
-| POST   | `/posts/:id/view`                                   | 🔒  | Tăng lượt xem. Trả 204. Frontend gọi một lần mỗi phiên cho mỗi bài                             |
-| POST   | `/posts`                                            | 🔒  | Tạo bài. Body: `createPostSchema`                                                              |
-| PATCH  | `/posts/:id`                                        | 🔒  | Sửa bài của mình. Body: `updatePostSchema`                                                     |
-| DELETE | `/posts/:id`                                        | 🔒  | Xóa bài của mình                                                                               |
-| GET    | `/me/posts?status=`                                 | 🔒  | Bài của tôi, mọi trạng thái                                                                    |
+| Method | Đường dẫn                                           |     | Mô tả                                                                                                                                                                                                   |
+| ------ | --------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/posts?page=&category=&tag=&author=&sort=new\|top` | 🔒  | Danh sách bài đã đăng. Query: `listPostsQuerySchema` (`author` là username)                                                                                                                             |
+| GET    | `/posts/:slug`                                      | 🔒  | Chi tiết bài (Markdown thô hoặc chữ thường, xem `contentFormat`). Bài chưa đăng: chỉ tác giả và admin xem được, người khác nhận 404                                                                     |
+| POST   | `/posts/:id/view`                                   | 🔒  | Tăng lượt xem. Trả 204. Frontend gọi một lần mỗi phiên cho mỗi bài                                                                                                                                      |
+| POST   | `/posts`                                            | 🔒  | Đăng bài, vào thẳng `PUBLISHED` (ADR 0008). Body: `createPostSchema` (`title` tùy chọn, `content` chữ thường, `category` slug, `mediaIds` tối đa 10). Trả 201 + `PostDetail`. Giới hạn 10 bài / 10 phút |
+| PATCH  | `/posts/:id`                                        | 🔒  | Sửa bài của mình. Body: `updatePostSchema`                                                                                                                                                              |
+| DELETE | `/posts/:id`                                        | 🔒  | Xóa bài của mình                                                                                                                                                                                        |
+| GET    | `/me/posts?status=`                                 | 🔒  | Bài của tôi, mọi trạng thái                                                                                                                                                                             |
 
-`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { id, name, username, image }, category { name, slug, color }, tags [{ name, slug }]`. `commentCount` chỉ đếm bình luận đang hiện. `author.id` để frontend so với `Me.id`.
-`PostDetail`: `PostListItem` + `content, status, rejectReason, updatedAt`. `rejectReason` là `null` trừ khi bài bị từ chối.
+`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { id, name, username, image }, category { name, slug, color }, tags [{ name, slug }], media [{ id, kind, mimeType }]`. `title` rỗng với bài không đặt tiêu đề (frontend hiện `excerpt`). `media` theo thứ tự trong bài. `commentCount` chỉ đếm bình luận đang hiện. `author.id` để frontend so với `Me.id`.
+`PostDetail`: `PostListItem` + `content, contentFormat (MARKDOWN | PLAIN), status, rejectReason, updatedAt`. `PLAIN`: chữ thường giữ xuống dòng, không render Markdown. `rejectReason` là `null` trừ khi bài bị từ chối.
 
 Đường dẫn khớp chính xác: `:slug` (bài, tag) và `:username` phải đúng dạng chuẩn (chữ thường, không khoảng trắng). Sai dạng, kể cả viết hoa (`/posts/Moi-Nhat`), trả 404 như không có, không phải 400: mỗi trang chỉ có một URL. `:id` sai dạng (quá 64 ký tự, có ký tự lạ) cũng trả 404. Bộ lọc trong query (`?category=`, `?tag=`, `?author=`) thì dễ dãi hơn: tự cắt khoảng trắng, đổi chữ thường.
 
@@ -96,7 +96,18 @@ Cache của `GET /posts/:slug`: mọi phản hồi (cả 404) có `Vary: Cookie`
 
 `sort=top` sắp theo `viewCount`, không có index (cột bị ghi mỗi lượt xem, thêm index thì ghi chậm). MySQL sắp mọi bài đã đăng mỗi lần gọi: ổn với vài nghìn bài, xem lại ở giai đoạn 7. Lượt xem chưa giới hạn tần suất (xem mục Giới hạn tần suất) nên tab "Nhiều người đọc" dễ bị đẩy số tới khi làm giai đoạn 4.
 
-Kiểu khai báo ở `api/src/types/post.ts`, `user.ts`, `tag.ts`; schema query ở `api/src/schemas/post.ts`, `search.ts`, `tag.ts`.
+Lỗi khi đăng: `VALIDATION_ERROR` kèm `fields` (`content` khi không có chữ lẫn ảnh, `category` khi danh mục không còn, `mediaIds` khi file không phải của mình, đã gắn bài khác, hoặc không có).
+
+### Ảnh, video (`modules/files`, ADR 0005)
+
+| Method | Đường dẫn    |     | Mô tả                                                                                                                                                                                                                              |
+| ------ | ------------ | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/files`     | 🔒  | Tải một file, multipart trường `file`. Ảnh JPG/PNG/WebP đến 5 MB, video MP4/WebM đến 25 MB, nhận loại bằng chữ ký nhị phân. Trả 201 + `MediaItem { id, kind, mimeType }`, chưa gắn bài. Quá 25 MB: 413. Giới hạn 30 file / 10 phút |
+| GET    | `/files/:id` | 🔒  | Nội dung file. Bài đã đăng: mọi thành viên; còn lại chỉ người tải lên và admin, người khác 404. Có `Range` (tua video), `Cache-Control: private`, `X-Content-Type-Options: nosniff`                                                |
+
+Frontend lấy đường dẫn bằng `fileUrl(baseUrl, id)` trong api-client; web dùng thẳng trong `<img>`, `<video>` (trình duyệt tự gửi cookie, web và backend cùng site).
+
+Kiểu khai báo ở `api/src/types/post.ts`, `media.ts`, `user.ts`, `tag.ts`; schema query ở `api/src/schemas/post.ts`, `search.ts`, `tag.ts`.
 
 ### Tìm kiếm (`modules/search`)
 
@@ -214,8 +225,9 @@ Phần đổi vai trò và cấm có thể dùng API của plugin admin trong Be
 ## Giới hạn tần suất
 
 - Đăng nhập/đăng ký: giới hạn sẵn của Better Auth.
-- Tạo bài: tối đa 5 bài/giờ với `user`.
+- Tạo bài: tối đa 10 bài / 10 phút mỗi người (`posts.service.ts`).
+- Tải file: tối đa 30 file / 10 phút mỗi người (`files.service.ts`).
 - Bình luận: tối đa 1 bình luận / 10 giây / người.
 - Lượt xem (`POST /posts/:id/view`): hiện chưa giới hạn, ai gọi lặp cũng tăng được. Khi làm `infrastructure/rate-limit` (giai đoạn 4), giới hạn theo IP + bài (ví dụ 1 lần / 30 phút).
 
-Giai đoạn đầu lưu bộ đếm trong bộ nhớ (`infrastructure/rate-limit`); khi chạy nhiều instance thì chuyển sang MySQL hoặc Redis.
+Bộ đếm lưu trong bộ nhớ (`infrastructure/rate-limit/rate-limiter.ts`, cửa sổ trượt theo khóa); khi chạy nhiều instance thì chuyển sang MySQL hoặc Redis.

@@ -61,7 +61,10 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 4: Viết bài + bình luận
 
-- [ ] Backend: tạo/sửa/xóa bài, luồng trạng thái, `comments`, giới hạn tần suất
+- [x] Backend: tạo bài kèm ảnh/video, đăng thẳng (ADR 0008), giới hạn tần suất trong bộ nhớ (`infrastructure/rate-limit`)
+- [x] Web: tấm tạo bài ở trang chủ, hộp soạn tải ảnh/video, lưới ảnh trên thẻ bài, ảnh/video ở trang bài
+- [ ] Backend: sửa/xóa bài (xóa cả file trên đĩa), `comments`
+- [ ] Dọn file tải lên mà không gắn bài quá 1 ngày
 - [ ] Backend: `PostLike` (thích / bỏ thích), feed trả số thích và 2 bình luận công khai mới nhất
 - [ ] Web: trình soạn Markdown có xem trước, bài của tôi, bình luận + trả lời
 - [ ] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất
@@ -69,7 +72,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 4b: Hồ sơ, cài đặt, kết bạn
 
-- [ ] `infrastructure/storage` + module `files`: tải ảnh, kiểm tra chữ ký nhị phân, giới hạn 5 MB ([ADR 0005](quyet-dinh/0005-luu-file-tren-o-dia-backend.md))
+- [x] `infrastructure/storage` + module `files`: tải ảnh, video, kiểm tra chữ ký nhị phân, giới hạn 5 MB / 25 MB ([ADR 0005](quyet-dinh/0005-luu-file-tren-o-dia-backend.md)); làm sớm ở giai đoạn 4 cho bài viết
 - [ ] Migration: `user.coverImage`, `user.location`, bảng `Friendship`, `UserBlock`
 - [ ] Backend: `modules/friends` (mời, chấp nhận, từ chối, hủy), hồ sơ trả số bạn bè và quan hệ với người xem
 - [ ] Web: trang hồ sơ có ảnh bìa, ảnh đại diện, nơi ở, số bạn bè, bài viết, ô viết bài

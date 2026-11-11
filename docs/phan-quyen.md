@@ -13,24 +13,26 @@ Vai trò lưu ở cột `role` của bảng `user` (plugin admin của Better Au
 
 ## Ma trận quyền
 
-| Hành động                               | Khách |       Hàng xóm        |     Cây bút     |   Trưởng xóm    |
-| --------------------------------------- | :---: | :-------------------: | :-------------: | :-------------: |
-| Xem trang chào mừng, đăng ký, đăng nhập |  ✅   |                       |                 |                 |
-| Xem bài đã đăng, bình luận đang hiện    |       |          ✅           |       ✅        |       ✅        |
-| Tìm kiếm, lọc theo danh mục/tag         |       |          ✅           |       ✅        |       ✅        |
-| Xem hồ sơ hàng xóm                      |       |          ✅           |       ✅        |       ✅        |
-| Bình luận, trả lời bình luận            |       |          ✅           |       ✅        |       ✅        |
-| Sửa/xóa bình luận của mình              |       |          ✅           |       ✅        |       ✅        |
-| Viết bài                                |       |    ✅ (chờ duyệt)     | ✅ (đăng thẳng) | ✅ (đăng thẳng) |
-| Sửa bài của mình                        |       | ✅ (về lại chờ duyệt) |       ✅        |       ✅        |
-| Xóa bài của mình                        |       |          ✅           |       ✅        |       ✅        |
-| Tạo tag mới khi viết bài                |       |                       |       ✅        |       ✅        |
-| Duyệt / từ chối bài                     |       |                       |                 |       ✅        |
-| Ẩn / hiện bình luận bất kỳ              |       |                       |                 |       ✅        |
-| Sửa / xóa bài bất kỳ                    |       |                       |                 |       ✅        |
-| Quản lý danh mục, tag                   |       |                       |                 |       ✅        |
-| Đổi vai trò, cấm người dùng             |       |                       |                 |       ✅        |
-| Đăng nhập app admin                     |       |                       |                 |       ✅        |
+| Hành động                               | Khách | Hàng xóm | Cây bút | Trưởng xóm |
+| --------------------------------------- | :---: | :------: | :-----: | :--------: |
+| Xem trang chào mừng, đăng ký, đăng nhập |  ✅   |          |         |            |
+| Xem bài đã đăng, bình luận đang hiện    |       |    ✅    |   ✅    |     ✅     |
+| Tìm kiếm, lọc theo danh mục/tag         |       |    ✅    |   ✅    |     ✅     |
+| Xem hồ sơ hàng xóm                      |       |    ✅    |   ✅    |     ✅     |
+| Bình luận, trả lời bình luận            |       |    ✅    |   ✅    |     ✅     |
+| Sửa/xóa bình luận của mình              |       |    ✅    |   ✅    |     ✅     |
+| Viết bài, kèm ảnh/video (đăng thẳng)    |       |    ✅    |   ✅    |     ✅     |
+| Tải ảnh, video lên                      |       |    ✅    |   ✅    |     ✅     |
+| Xem ảnh, video của bài đã đăng          |       |    ✅    |   ✅    |     ✅     |
+| Sửa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
+| Xóa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
+| Tạo tag mới khi viết bài                |       |          |   ✅    |     ✅     |
+| Duyệt / từ chối bài                     |       |          |         |     ✅     |
+| Ẩn / hiện bình luận bất kỳ              |       |          |         |     ✅     |
+| Sửa / xóa bài bất kỳ                    |       |          |         |     ✅     |
+| Quản lý danh mục, tag                   |       |          |         |     ✅     |
+| Đổi vai trò, cấm người dùng             |       |          |         |     ✅     |
+| Đăng nhập app admin                     |       |          |         |     ✅     |
 
 Hàng xóm chỉ được gắn tag đã có; cây bút và trưởng xóm được tạo tag mới.
 
@@ -38,8 +40,13 @@ Khách không đọc được gì (ADR 0007): backend trả 401 cho mọi route 
 
 ## Trạng thái bài viết
 
+Từ ADR 0008 mọi thành viên đăng thẳng: bài soạn ở trang chủ vào thẳng `PUBLISHED`. Các trạng thái chờ duyệt bên dưới giữ cho bài cũ và trình soạn Markdown sau này (nếu bật lại duyệt bài).
+
+Ảnh, video (`GET /files/:id`): file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
+
 ```mermaid
 stateDiagram-v2
+  [*] --> PUBLISHED: đăng từ ô tạo bài (mọi thành viên, ADR 0008)
   [*] --> DRAFT: lưu nháp
   DRAFT --> PENDING: hàng xóm gửi
   DRAFT --> PUBLISHED: cây bút / trưởng xóm đăng

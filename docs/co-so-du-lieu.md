@@ -15,6 +15,8 @@ erDiagram
   Tag ||--o{ PostTag : ""
   Post ||--o{ Comment : "có"
   Comment ||--o{ Comment : "trả lời"
+  User ||--o{ Media : "tải lên"
+  Post ||--o{ Media : "gắn"
   User ||--o{ Post : "duyệt (reviewer)"
 
   User {
@@ -34,7 +36,8 @@ erDiagram
     string title
     string slug UK
     string excerpt
-    text content "Markdown"
+    text content "Markdown hoặc chữ thường"
+    enum contentFormat "MARKDOWN PLAIN"
     text searchText "đã bỏ dấu, FULLTEXT"
     enum status "DRAFT PENDING PUBLISHED REJECTED ARCHIVED"
     string rejectReason
@@ -45,6 +48,17 @@ erDiagram
     datetime publishedAt
     datetime createdAt
     datetime updatedAt
+  }
+  Media {
+    string id PK
+    enum kind "IMAGE VIDEO"
+    string mimeType
+    int sizeBytes
+    string storageKey UK "tên file trên đĩa, ngẫu nhiên"
+    string ownerId FK
+    string postId FK "null = chưa gắn bài"
+    int position
+    datetime createdAt
   }
   Category {
     string id PK
@@ -84,6 +98,8 @@ Nâng cấp Better Auth lên bản mới: so lại cột với `@better-auth/cor
 Ghi chú cài đặt:
 
 - Tên bảng viết thường, số ít, gạch dưới (`user`, `post`, `post_tag`) qua `@@map`; tên cột giữ camelCase như Better Auth.
+- `Post.contentFormat`: `MARKDOWN` (bài kiểu diễn đàn, có trước) hoặc `PLAIN` (soạn ở trang chủ, ADR 0008). Bài soạn ở trang chủ có thể có `title` rỗng.
+- `Media`: ảnh, video tải lên (ADR 0005). File nằm trên đĩa backend (`UPLOAD_DIR`), tên là `storageKey` (uuid + đuôi do backend chọn theo chữ ký nhị phân). Tải lên trước với `postId = null`, gắn khi đăng bài. Xóa bài thì xóa dòng media (cascade); file trên đĩa phải dọn riêng.
 - `Post.content` là `MEDIUMTEXT` (16 MB): `TEXT` chỉ 64 KB, bài tiếng Việt dài (mỗi chữ có dấu 2-3 byte) dễ vượt.
 - Server MySQL mặc định `utf8mb4_0900_ai_ci`, nhưng Prisma tạo từng bảng với `utf8mb4_unicode_ci` và không theo dõi collation. Giữ nguyên `unicode_ci` cho mọi bảng (không sửa tay migration) để các bảng luôn đồng nhất. Cả hai collation đều không phân biệt dấu khi so sánh, nên cột `UNIQUE` coi "bàn" và "ban" là trùng (hai tag này không cùng tồn tại được). Đây là hành vi mong muốn cho tên tag, danh mục. Tìm kiếm không phụ thuộc collation vì `searchText` đã bỏ dấu sẵn.
 - Kết nối qua driver adapter `@prisma/adapter-mariadb` (Prisma 7 bắt buộc dùng adapter). `DATABASE_URL` khai báo trong `backend/prisma.config.ts` (file này trỏ tới `database/prisma/`), không còn trong `schema.prisma`.
@@ -98,15 +114,17 @@ Ghi chú cài đặt:
 
 ## Chỉ mục
 
-| Bảng    | Chỉ mục                             | Phục vụ                         |
-| ------- | ----------------------------------- | ------------------------------- |
-| Post    | `(status, publishedAt DESC)`        | Trang chủ: bài mới nhất đã đăng |
-| Post    | `(categoryId, status, publishedAt)` | Lọc theo danh mục               |
-| Post    | `(authorId, status, publishedAt)`   | Bài của tôi, hồ sơ (`?author=`) |
-| Post    | `FULLTEXT(searchText)`              | Tìm kiếm                        |
-| Comment | `(postId, status, createdAt)`       | Bình luận dưới bài              |
-| Comment | `(parentId)`                        | Trả lời                         |
-| PostTag | `(tagId)`                           | Lọc theo tag                    |
+| Bảng    | Chỉ mục                             | Phục vụ                          |
+| ------- | ----------------------------------- | -------------------------------- |
+| Post    | `(status, publishedAt DESC)`        | Trang chủ: bài mới nhất đã đăng  |
+| Post    | `(categoryId, status, publishedAt)` | Lọc theo danh mục                |
+| Post    | `(authorId, status, publishedAt)`   | Bài của tôi, hồ sơ (`?author=`)  |
+| Post    | `FULLTEXT(searchText)`              | Tìm kiếm                         |
+| Media   | `(postId, position)`                | Ảnh, video của bài theo thứ tự   |
+| Media   | `(ownerId, postId, createdAt)`      | File chưa gắn bài (gắn, dọn rác) |
+| Comment | `(postId, status, createdAt)`       | Bình luận dưới bài               |
+| Comment | `(parentId)`                        | Trả lời                          |
+| PostTag | `(tagId)`                           | Lọc theo tag                     |
 
 Không có index cho `Post.viewCount` (tab "Nhiều người đọc"): cột bị ghi mỗi lượt xem. Đánh đổi có chủ ý, xem lại ở giai đoạn 7 nếu bài nhiều.
 

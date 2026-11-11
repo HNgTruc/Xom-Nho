@@ -192,9 +192,17 @@ Thứ tự hiện ra trên trang danh sách: header (bậc 0) → đầu trang (
 
 ## 7. Thành phần chính
 
+### Tấm tạo bài và hộp soạn (trang chủ)
+
+- Tấm `glass` đầu feed (thay đầu trang "Bài viết trong xóm", `h1` chỉ còn cho trình đọc màn hình): ảnh đại diện 40px, viên viền `input` 60% cao 44px ghi "Chào {tên}, hôm nay có chuyện gì?" (`muted-foreground` trên `glass`), dưới đường kẻ là nút ghost **Ảnh/Video** và chỗ báo "Bài của bạn đã lên xóm." (`role=status`).
+- Hộp soạn là `Dialog` của `ui`: tấm `glass-bar` bo `radius-2xl`, rộng tối đa 576px, dưới 640px rộng gần hết màn hình; lớp phủ đen 40% không làm mờ. Thứ tự: tiêu đề hộp + tên người đăng, ô tiêu đề (không bắt buộc), ô nội dung chữ 18px, lưới xem trước 3 cột (4 cột từ 640px) ô vuông bo `radius-md`, nút gỡ tròn 32px nền đen 60%; ô đang tải phủ đen 45% có vòng quay; ô lỗi viền `destructive` và dải lỗi chữ trắng trên `destructive`. Rồi nút viền Ảnh/Video + dòng giới hạn file, chọn danh mục (select gốc, cao 44px trên điện thoại), nút chính **Đăng bài** (rộng hết trên điện thoại).
+
 ### Thẻ bài trong feed
 
-- Thứ tự đọc: badge danh mục → tiêu đề (`text-lg`, 600) → tóm tắt 2 dòng (`muted-foreground`) → hàng metadata (avatar 24, tên, "2 giờ trước", số bình luận).
+- Thứ tự đọc: badge danh mục → tiêu đề (`text-lg`, 600) → tóm tắt 2 dòng (`muted-foreground`) → lưới ảnh/video → hàng metadata (avatar 24, tên, "2 giờ trước", số bình luận).
+- Bài không có tiêu đề (soạn kiểu mạng xã hội): phần đầu nội dung làm chữ chính (`text-base`, `card-foreground`, tối đa 4 dòng).
+- Lưới ảnh/video bo `radius-lg`, khe 4px: 1 ô tỉ lệ 16:9; 2 ô đôi; 3 ô thì ô đầu cao gấp đôi bên trái; 4 ô trở lên 2x2, ô cuối phủ đen 55% ghi "+N". Video chỉ hiện khung đầu và nút phát tròn đen 60%. Ảnh lấy thẳng từ backend (`next/image` `unoptimized`, vì cần cookie). Lưới nằm dưới lớp liên kết của thẻ: bấm ô nào cũng mở bài.
+- Trang bài: ảnh xếp dọc, giữ tỉ lệ (`object-contain`, cao tối đa 80vh), video có điều khiển, nền đen.
 - Tấm `glass`, bo `radius-xl`. Cả thẻ bấm được (một liên kết bao ngoài), vùng bấm đủ lớn; hover theo mục 5.
 - Số bình luận trong viên `accent` (xanh nhạt, chữ đen), như viên màu nhấn của mẫu.
 - Bài chưa đăng (chỉ tác giả thấy): badge trạng thái ở góc phải.

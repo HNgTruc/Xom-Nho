@@ -15,7 +15,8 @@ Lưu file trong thư mục `uploads/` của backend (đường dẫn lấy từ 
 
 - Mọi file đi qua một lớp `StorageService` (`infrastructure/storage`) với các hàm `save`, `open`, `remove`. Đổi sang cloud sau này chỉ cần viết lại lớp này.
 - Kiểm tra loại file bằng **chữ ký nhị phân** (vài byte đầu), không tin đuôi file hay `Content-Type` do trình duyệt gửi. Tên file trên đĩa là id ngẫu nhiên, không dùng tên gốc.
-- Ảnh hồ sơ (công khai): phục vụ qua `GET /api/v1/files/:id`, có cache dài.
+- Ảnh hồ sơ: phục vụ qua `GET /api/v1/files/:id`, có cache dài.
+- Ảnh, video trong bài (thêm 2026-11-11, ADR 0008): cùng endpoint, chỉ thành viên xem (ADR 0007); file chưa gắn bài chỉ người tải lên và trưởng xóm xem. Tối đa 10 file mỗi bài. Đã làm: `infrastructure/storage`, `modules/files`, bảng `media`.
 - File trong tin nhắn riêng: cùng endpoint đó nhưng **kiểm tra quyền** (chỉ hai người trong cuộc trò chuyện), `Cache-Control: private`.
 - Giới hạn tần suất tải lên theo người dùng.
 

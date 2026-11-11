@@ -5,7 +5,7 @@ Xóm Nhỏ là diễn đàn / blog cộng đồng tiếng Việt. Một **backen
 ## Bối cảnh nhanh
 
 - Người dùng gọi là **hàng xóm**. Vai trò: `user` (hàng xóm), `author` (cây bút), `admin` (trưởng xóm). Chi tiết: `docs/phan-quyen.md`.
-- Bài của `user` phải chờ duyệt; bài của `author` đăng thẳng; `admin` duyệt bài, ẩn bình luận, quản lý thành viên **trên app admin riêng**.
+- Mọi thành viên đăng bài thẳng, soạn kiểu mạng xã hội kèm ảnh/video (ADR 0008); `admin` ẩn bài, ẩn bình luận, quản lý thành viên **trên app admin riêng**. Khách chỉ thấy trang chào mừng (ADR 0007).
 - Trước khi làm một tính năng: đọc mục tương ứng trong `docs/tinh-nang.md`, xem `docs/lo-trinh.md` đang ở giai đoạn nào.
 
 ## Cấu trúc
@@ -71,17 +71,17 @@ Script được thêm khi khởi tạo từng phần (giai đoạn 0). Script ch
 
 - Chia code **theo tính năng**: `backend/src/modules/<tính-năng>/`, `frontend/*/src/features/<tính-năng>/`. Thư mục định tuyến (`app/`, `router.tsx`) chỉ ghép feature lại.
 - Tên file kebab-case; component React PascalCase; hàm, biến camelCase; model Prisma PascalCase số ít.
-- Code, tên biến, commit: **tiếng Anh**. Chữ hiển thị, comment nghiệp vụ, tài liệu: **tiếng Việt**.
+- Code, tên biến: **tiếng Anh**. Commit message, chữ hiển thị, comment nghiệp vụ, tài liệu: **tiếng Việt**.
 - Dữ liệu vào backend luôn qua schema Zod trong `api`. Frontend dùng cùng schema cho form.
 - Frontend gọi backend **chỉ qua `@xom-nho/api/api-client`**.
 - Quyền kiểm tra **ở backend**. Frontend ẩn/hiện nút chỉ để tiện.
 - Component nền (nút, ô nhập, hộp thoại) lấy từ `@xom-nho/ui`, không sao chép vào từng app.
 - Không thêm thư viện mới khi chưa hỏi.
-- Conventional Commits, scope là tên phần: `feat(backend): ...`, `fix(admin): ...`.
+- Conventional Commits, scope là tên phần. `type(scope)` giữ từ khóa tiếng Anh; mô tả và thân viết **tiếng Việt có dấu**: `feat(backend): thêm tải ảnh, video cho bài viết`, `fix(admin): sửa lỗi lọc bài chờ duyệt`.
 
 ## Không được làm
 
-- **Không commit.** Trong repo chỉ chủ dự án được commit: Claude không chạy `git commit` (đã chặn trong `.claude/settings.json`), kể cả khi được bảo "commit đi". Làm xong thì báo những file đã đổi và đề xuất cách chia commit kèm message; chủ dự án tự stage và commit.
+- **Không commit.** Trong repo chỉ chủ dự án được commit: Claude không chạy `git commit` (đã chặn trong `.claude/settings.json`), kể cả khi được bảo "commit đi". Làm xong thì báo những file đã đổi và đề xuất cách chia commit kèm message tiếng Việt; chủ dự án tự stage và commit.
 - Không sửa `.env*` (trừ `.env.example`), không in bí mật ra màn hình.
 - Không sửa migration Prisma đã commit; đổi schema thì tạo migration mới.
 - Không chạy `pnpm db:compose down -v` (hay `docker compose down -v`) hay `prisma migrate reset` khi chưa hỏi.

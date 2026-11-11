@@ -113,16 +113,23 @@ Tiêu chí:
 
 ### 2.3 Viết và sửa bài 🌐📱
 
-- Tiêu đề, danh mục (bắt buộc), tag (tối đa 5), nội dung Markdown, tóm tắt (tự lấy 160 ký tự đầu nếu để trống).
-- Có nút xem trước. Lưu nháp hoặc gửi.
-- Hàng xóm gửi thì chờ duyệt; cây bút, trưởng xóm thì đăng thẳng.
+Soạn kiểu mạng xã hội (ADR 0008). Đầu trang chủ là tấm **tạo bài**: ảnh đại diện, ô "Chào {tên}, hôm nay có chuyện gì?", nút Ảnh/Video. Bấm vào mở hộp soạn:
+
+- Tiêu đề (không bắt buộc), nội dung chữ thường (giữ xuống dòng), danh mục (bắt buộc, mặc định danh mục đầu).
+- Ảnh JPG/PNG/WebP đến 5 MB, video MP4/WebM đến 25 MB, tối đa 10 file. Chọn xong là tải lên ngay, mỗi file một ô xem trước có trạng thái (đang tải, lỗi) và nút gỡ.
+- Phải có chữ hoặc ít nhất một ảnh/video. Mọi thành viên đăng thẳng; đăng xong feed tự làm mới, bài lên đầu.
+- Tóm tắt tự lấy 160 ký tự đầu; slug từ tiêu đề hoặc vài từ đầu nội dung.
 
 Tiêu chí:
 
-- [ ] Web: soạn và xem trước cạnh nhau (màn hình rộng) hoặc chuyển tab (màn hình hẹp)
-- [ ] App: chuyển tab Soạn / Xem trước
-- [ ] Thoát giữa chừng có hỏi lại, không mất bài
-- [ ] Bài bị từ chối hiện lý do cho tác giả
+- [x] Web: tấm tạo bài ở trang chủ, hộp soạn có ảnh/video, đăng thẳng (`files-and-create-post.e2e-spec.ts`)
+- [x] File sai loại (đổi đuôi), quá cỡ bị từ chối ở cả trình duyệt lẫn backend (chữ ký nhị phân)
+- [x] Không dùng được ảnh của người khác hay ảnh đã gắn bài khác
+- [x] Thoát giữa chừng có hỏi lại, không mất bài
+- [x] Thẻ bài hiện lưới ảnh/video (tối đa 4 ô, ô cuối "+N"); trang bài hiện đủ ảnh và video có điều khiển, tua được
+- [ ] Sửa, xóa bài của mình
+- [ ] App: màn tạo bài, chọn ảnh/video từ máy
+- [ ] Dọn file đã tải lên mà không gắn bài
 
 ### 2.4 Danh mục và tag 🌐📱
 

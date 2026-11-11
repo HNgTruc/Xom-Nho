@@ -26,20 +26,21 @@ Tên vai trò hiển thị: Hàng xóm, Cây bút, Trưởng xóm.
 
 ### Câu mẫu
 
-| Chỗ                               | Câu                                                       |
-| --------------------------------- | --------------------------------------------------------- |
-| Lời chào trang chủ (đã đăng nhập) | Chào {tên}, hôm nay xóm có gì mới nè.                     |
-| Lời chào (trang đăng nhập)        | Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện.           |
-| Trang chào mừng (khách)           | Chào mừng đến Xóm Nhỏ (đủ câu: `WELCOME_MESSAGES`)        |
-| Trang chủ trống                   | Xóm còn vắng quá. Bạn mở hàng bài đầu tiên nhé?           |
-| Bài chưa có bình luận             | Chưa ai lên tiếng. Bạn nói gì đi!                         |
-| Tìm không ra                      | Không thấy bài nào khớp "{từ khóa}". Thử từ khác xem sao. |
-| Gửi bài, chờ duyệt                | Đã gửi! Trưởng xóm sẽ xem và duyệt sớm.                   |
-| Đăng thành công                   | Bài của bạn đã lên xóm.                                   |
-| Bị từ chối                        | Bài chưa được duyệt. Lý do: {lý do}                       |
-| 404                               | Lạc đường rồi. Trang này không có trong xóm.              |
-| Lỗi máy chủ                       | Có trục trặc bên mình. Bạn thử lại sau ít phút nhé.       |
-| Bị giới hạn tần suất              | Từ từ thôi bạn ơi, chờ vài giây rồi gửi tiếp.             |
+| Chỗ                                           | Câu                                                       |
+| --------------------------------------------- | --------------------------------------------------------- |
+| Lời chào trang chủ (đã đăng nhập)             | Chào {tên}, hôm nay xóm có gì mới nè.                     |
+| Lời chào (trang đăng nhập)                    | Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện.           |
+| Trang chào mừng (khách)                       | Chào mừng đến Xóm Nhỏ (đủ câu: `WELCOME_MESSAGES`)        |
+| Trang chủ trống                               | Xóm còn vắng quá. Bạn mở hàng bài đầu tiên nhé?           |
+| Bài chưa có bình luận                         | Chưa ai lên tiếng. Bạn nói gì đi!                         |
+| Tìm không ra                                  | Không thấy bài nào khớp "{từ khóa}". Thử từ khác xem sao. |
+| Gửi bài, chờ duyệt (tạm không dùng, ADR 0008) | Đã gửi! Trưởng xóm sẽ xem và duyệt sớm.                   |
+| Ô tạo bài                                     | Chào {tên}, hôm nay có chuyện gì?                         |
+| Đăng thành công                               | Bài của bạn đã lên xóm.                                   |
+| Bị từ chối                                    | Bài chưa được duyệt. Lý do: {lý do}                       |
+| 404                                           | Lạc đường rồi. Trang này không có trong xóm.              |
+| Lỗi máy chủ                                   | Có trục trặc bên mình. Bạn thử lại sau ít phút nhé.       |
+| Bị giới hạn tần suất                          | Từ từ thôi bạn ơi, chờ vài giây rồi gửi tiếp.             |
 
 Toàn bộ chữ hiển thị nên gom về một chỗ (`api/src/constants/messages.ts`) để web, admin và app nói giống nhau.
 

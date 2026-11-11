@@ -12,4 +12,4 @@ argument-hint: "<số issue>"
 5. Sửa ở đúng tầng (thường là service). Nếu ảnh hưởng cả web và app, sửa cả hai.
 6. Chạy test, lint, typecheck liên quan.
 7. Tóm tắt: nguyên nhân, cách sửa, file đã đổi, cách kiểm tra lại bằng tay.
-8. Đề xuất commit message dạng `fix: <mô tả> (closes #$ARGUMENTS)` để chủ dự án tự commit. Không tự commit.
+8. Đề xuất commit message dạng `fix(<scope>): <mô tả tiếng Việt> (closes #$ARGUMENTS)` để chủ dự án tự commit. Không tự commit.
