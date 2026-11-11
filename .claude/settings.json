@@ -45,7 +45,6 @@
       "Bash(pnpm db:down:*)",
       "Bash(pnpm db:compose down:*)",
       "Bash(docker compose down:*)",
-      "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git reset:*)",
       "Bash(git checkout:*)"
@@ -60,6 +59,7 @@
       "Bash(pnpm db:compose down -v:*)",
       "Bash(docker compose down -v:*)",
       "Bash(pnpm --filter backend exec prisma migrate reset:*)",
+      "Bash(git commit:*)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"
     ]

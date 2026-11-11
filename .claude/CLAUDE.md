@@ -59,6 +59,14 @@ pnpm --filter backend db:seed
 
 Script được thêm khi khởi tạo từng phần (giai đoạn 0). Script chưa có thì đề xuất thêm vào `package.json`.
 
+## Nghĩ trước khi làm
+
+- Trước khi sửa: đọc code và tài liệu liên quan (`CLAUDE.md` của phần đó, mục trong `docs/tinh-nang.md`), không sửa dựa trên phỏng đoán.
+- Nói ngắn gọn đã hiểu yêu cầu thế nào và định làm gì: sửa file nào, theo cách nào, vì sao.
+- Việc lớn (nhiều file, nhiều phần, đổi schema, đổi API, đổi token) thì trình bày kế hoạch và chờ đồng ý rồi mới sửa.
+- Yêu cầu chưa rõ thì hỏi, không tự đoán rồi làm.
+- Nghĩ trước về ảnh hưởng: phân quyền, dữ liệu đang có, các phần khác dùng chung `api` / `ui`.
+
 ## Quy ước chung
 
 - Chia code **theo tính năng**: `backend/src/modules/<tính-năng>/`, `frontend/*/src/features/<tính-năng>/`. Thư mục định tuyến (`app/`, `router.tsx`) chỉ ghép feature lại.
@@ -73,6 +81,7 @@ Script được thêm khi khởi tạo từng phần (giai đoạn 0). Script ch
 
 ## Không được làm
 
+- **Không commit.** Trong repo chỉ chủ dự án được commit: Claude không chạy `git commit` (đã chặn trong `.claude/settings.json`), kể cả khi được bảo "commit đi". Làm xong thì báo những file đã đổi và đề xuất cách chia commit kèm message; chủ dự án tự stage và commit.
 - Không sửa `.env*` (trừ `.env.example`), không in bí mật ra màn hình.
 - Không sửa migration Prisma đã commit; đổi schema thì tạo migration mới.
 - Không chạy `pnpm db:compose down -v` (hay `docker compose down -v`) hay `prisma migrate reset` khi chưa hỏi.
@@ -101,13 +110,14 @@ Mọi việc thay đổi giao diện (trang, màn hình, component, màu, bố c
 1. Đọc `docs/design-system/xom-nho/MASTER.md`, rồi file override nếu có (`pages/admin.md` cho admin, `pages/mobile.md` cho mobile-app). Override thắng MASTER.
 2. Dùng skill **ui-ux-pro-max** để tra quy tắc cụ thể (`--domain ux`, `--stack nextjs|react|shadcn|react-native`). Không chạy lại `--design-system --persist --force` khi người dùng chưa đồng ý: MASTER đã có quyết định đã kiểm tra.
 3. Trước khi xong: chạy checklist ở cuối MASTER (và của file override).
+4. Web, admin: mở trang bằng skill **agent-browser** (`http://localhost:3000`, `:5173`), chụp màn hình ở bề rộng điện thoại và máy tính, cả sáng lẫn tối, để tự kiểm tra trước khi báo xong.
 
 Đổi token (màu, chữ, khoảng cách) thì sửa MASTER, `frontend/ui/src/tokens/*` và `frontend/ui/src/styles/theme.css` cùng lúc.
 
 ## Công cụ Claude trong repo
 
 - Rules (`.claude/rules/`): tự nạp theo thư mục đang sửa.
-- Skills: `tao-tinh-nang`, `tao-module-backend`, `prisma-migration`, `trang-admin-crud`, `man-hinh-mobile`, `them-component-ui`.
+- Skills: `tao-tinh-nang`, `tao-module-backend`, `prisma-migration`, `trang-admin-crud`, `man-hinh-mobile`, `them-component-ui`, `agent-browser` (cần cài CLI: `npm i -g agent-browser && agent-browser install`).
 - Agents: `kiem-tra-bao-mat`, `review-code`, `kiem-tra-hieu-nang`, `viet-test`.
 - Commands: `/tiep-theo`, `/review`, `/db-reset`, `/fix-issue <số>`, `/commit`.
 - Hooks: tự format sau khi sửa; chặn sửa `.env`, lockfile, migration đã commit.

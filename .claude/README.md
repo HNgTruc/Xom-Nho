@@ -30,14 +30,17 @@ Cấu hình Claude Code cho Xóm Nhỏ. Mọi thứ ở đây được commit đ
 
 ## Skills
 
-| Skill                | Dùng khi                                                       |
-| -------------------- | -------------------------------------------------------------- |
-| `tao-tinh-nang`      | Làm một tính năng đi qua nhiều phần (điều phối các skill dưới) |
-| `tao-module-backend` | Thêm module / endpoint NestJS                                  |
-| `prisma-migration`   | Đổi schema database                                            |
-| `trang-admin-crud`   | Làm màn hình trong admin                                       |
-| `man-hinh-mobile`    | Làm màn hình trên app                                          |
-| `them-component-ui`  | Thêm component nền hoặc đổi token trong `ui`                   |
+| Skill                | Dùng khi                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `tao-tinh-nang`      | Làm một tính năng đi qua nhiều phần (điều phối các skill dưới)                          |
+| `tao-module-backend` | Thêm module / endpoint NestJS                                                           |
+| `prisma-migration`   | Đổi schema database                                                                     |
+| `trang-admin-crud`   | Làm màn hình trong admin                                                                |
+| `man-hinh-mobile`    | Làm màn hình trên app                                                                   |
+| `them-component-ui`  | Thêm component nền hoặc đổi token trong `ui`                                            |
+| `agent-browser`      | Mở web/admin bằng trình duyệt thật: bấm, điền form, chụp màn hình để kiểm tra giao diện |
+
+`agent-browser` cần CLI cài riêng trên máy (một lần): `npm i -g agent-browser && agent-browser install`. File `SKILL.md` chỉ là stub; hướng dẫn thật lấy từ CLI bằng `agent-browser skills get core`.
 
 ## Agents
 

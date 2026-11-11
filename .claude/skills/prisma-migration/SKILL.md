@@ -43,7 +43,7 @@ pnpm --filter backend exec prisma migrate dev     # áp dụng + generate client
 - Cập nhật `docs/co-so-du-lieu.md` (sơ đồ ER, bảng chỉ mục).
 - Cập nhật repository, mapper, và kiểu trong `api/src/types` nếu dữ liệu trả về thay đổi.
 - `pnpm typecheck` ở gốc.
-- Commit migration cùng schema và tài liệu: `feat(backend): <mô tả>`.
+- Nhắc chủ dự án commit migration cùng schema và tài liệu, đề xuất message `feat(backend): <mô tả>`. Claude không tự commit.
 
 ## Không bao giờ
 
