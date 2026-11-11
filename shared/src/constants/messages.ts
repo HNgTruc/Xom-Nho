@@ -20,3 +20,17 @@ export const FEED_MESSAGES = {
   PAGE_EMPTY: "Trang này chưa có bài nào. Bạn quay về trang đầu xem sao.",
   LOAD_ERROR: "Chưa tải được bài viết. Bạn thử lại sau ít phút nhé.",
 } as const;
+
+/**
+ * Câu hiện trên trang bài khi bài chưa đăng (chỉ tác giả và trưởng xóm thấy trang này).
+ * Bài bị từ chối: `rejectedNote(lý do)`, theo câu mẫu ở docs/giong-van-va-giao-dien.md.
+ */
+export const POST_STATUS_NOTES = {
+  DRAFT: "Đây là bản nháp, bài chưa lên xóm.",
+  PENDING: "Bài đang chờ trưởng xóm duyệt. Duyệt xong hàng xóm mới thấy.",
+  ARCHIVED: "Bài đã bị ẩn khỏi xóm. Hàng xóm khác không thấy bài này.",
+} as const;
+
+export function rejectedNote(reason: string | null): string {
+  return reason ? `Bài chưa được duyệt. Lý do: ${reason}` : "Bài chưa được duyệt.";
+}

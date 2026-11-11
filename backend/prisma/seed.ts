@@ -111,8 +111,12 @@ function excerptOf(title: string): string {
   return `${title}. Vài dòng chia sẻ từ một hàng xóm trong xóm nhỏ.`.slice(0, 160);
 }
 
-function contentOf(title: string): string {
-  return [
+/**
+ * Nội dung Markdown mẫu. Bài chẵn có đủ kiểu (nhiều mục để hiện mục lục, bảng, code, trích dẫn, liên kết ngoài,
+ * danh sách việc) để xem thử trang bài viết; bài lẻ ngắn như bài thường gặp.
+ */
+function contentOf(title: string, index: number): string {
+  const short = [
     `## ${title}`,
     "",
     "Mình viết bài này sau một thời gian để ý chuyện quanh mình. Hy vọng có ích cho bạn.",
@@ -122,6 +126,44 @@ function contentOf(title: string): string {
     "- Điều thứ ba: hỏi hàng xóm khi cần.",
     "",
     "Bạn nghĩ sao? Để lại bình luận cho mình biết nhé.",
+  ];
+  if (index % 2 === 1) return short.join("\n");
+
+  return [
+    ...short,
+    "",
+    "## Chuyện bắt đầu thế nào",
+    "",
+    "Hồi đầu mình cũng **lúng túng** lắm. Đọc mấy bài trên [Wikipedia](https://vi.wikipedia.org) thấy rối,",
+    "nên mình ghi lại theo cách *dễ hiểu nhất* cho bản thân.",
+    "",
+    "> Việc nhỏ làm đều đặn thì thành chuyện lớn.",
+    "",
+    "### Những thứ cần chuẩn bị",
+    "",
+    "| Món        | Số lượng | Ghi chú           |",
+    "| ---------- | -------- | ----------------- |",
+    "| Sổ tay     | 1        | Loại nhỏ, bỏ túi  |",
+    "| Bút        | 2        | Một xanh, một đỏ  |",
+    "| Thời gian  | 15 phút  | Mỗi tối trước ngủ |",
+    "",
+    "## Mẹo nhỏ cho người mới",
+    "",
+    "1. Đặt nhắc việc cố định mỗi ngày.",
+    "2. Ghi ngắn thôi, đừng cầu toàn.",
+    "3. Cuối tuần đọc lại một lượt.",
+    "",
+    "Ai thích dùng máy tính thì có thể ghi bằng lệnh `echo` cho nhanh:",
+    "",
+    "```bash",
+    'echo "Hôm nay mình học được một điều mới" >> nhat-ky.txt',
+    "```",
+    "",
+    "## Việc của tuần này",
+    "",
+    "- [x] Viết bài chia sẻ",
+    "- [ ] Hỏi ý kiến hàng xóm",
+    "- [ ] Tổng kết sau một tháng",
   ].join("\n");
 }
 
@@ -190,7 +232,7 @@ async function main() {
     const data = {
       title,
       excerpt,
-      content: contentOf(title),
+      content: contentOf(title, index),
       searchText: buildPostSearchText({
         title,
         excerpt,

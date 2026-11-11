@@ -51,9 +51,9 @@ Tiêu chí:
 
 Tiêu chí:
 
-- [ ] Không chạy được script chèn trong Markdown
-- [ ] Web có thẻ meta, Open Graph để chia sẻ link đẹp
-- [ ] Bài chưa đăng trả 404 với người không phải tác giả/admin
+- [x] Không chạy được script chèn trong Markdown (web: `frontend/web/src/lib/markdown.test.ts`)
+- [x] Web có thẻ meta, Open Graph để chia sẻ link đẹp
+- [x] Bài chưa đăng trả 404 với người không phải tác giả/admin
 
 ### 2.3 Viết và sửa bài 🌐📱
 
