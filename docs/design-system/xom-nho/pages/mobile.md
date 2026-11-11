@@ -60,3 +60,9 @@
 - [ ] Trạng thái vô hiệu rõ ràng và thật sự không bấm được
 - [ ] Thứ tự focus của trình đọc màn hình khớp thứ tự hiển thị; nhãn mô tả rõ
 - [ ] Không có xung đột cử chỉ (chạm/kéo/vuốt quay lại)
+
+## Kính mờ (MASTER 2.4)
+
+- Màu nhấn đen + xanh nhạt và bảng màu trung tính lạnh áp dụng ngay vì app đọc chung `@xom-nho/ui/tokens`; nút, tab dạng viên thuốc theo MASTER 7. Ảnh nền biển chưa dùng trên app.
+- Chưa làm mờ phía sau: cần thư viện `expo-blur`, chưa thêm (CLAUDE.md: hỏi trước khi thêm thư viện). Trong lúc chờ, thẻ và thanh tab dùng `card` đặc; token `glass` trong `@xom-nho/ui/tokens` có sẵn khi bật.
+- Khi thêm `expo-blur`: chỉ dùng cho thanh tab dưới và header, không cho từng thẻ trong danh sách cuộn (tốn pin, giật trên Android); tôn trọng "Reduce Transparency" của iOS qua `AccessibilityInfo.isReduceTransparencyEnabled()`.

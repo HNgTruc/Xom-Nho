@@ -17,27 +17,28 @@
 @source "../hooks";
 
 :root {
-  --background: #fbf8f3;
-  --foreground: #292524;
+  --background: #e6eef0;
+  --foreground: #18181b;
   --card: #ffffff;
-  --card-foreground: #292524;
-  --muted: #f3efe8;
-  --muted-foreground: #6b635e;
-  --primary: #c2410c;
+  --card-foreground: #18181b;
+  --muted: #f1f4f5;
+  --muted-foreground: #52525b;
+  --primary: #18181b;
   --primary-foreground: #ffffff;
   --secondary: #15803d;
   --secondary-foreground: #ffffff;
-  --border: #e7e5e4;
-  --input: #8f8883;
-  --ring: #c2410c;
+  --accent: #bae6fd;
+  --accent-foreground: #18181b;
+  --link: #075985;
+  --border: #e4e4e7;
+  --input: #71717a;
+  --ring: #0369a1;
   --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
 
   /* Tên shadcn dùng nhưng MASTER không tách riêng: trỏ về token có sẵn */
   --popover: var(--card);
   --popover-foreground: var(--card-foreground);
-  --accent: var(--muted);
-  --accent-foreground: var(--foreground);
 
   --category-amber: #b45309;
   --category-amber-bg: #fef3c7;
@@ -50,62 +51,93 @@
   --category-rose: #be123c;
   --category-rose-bg: #ffe4e6;
 
-  --status-draft: #57534e;
-  --status-draft-bg: #e7e5e4;
+  --status-draft: #52525b;
+  --status-draft-bg: #e4e4e7;
   --status-pending: #92400e;
   --status-pending-bg: #fef3c7;
   --status-published: #166534;
   --status-published-bg: #dcfce7;
   --status-rejected: #991b1b;
   --status-rejected-bg: #fee2e2;
-  --status-hidden: #57534e;
-  --status-hidden-bg: #f5f5f4;
+  --status-hidden: #52525b;
+  --status-hidden-bg: #f4f4f5;
 
-  --elevation: 0 1px 2px rgb(41 37 36 / 0.06), 0 4px 12px rgb(41 37 36 / 0.06);
+  /* Card đặc (admin): một mức bóng nhẹ */
+  --elevation: 0 1px 2px rgb(24 24 27 / 0.06), 0 4px 12px rgb(24 24 27 / 0.06);
+
+  /* Kính (MASTER 2.4): khung làm mờ ảnh nền, tấm nội dung, tấm gần đặc */
+  --glass-shell: rgb(255 255 255 / 0.3);
+  --glass-surface: rgb(255 255 255 / 0.75);
+  --glass-strong: rgb(255 255 255 / 0.85);
+  --glass-button: rgb(255 255 255 / 0.45);
+  --glass-button-hover: rgb(255 255 255 / 0.7);
+  --glass-primary: rgb(24 24 27 / 0.82);
+  --glass-primary-hover: rgb(63 63 70 / 0.9);
+  --glass-border: rgb(255 255 255 / 0.55);
+  --glass-border-hover: rgb(113 113 122 / 0.45);
+  --glass-shadow: 0 1px 2px rgb(9 9 11 / 0.04), 0 8px 24px rgb(9 9 11 / 0.06);
+  --glass-shadow-hover: 0 2px 4px rgb(9 9 11 / 0.05), 0 16px 40px rgb(9 9 11 / 0.12);
+  --glass-shell-shadow: 0 24px 80px rgb(9 9 11 / 0.25), inset 0 1px 0 rgb(255 255 255 / 0.7);
 }
 
 .dark {
-  --background: #1c1917;
-  --foreground: #f5f5f4;
-  --card: #292524;
-  --card-foreground: #f5f5f4;
-  --muted: #292524;
-  --muted-foreground: #a8a29e;
-  --primary: #fb923c;
-  --primary-foreground: #1c1917;
+  --background: #0b1214;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
   --secondary: #4ade80;
-  --secondary-foreground: #1c1917;
-  --border: #44403c;
-  --input: #78716c;
-  --ring: #fb923c;
+  --secondary-foreground: #18181b;
+  --accent: #7dd3fc;
+  --accent-foreground: #09090b;
+  --link: #7dd3fc;
+  --border: #3f3f46;
+  --input: #8b8b94;
+  --ring: #38bdf8;
   --destructive: #f87171;
-  --destructive-foreground: #1c1917;
+  --destructive-foreground: #18181b;
 
-  /* Nền badge tối: màu chữ mờ 12% (1F). Không tăng lên, purple/rose sẽ dưới 4.5:1 */
+  /* Nền badge tối là màu đặc (màu chữ trộn 14% trên #18181b): kính trên ảnh đổi độ sáng theo chỗ */
   --category-amber: #fbbf24;
-  --category-amber-bg: #fbbf241f;
+  --category-amber-bg: #382f1c;
   --category-blue: #60a5fa;
-  --category-blue-bg: #60a5fa1f;
+  --category-blue-bg: #222c3a;
   --category-green: #34d399;
-  --category-green-bg: #34d3991f;
+  --category-green-bg: #1c322d;
   --category-purple: #c084fc;
-  --category-purple-bg: #c084fc1f;
+  --category-purple-bg: #30273b;
   --category-rose: #fb7185;
-  --category-rose-bg: #fb71851f;
+  --category-rose-bg: #38242a;
 
-  --status-draft: #d6d3d1;
-  --status-draft-bg: #d6d3d11f;
+  --status-draft: #d4d4d8;
+  --status-draft-bg: #323235;
   --status-pending: #fcd34d;
-  --status-pending-bg: #fcd34d1f;
+  --status-pending-bg: #383222;
   --status-published: #86efac;
-  --status-published-bg: #86efac1f;
+  --status-published-bg: #27362f;
   --status-rejected: #fca5a5;
-  --status-rejected-bg: #fca5a51f;
-  --status-hidden: #a8a29e;
-  --status-hidden-bg: #a8a29e1f;
+  --status-rejected-bg: #382c2e;
+  --status-hidden: #a1a1aa;
+  --status-hidden-bg: #2b2b2f;
 
   /* Chế độ tối dùng viền thay cho bóng */
   --elevation: none;
+
+  --glass-shell: rgb(9 9 11 / 0.45);
+  --glass-surface: rgb(9 9 11 / 0.68);
+  --glass-strong: rgb(9 9 11 / 0.85);
+  --glass-button: rgb(24 24 27 / 0.45);
+  --glass-button-hover: rgb(39 39 42 / 0.7);
+  --glass-primary: rgb(250 250 250 / 0.88);
+  --glass-primary-hover: rgb(212 212 216 / 0.92);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-border-hover: rgb(255 255 255 / 0.24);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 8px 24px rgb(0 0 0 / 0.25);
+  --glass-shadow-hover: 0 2px 4px rgb(0 0 0 / 0.25), 0 16px 40px rgb(0 0 0 / 0.4);
+  --glass-shell-shadow: 0 24px 80px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.08);
 }
 
 @theme inline {
@@ -119,6 +151,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-link: var(--link);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -151,11 +184,22 @@
   --color-status-hidden: var(--status-hidden);
   --color-status-hidden-bg: var(--status-hidden-bg);
 
+  --color-glass: var(--glass-surface);
+  --color-glass-strong: var(--glass-strong);
+  --color-glass-button: var(--glass-button);
+  --color-glass-button-hover: var(--glass-button-hover);
+  --color-glass-primary: var(--glass-primary);
+  --color-glass-primary-hover: var(--glass-primary-hover);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-hover: var(--glass-border-hover);
+
   --font-sans: var(--font-be-vietnam-pro, "Be Vietnam Pro"), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-lora, "Lora"), ui-serif, Georgia, serif;
   --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
 
   --shadow-card: var(--elevation);
+  --shadow-glass: var(--glass-shadow);
+  --shadow-glass-hover: var(--glass-shadow-hover);
 }
 
 @theme {
@@ -165,19 +209,129 @@
   --text-4xl: 2.25rem;
   --text-4xl--line-height: 2.75rem;
 
-  /* MASTER chỉ có ba mức; xl trở lên ép về lg để component shadcn không tự bo to hơn */
+  /* MASTER 4: sm, md, lg cho thành phần; xl cho tấm kính; 2xl trở lên cho khung lớn */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --radius-xl: 14px;
-  --radius-2xl: 14px;
-  --radius-3xl: 14px;
-  --radius-4xl: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-3xl: 28px;
+  --radius-4xl: 28px;
 
   /* `transition` không ghi thời gian thì dùng duration-fast */
   --default-transition-duration: 120ms;
   --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Độ làm mờ (tokens/glass.ts: glassBlur) */
+  --blur-glass-shell: 28px;
+  --blur-glass-bar: 16px;
+  --blur-glass-button: 12px;
+}
+
+/*
+ * Ba lớp kính (MASTER 2.4).
+ * - `glass-shell`: khung lớn bao cả trang, làm mờ ảnh nền phía sau. Mỗi trang chỉ một khung.
+ * - `glass`: tấm nội dung trong khung (thẻ bài, đầu trang, tab). Không làm mờ thêm: khung đã làm mờ.
+ * - `glass-strong`: tấm gần đặc cho chỗ đọc lâu (bài viết, form). Không làm mờ thêm.
+ * - `glass-bar`: như `glass-strong` nhưng tự làm mờ, cho thứ trôi trên nội dung (header dính) hoặc
+ *   nằm thẳng trên ảnh nền ngoài khung (form đăng nhập).
+ * - `glass-button`: nút phụ, tab, chip: kính mỏng tự làm mờ. Chữ trên đó dùng `foreground` (không dùng chữ phụ).
+ * - `glass-primary`: nút chính, mục đang chọn: kính màu `primary`, chữ `primary-foreground`.
+ * Hover của thẻ: `hover:bg-glass-strong hover:border-glass-border-hover hover:shadow-glass-hover`.
+ */
+@utility glass-shell {
+  border: 1px solid var(--glass-border);
+  background-color: var(--glass-shell);
+  box-shadow: var(--glass-shell-shadow);
+  -webkit-backdrop-filter: blur(var(--blur-glass-shell));
+  backdrop-filter: blur(var(--blur-glass-shell));
+}
+
+@utility glass {
+  border: 1px solid var(--glass-border);
+  background-color: var(--glass-surface);
+  box-shadow: var(--glass-shadow);
+}
+
+@utility glass-strong {
+  border: 1px solid var(--glass-border);
+  background-color: var(--glass-strong);
+  box-shadow: var(--glass-shadow);
+}
+
+@utility glass-bar {
+  border: 1px solid var(--glass-border);
+  background-color: var(--glass-strong);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--blur-glass-bar));
+  backdrop-filter: blur(var(--blur-glass-bar));
+}
+
+@utility glass-button {
+  /* Viền xám mờ (không dùng viền trắng): nút thường nằm trên tấm trắng, viền trắng sẽ mất */
+  border: 1px solid var(--glass-border-hover);
+  background-color: var(--glass-button);
+  color: var(--foreground);
+  -webkit-backdrop-filter: blur(var(--blur-glass-button));
+  backdrop-filter: blur(var(--blur-glass-button));
+}
+
+@utility glass-primary {
+  border: 1px solid transparent;
+  background-color: var(--glass-primary);
+  color: var(--primary-foreground);
+  -webkit-backdrop-filter: blur(var(--blur-glass-button));
+  backdrop-filter: blur(var(--blur-glass-button));
+}
+
+/*
+ * Khối hiện ra khi trang tải (MASTER 5, tokens/motion.ts). Hiện lần lượt: đặt `--stagger` (bậc 0 đến 8,
+ * mỗi bậc 60ms) trên chính phần tử, ví dụ class `[--stagger:2]` hoặc `style={{ "--stagger": index }}`.
+ * Viết thành utility (không để trong @theme): biến `--animate-*` của @theme khai báo ở :root, nên
+ * `var(--stagger)` trong đó bị tính tại :root (luôn 0) chứ không tại phần tử.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-rise-in {
+  animation: rise-in 520ms var(--ease-enter) calc(min(var(--stagger, 0), 8) * 60ms) both;
+}
+
+/* Trình duyệt không làm mờ được, hoặc người dùng muốn bớt trong suốt: khung và tấm thành màu đặc */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root,
+  .dark {
+    --glass-shell: var(--background);
+    --glass-surface: var(--card);
+    --glass-strong: var(--card);
+    --glass-button: var(--card);
+    --glass-button-hover: var(--muted);
+    --glass-primary: var(--primary);
+    --glass-primary-hover: color-mix(in srgb, var(--primary), var(--primary-foreground) 14%);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  .dark {
+    --glass-shell: var(--background);
+    --glass-surface: var(--card);
+    --glass-strong: var(--card);
+    --glass-button: var(--card);
+    --glass-button-hover: var(--muted);
+    --glass-primary: var(--primary);
+    --glass-primary-hover: color-mix(in srgb, var(--primary), var(--primary-foreground) 14%);
+  }
 }
 
 @layer base {
@@ -201,6 +355,7 @@
   ::before,
   ::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
