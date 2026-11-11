@@ -164,7 +164,7 @@ xom-nho/
 ```
 backend/src/modules/posts/
 ├── posts.module.ts
-├── posts.controller.ts            /api/v1/posts         (khách, hàng xóm, cây bút)
+├── posts.controller.ts            /api/v1/posts         (hàng xóm, cây bút; khách nhận 401)
 ├── posts.admin.controller.ts      /api/v1/admin/posts   (chỉ admin)
 ├── posts.service.ts               quy tắc nghiệp vụ, kiểm tra quyền
 ├── posts.repository.ts            truy vấn Prisma, không có quy tắc

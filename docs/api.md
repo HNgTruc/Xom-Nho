@@ -8,7 +8,7 @@ Backend NestJS là nguồn dữ liệu duy nhất cho cả ba frontend. Frontend
 
 ## Quy ước chung
 
-**Đăng nhập.** Mặc định mọi route cần đăng nhập. Ký hiệu: 🌐 công khai (`@Public()`), 🔒 cần đăng nhập, 🛡️ cần `admin`.
+**Đăng nhập.** Mặc định mọi route cần đăng nhập, **kể cả route đọc** (ADR 0007: khách chỉ thấy trang chào mừng). Ký hiệu: 🌐 công khai (`@Public()`), 🔒 cần đăng nhập, 🛡️ cần `admin`. Khách gọi route 🔒 nhận 401, người bị cấm nhận 403.
 
 **Định dạng phản hồi.**
 
@@ -79,9 +79,9 @@ Kiểu trong `api` chỉ bảo vệ lúc build. App đã cài trên điện tho�
 
 | Method | Đường dẫn                                           |     | Mô tả                                                                                          |
 | ------ | --------------------------------------------------- | --- | ---------------------------------------------------------------------------------------------- |
-| GET    | `/posts?page=&category=&tag=&author=&sort=new\|top` | 🌐  | Danh sách bài đã đăng. Query: `listPostsQuerySchema` (`author` là username)                    |
-| GET    | `/posts/:slug`                                      | 🌐  | Chi tiết bài (Markdown thô). Bài chưa đăng: chỉ tác giả và admin xem được, người khác nhận 404 |
-| POST   | `/posts/:id/view`                                   | 🌐  | Tăng lượt xem. Trả 204. Frontend gọi một lần mỗi phiên cho mỗi bài                             |
+| GET    | `/posts?page=&category=&tag=&author=&sort=new\|top` | 🔒  | Danh sách bài đã đăng. Query: `listPostsQuerySchema` (`author` là username)                    |
+| GET    | `/posts/:slug`                                      | 🔒  | Chi tiết bài (Markdown thô). Bài chưa đăng: chỉ tác giả và admin xem được, người khác nhận 404 |
+| POST   | `/posts/:id/view`                                   | 🔒  | Tăng lượt xem. Trả 204. Frontend gọi một lần mỗi phiên cho mỗi bài                             |
 | POST   | `/posts`                                            | 🔒  | Tạo bài. Body: `createPostSchema`                                                              |
 | PATCH  | `/posts/:id`                                        | 🔒  | Sửa bài của mình. Body: `updatePostSchema`                                                     |
 | DELETE | `/posts/:id`                                        | 🔒  | Xóa bài của mình                                                                               |
@@ -102,7 +102,7 @@ Kiểu khai báo ở `api/src/types/post.ts`, `user.ts`, `tag.ts`; schema query 
 
 | Method | Đường dẫn                    |     | Mô tả                                                                                   |
 | ------ | ---------------------------- | --- | --------------------------------------------------------------------------------------- |
-| GET    | `/search?q=&category=&page=` | 🌐  | Tìm theo tiêu đề, tóm tắt, tag; có dấu / không dấu đều được. Query: `searchQuerySchema` |
+| GET    | `/search?q=&category=&page=` | 🔒  | Tìm theo tiêu đề, tóm tắt, tag; có dấu / không dấu đều được. Query: `searchQuerySchema` |
 
 Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng mức thì mới nhất trước). Mọi từ đều phải có trong bài. Ký tự ngoài chữ và số (kể cả toán tử boolean của MySQL) bị bỏ. `q` rỗng, hoặc chỉ có ký tự đặc biệt, trả danh sách rỗng, không truy vấn database. `api.search.posts` trả rỗng ngay mà không gọi backend. Cách tìm: `docs/co-so-du-lieu.md`, mục Tìm kiếm tiếng Việt.
 
@@ -110,22 +110,22 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 
 | Method | Đường dẫn             |     | Mô tả                                            |
 | ------ | --------------------- | --- | ------------------------------------------------ |
-| GET    | `/posts/:id/comments` | 🌐  | Bình luận gốc đang hiện, mỗi cái kèm `replies[]` |
+| GET    | `/posts/:id/comments` | 🔒  | Bình luận gốc đang hiện, mỗi cái kèm `replies[]` |
 | POST   | `/posts/:id/comments` | 🔒  | Body: `{ content, parentId? }`                   |
 | PATCH  | `/comments/:id`       | 🔒  | Sửa bình luận của mình                           |
 | DELETE | `/comments/:id`       | 🔒  | Xóa bình luận của mình                           |
 
 ### Danh mục, tag, người dùng
 
-| Method | Đường dẫn          |     | Mô tả                                                                                                 |
-| ------ | ------------------ | --- | ----------------------------------------------------------------------------------------------------- |
-| GET    | `/categories`      | 🌐  | Tất cả danh mục, kèm số bài                                                                           |
-| GET    | `/tags?q=`         | 🌐  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất |
-| GET    | `/tags/:slug`      | 🌐  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404             |
-| GET    | `/users/:username` | 🌐  | Hồ sơ công khai (`PublicProfile`). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404 |
-| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                        |
-| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                             |
-| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)  |
+| Method | Đường dẫn          |     | Mô tả                                                                                                                 |
+| ------ | ------------------ | --- | --------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/categories`      | 🔒  | Tất cả danh mục, kèm số bài                                                                                           |
+| GET    | `/tags?q=`         | 🔒  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất                 |
+| GET    | `/tags/:slug`      | 🔒  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404                             |
+| GET    | `/users/:username` | 🔒  | Hồ sơ (`PublicProfile`: phần mọi thành viên thấy). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404 |
+| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                                        |
+| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                                             |
+| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)                  |
 
 `Category`: `id, name, slug, description, color, postCount`. `postCount` chỉ đếm bài đã đăng.
 `Tag`: `id, name, slug`.

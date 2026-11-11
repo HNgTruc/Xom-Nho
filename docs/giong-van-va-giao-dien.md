@@ -29,7 +29,8 @@ Tên vai trò hiển thị: Hàng xóm, Cây bút, Trưởng xóm.
 | Chỗ                               | Câu                                                       |
 | --------------------------------- | --------------------------------------------------------- |
 | Lời chào trang chủ (đã đăng nhập) | Chào {tên}, hôm nay xóm có gì mới nè.                     |
-| Lời chào (khách)                  | Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện.           |
+| Lời chào (trang đăng nhập)        | Ghé chơi Xóm Nhỏ. Đăng nhập để cùng trò chuyện.           |
+| Trang chào mừng (khách)           | Chào mừng đến Xóm Nhỏ (đủ câu: `WELCOME_MESSAGES`)        |
 | Trang chủ trống                   | Xóm còn vắng quá. Bạn mở hàng bài đầu tiên nhé?           |
 | Bài chưa có bình luận             | Chưa ai lên tiếng. Bạn nói gì đi!                         |
 | Tìm không ra                      | Không thấy bài nào khớp "{từ khóa}". Thử từ khác xem sao. |

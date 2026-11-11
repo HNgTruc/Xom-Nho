@@ -77,6 +77,18 @@ Tiêu chí:
 
 ## 2. Bài viết
 
+### 2.0 Trang chào mừng cho khách 🌐📱
+
+Xóm Nhỏ chỉ dành cho người trong xóm (ADR 0007). Khách (chưa đăng nhập, hoặc vừa đăng xuất) chỉ thấy trang chào mừng: tên Xóm Nhỏ, vài câu giới thiệu, nút **Tham gia xóm** (đăng ký) và **Đăng nhập**, ba tấm nhỏ nói trong xóm có gì. Header chỉ có logo, Đăng nhập, Đăng ký; không có thanh danh mục, Tin nhắn, Thông báo.
+
+Tiêu chí:
+
+- [x] Web: khách mở `/` thấy trang chào mừng (URL giữ `/`); đã đăng nhập thì thấy feed
+- [x] Web: khách mở bài, danh mục, thẻ, hồ sơ, cài đặt (hay trang bất kỳ khác) thì sang đăng nhập, xong quay lại đúng trang
+- [x] Backend: mọi route đọc dữ liệu trả 401 cho khách, 403 cho người bị cấm (`test/e2e/guest-access.e2e-spec.ts`)
+- [x] Phiên hết hạn mà cookie còn: trang tự chuyển sang đăng nhập, không hiện lỗi
+- [ ] App: chưa đăng nhập thì vào màn chào mừng, không vào được màn đọc bài
+
 ### 2.1 Danh sách bài 🌐📱
 
 - Trang chủ: bài mới nhất đã đăng, 10 bài/trang. Có tab "Mới" và "Nhiều người đọc".
@@ -96,7 +108,7 @@ Tiêu chí:
 Tiêu chí:
 
 - [x] Không chạy được script chèn trong Markdown (web: `frontend/web/src/lib/markdown.test.ts`)
-- [x] Web có thẻ meta, Open Graph để chia sẻ link đẹp
+- [x] Web có thẻ meta, Open Graph (chỉ người đã đăng nhập thấy: link chia sẻ cho người ngoài chỉ hiện trang đăng nhập, ADR 0007)
 - [x] Bài chưa đăng trả 404 với người không phải tác giả/admin
 
 ### 2.3 Viết và sửa bài 🌐📱

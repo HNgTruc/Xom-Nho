@@ -13,7 +13,7 @@ paths:
 - Component nền (Button, Input, Dialog, Card...) import từ `@xom-nho/ui/components/*`. Không tạo bản sao trong web; thiếu thì thêm vào `ui` (skill `them-component-ui`).
 - Màu, font dùng class theo theme (`bg-background`, `text-primary`), không mã màu cứng.
 - Trang có tham số gọi `notFound()` khi backend trả `NOT_FOUND`.
-- Route `(author)/*` kiểm tra phiên ở server, chưa đăng nhập thì chuyển tới `/dang-nhap?next=...`.
+- Khách chỉ mở được trang chào mừng, đăng nhập, đăng ký (`src/proxy.ts`, ADR 0007). Trang cho thành viên gọi `requireUser(next)` trong `<Suspense>`; không có client đọc dữ liệu "công khai" không gửi cookie.
 - Mỗi route có `loading.tsx` hoặc `<Suspense>`, các nhánh chính có `error.tsx`.
 - Mọi trang có `metadata` tiếng Việt; trang bài viết có Open Graph.
 - Ảnh `next/image` có `alt`, liên kết `next/link`, font `next/font`.
