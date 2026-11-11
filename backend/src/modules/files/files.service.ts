@@ -3,7 +3,10 @@ import { FILE_MESSAGES, LIMITS, type MediaItem, type MediaKind, pathIdSchema } f
 import { AppException } from "../../common/exceptions/app-exception.js";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
-import { StorageService } from "../../infrastructure/storage/storage.service.js";
+import {
+  type StorageFolder,
+  StorageService,
+} from "../../infrastructure/storage/storage.service.js";
 import { detectFileType } from "./file-signature.js";
 import { FilesPolicy } from "./files.policy.js";
 import { FilesRepository, type MediaItemRow } from "./files.repository.js";
@@ -22,6 +25,12 @@ const MAX_BYTES: Record<MediaKind, number> = {
 const TOO_LARGE_MESSAGE: Record<MediaKind, string> = {
   IMAGE: FILE_MESSAGES.IMAGE_TOO_LARGE,
   VIDEO: FILE_MESSAGES.VIDEO_TOO_LARGE,
+};
+
+/** Ảnh, video trong bài nằm ở `media/images`, `media/videos`. */
+const FOLDER: Record<MediaKind, StorageFolder> = {
+  IMAGE: "images",
+  VIDEO: "videos",
 };
 
 /** 30 file mỗi 10 phút mỗi người: đủ cho vài bài 10 ảnh, chặn ai đó đổ đầy ổ đĩa. */
@@ -63,7 +72,7 @@ export class FilesService {
     }
     this.rateLimiter.consume(`upload:${user.id}`, UPLOAD_RATE);
 
-    const storageKey = await this.storage.save(file.buffer, type.extension);
+    const storageKey = await this.storage.save(file.buffer, type.extension, FOLDER[type.kind]);
     try {
       const row = await this.filesRepository.create({
         kind: type.kind,

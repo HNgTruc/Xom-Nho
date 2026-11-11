@@ -88,6 +88,7 @@ xom-nho/
 │   │   │   ├── database/          PrismaModule, PrismaService
 │   │   │   ├── auth/              cấu hình Better Auth
 │   │   │   ├── rate-limit/
+│   │   │   ├── storage/           StorageService: đọc ghi file trong media/
 │   │   │   └── logger/
 │   │   └── modules/               mỗi tính năng một module
 │   │       ├── auth/              phiên hiện tại, /me
@@ -152,6 +153,11 @@ xom-nho/
 │   ├── docker-compose.yml         MySQL + Adminer cho máy dev
 │   ├── mysql/init/                script chạy lần đầu tạo container
 │   └── prisma/                    schema.prisma, migrations/
+│
+├── media/                         ảnh, video người dùng tải lên (UPLOAD_DIR, gitignore, ADR 0005)
+│   ├── images/                    ảnh trong bài
+│   ├── videos/                    video trong bài
+│   └── avatars/                   ảnh đại diện (chưa dùng)
 │
 ├── docs/                          tài liệu thiết kế
 │   └── design-system/xom-nho/     MASTER.md + override admin, mobile

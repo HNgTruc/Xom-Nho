@@ -21,7 +21,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "media:move": "tsx scripts/move-media-to-folders.ts"
   },
   "dependencies": {
     "@better-auth/expo": "1.7.15",

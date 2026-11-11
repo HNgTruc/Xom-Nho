@@ -31,8 +31,8 @@ export const envSchema = z.object({
   BETTER_AUTH_URL: z.url("BETTER_AUTH_URL phải là URL").default("http://localhost:4000"),
   /** Scheme của app Expo (trùng "scheme" trong app.json), để Better Auth tin link quay về app. */
   MOBILE_APP_SCHEME: z.string().min(1).default("xomnho"),
-  /** Thư mục lưu ảnh, video tải lên (ADR 0005), tương đối với thư mục chạy backend. */
-  UPLOAD_DIR: z.string().min(1).default("uploads"),
+  /** Thư mục lưu ảnh, video tải lên (ADR 0005), tương đối với thư mục chạy backend: mặc định `media/` ở gốc repo. */
+  UPLOAD_DIR: z.string().min(1).default("../media"),
 
   // Để trống thì tắt đăng nhập bằng nhà cung cấp đó, frontend ẩn nút
   GOOGLE_CLIENT_ID: optionalString,

@@ -114,7 +114,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 ## Giai đoạn 7: Hoàn thiện
 
 - [ ] Rà soát bảo mật (agent `kiem-tra-bao-mat`), có WebSocket và tải file
-- [ ] Deploy: ổ đĩa lưu lâu dài cho `uploads/` và sao lưu; nhiều bản backend thì chuyển file lên cloud và thêm adapter Redis cho Socket.IO
+- [ ] Deploy: ổ đĩa lưu lâu dài cho `media/` và sao lưu; nhiều bản backend thì chuyển file lên cloud và thêm adapter Redis cho Socket.IO
 - [ ] Rà soát hiệu năng (agent `kiem-tra-hieu-nang`)
 - [ ] Ảnh chụp màn hình, GIF demo trong README
 - [ ] Deploy: backend + MySQL, web, admin (tên miền con riêng). MySQL cần `innodb_ft_min_token_size=1` và `innodb_ft_enable_stopword=OFF` (xem `co-so-du-lieu.md`, mục Tìm kiếm tiếng Việt)

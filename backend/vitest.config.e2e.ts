@@ -31,7 +31,7 @@ export default defineConfig({
       GOOGLE_CLIENT_SECRET: "",
       GITHUB_CLIENT_ID: "",
       GITHUB_CLIENT_SECRET: "",
-      // File tải lên trong test nằm ở thư mục tạm, không lẫn vào backend/uploads
+      // File tải lên trong test nằm ở thư mục tạm, không lẫn vào media/
       UPLOAD_DIR: join(tmpdir(), "xom-nho-e2e-uploads"),
     },
   },

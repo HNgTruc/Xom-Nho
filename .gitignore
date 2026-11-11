@@ -42,7 +42,9 @@ blob-report/
 # Prisma client sinh ra
 backend/src/generated/
 
-# Upload cục bộ khi dev
+# Ảnh, video người dùng tải lên (UPLOAD_DIR, ADR 0005)
+/media/
+# Chỗ lưu cũ, trước khi chuyển sang media/
 backend/uploads/
 
 # Claude Code: file cá nhân, không chia sẻ

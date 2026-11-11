@@ -18,6 +18,7 @@ frontend/admin/        React + Vite: trang quản trị cho trưởng xóm
 frontend/mobile-app/   Expo: app điện thoại, như web trừ quản trị
 frontend/ui/           Design system (@xom-nho/ui): token (cả 3 frontend) + component shadcn/ui (web, admin)
 database/              Dữ liệu: docker-compose.yml (MySQL + Adminer), mysql/init, prisma/ (schema.prisma, migrations)
+media/                 Ảnh, video người dùng tải lên: images/, videos/, avatars/ (gitignore, ADR 0005)
 docs/                  Tài liệu thiết kế; docs/design-system/xom-nho/ là MASTER.md + override cho admin, mobile
 config/                Cấu hình dùng chung: tsconfig.base.json
 ```

@@ -69,13 +69,15 @@ describe("Tải file và đăng bài (/api/v1/files, /api/v1/posts)", () => {
       });
       const row = await prisma.media.findUniqueOrThrow({ where: { id: res.body.data.id } });
       expect(row).toMatchObject({ ownerId: lan.id, postId: null, sizeBytes: PNG.length });
-      expect(row.storageKey).toMatch(/^[0-9a-f-]{36}\.png$/);
+      expect(row.storageKey).toMatch(/^images\/[0-9a-f-]{36}\.png$/);
     });
 
     it("nhận video MP4 dù trình duyệt gửi sai Content-Type", async () => {
       const res = await upload(lan.cookie, MP4, "clip.bin", "application/octet-stream").expect(201);
 
       expect(res.body.data).toMatchObject({ kind: "VIDEO", mimeType: "video/mp4" });
+      const row = await prisma.media.findUniqueOrThrow({ where: { id: res.body.data.id } });
+      expect(row.storageKey).toMatch(/^videos\/[0-9a-f-]{36}\.mp4$/);
     });
 
     it("file chữ đổi đuôi thành .jpg thì 400, không lưu gì", async () => {
