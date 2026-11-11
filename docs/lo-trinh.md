@@ -56,7 +56,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Web: trang chủ có phân trang, chi tiết bài (Markdown an toàn), danh mục, tag, hồ sơ, tìm kiếm
 - [ ] Web: metadata, Open Graph, sitemap
 - [x] Web: giao diện kính trên ảnh nền, header viên thuốc, chuyển động (MASTER 2.4, 5)
-- [x] Web: menu người dùng (Hồ sơ, Cài đặt, Đăng xuất)
+- [x] Web: menu người dùng (Hồ sơ, Cài đặt, Hiển thị và trợ năng, Đăng xuất)
 
 ## Giai đoạn 4: Viết bài + bình luận
 

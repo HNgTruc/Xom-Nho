@@ -60,6 +60,21 @@ Tiêu chí:
 - [ ] A mời B trong lúc B cũng mời A thì thành bạn luôn
 - [ ] Người bị cấm không gửi, không nhận lời mời được
 
+### 1.6 Hiển thị và trợ năng 🌐
+
+- Trong menu ảnh đại diện: mục "Hiển thị và trợ năng" mở trang con (có nút quay lại) với ba tùy chọn:
+  - Chế độ tối: Tắt / Bật / Tự động (theo thiết bị).
+  - Hiệu ứng kính: Tự động (theo cài đặt giảm trong suốt của thiết bị) / Luôn bật / Tắt.
+  - Giảm chuyển động: Tự động / Bật.
+- Lưu trên trình duyệt (`localStorage`), áp dụng ngay, không cần tải lại. Chưa lưu trên tài khoản.
+
+Tiêu chí:
+
+- [x] Tải trang không bị chớp sáng rồi mới tối (script chạy trước khi trang vẽ)
+- [x] Chọn tùy chọn không đóng menu; dùng được bằng bàn phím
+- [x] "Tự động" đổi theo thiết bị ngay khi thiết bị đổi chế độ tối
+- [x] Dữ liệu lưu bị hỏng thì về mặc định, không lỗi trang
+
 ## 2. Bài viết
 
 ### 2.1 Danh sách bài 🌐📱

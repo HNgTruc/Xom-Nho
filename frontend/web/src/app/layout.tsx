@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
+import { displayPreferencesScript } from "@xom-nho/ui/lib/display-preferences";
 import { SiteBackdrop } from "@/components/layout/site-backdrop";
 import "@/styles/globals.css";
 
@@ -29,7 +30,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`}>
+    // Script trong <head> đổi class `dark` và data-* của <html> trước khi trang vẽ (Hiển thị và trợ năng),
+    // nên giá trị trên <html> khác bản server render: báo React bỏ qua chênh lệch ở riêng thẻ này.
+    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Nội dung cố định từ ui, không có dữ liệu người dùng */}
+        <script dangerouslySetInnerHTML={{ __html: displayPreferencesScript }} />
+      </head>
       <body>
         <SiteBackdrop />
         {children}

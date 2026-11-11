@@ -3,8 +3,8 @@ import { cache } from "react";
 import { publicApi } from "@/lib/server-api";
 
 /**
- * Tất cả danh mục theo thứ tự hiển thị. `cache`: header, cột phải và trang danh mục dùng chung một lần gọi
- * trong cùng request. Lỗi ném tiếp; chỗ chỉ là phần phụ (header, cột phải) tự bắt và hiện rỗng.
+ * Tất cả danh mục theo thứ tự hiển thị. `cache`: header và trang danh mục dùng chung một lần gọi trong cùng
+ * request. Lỗi ném tiếp; chỗ chỉ là phần phụ (thanh điều hướng của header) tự bắt và hiện rỗng.
  */
 export const getCategories = cache(async (): Promise<Category[]> => {
   const { data } = await publicApi.categories.list();
