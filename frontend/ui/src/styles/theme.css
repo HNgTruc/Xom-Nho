@@ -224,29 +224,33 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Độ làm mờ (tokens/glass.ts: glassBlur) */
+  /*
+   * Độ làm mờ (tokens/glass.ts: glassBlur). `glass-shell`: ảnh nền được làm mờ sẵn một lần (class
+   * `blur-glass-shell` trên ảnh), không dùng backdrop-filter trên khung: khung cao vài màn hình và cuộn trên
+   * ảnh đứng yên, làm mờ phía sau thì trình duyệt phải tính lại mỗi khung hình. `glass-bar`: header dính, menu.
+   */
   --blur-glass-shell: 6px;
   --blur-glass-bar: 10px;
-  --blur-glass-button: 6px;
 }
 
 /*
- * Ba lớp kính (MASTER 2.4).
- * - `glass-shell`: khung lớn bao cả trang, làm mờ ảnh nền phía sau. Mỗi trang chỉ một khung.
+ * Các lớp kính (MASTER 2.4). Chỉ `glass-bar` tự làm mờ phía sau (backdrop-filter): nó nhỏ và trôi trên nội
+ * dung đang cuộn. Mọi lớp khác chỉ là màu trong suốt nằm trên ảnh nền đã làm mờ sẵn, nên cuộn trang không phải
+ * tính lại phép làm mờ.
+ * - `glass-shell`: khung lớn bao cả trang. Mỗi trang chỉ một khung.
  * - `glass`: tấm nội dung trong khung (thẻ bài, đầu trang, tab). Không làm mờ thêm: khung đã làm mờ.
  * - `glass-strong`: tấm gần đặc cho chỗ đọc lâu (bài viết, form). Không làm mờ thêm.
  * - `glass-bar`: như `glass-strong` nhưng tự làm mờ, cho thứ trôi trên nội dung (header dính) hoặc
  *   nằm thẳng trên ảnh nền ngoài khung (form đăng nhập).
- * - `glass-button`: nút phụ, tab, chip: kính mỏng tự làm mờ. Chữ trên đó dùng `foreground` (không dùng chữ phụ).
+ * - `glass-button`: nút phụ, tab, chip: kính mỏng. Chữ trên đó dùng `foreground` (không dùng chữ phụ).
  * - `glass-primary`: nút chính, mục đang chọn: kính màu `primary`, chữ `primary-foreground`.
- * Hover của thẻ: `hover:bg-glass-strong hover:border-glass-border-hover hover:shadow-glass-hover`.
+ * Hover của thẻ: `hover:bg-glass-strong hover:border-glass-border-hover hover:shadow-glass-hover`; chỉ chuyển
+ * mượt `translate`, nền, viền (không chuyển `box-shadow`: bóng lớn phải vẽ lại mỗi khung hình).
  */
 @utility glass-shell {
   border: 1px solid var(--glass-border);
   background-color: var(--glass-shell);
   box-shadow: var(--glass-shell-shadow);
-  -webkit-backdrop-filter: blur(var(--blur-glass-shell));
-  backdrop-filter: blur(var(--blur-glass-shell));
 }
 
 @utility glass {
@@ -274,28 +278,25 @@
   border: 1px solid var(--glass-border-hover);
   background-color: var(--glass-button);
   color: var(--foreground);
-  -webkit-backdrop-filter: blur(var(--blur-glass-button));
-  backdrop-filter: blur(var(--blur-glass-button));
 }
 
 @utility glass-primary {
   border: 1px solid transparent;
   background-color: var(--glass-primary);
   color: var(--primary-foreground);
-  -webkit-backdrop-filter: blur(var(--blur-glass-button));
-  backdrop-filter: blur(var(--blur-glass-button));
 }
 
 /*
- * Khối hiện ra khi trang tải (MASTER 5, tokens/motion.ts). Hiện lần lượt: đặt `--stagger` (bậc 0 đến 8,
- * mỗi bậc 60ms) trên chính phần tử, ví dụ class `[--stagger:2]` hoặc `style={{ "--stagger": index }}`.
+ * Khối hiện ra khi trang tải (MASTER 5, tokens/motion.ts). Hiện lần lượt: đặt `--stagger` (bậc 0 đến 6,
+ * mỗi bậc 35ms) trên chính phần tử, ví dụ class `[--stagger:2]` hoặc `style={{ "--stagger": index }}`.
  * Viết thành utility (không để trong @theme): biến `--animate-*` của @theme khai báo ở :root, nên
  * `var(--stagger)` trong đó bị tính tại :root (luôn 0) chứ không tại phần tử.
  */
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.99);
+    /* Chỉ trượt, không thu nhỏ: thu nhỏ làm chữ nhòe trong lúc chạy và phải vẽ lại chữ */
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -304,7 +305,7 @@
 }
 
 @utility animate-rise-in {
-  animation: rise-in 520ms var(--ease-enter) calc(min(var(--stagger, 0), 8) * 60ms) both;
+  animation: rise-in 360ms var(--ease-enter) calc(min(var(--stagger, 0), 6) * 35ms) both;
 }
 
 /* Trình duyệt không làm mờ được, hoặc người dùng muốn bớt trong suốt: khung và tấm thành màu đặc */

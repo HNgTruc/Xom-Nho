@@ -4,10 +4,10 @@
 
 /**
  * Các lớp kính:
- * - `shell`: khung lớn bao cả trang, làm mờ ảnh nền phía sau. Không đặt chữ thẳng lên nên rất trong.
+ * - `shell`: khung lớn bao cả trang, nằm trên ảnh nền đã làm mờ sẵn. Không đặt chữ thẳng lên nên rất trong.
  * - `surface`: tấm nội dung trong khung (thẻ bài, đầu trang), không làm mờ thêm.
  * - `strong`: tấm gần đặc cho chỗ đọc lâu (bài viết, form), thanh header, menu thả xuống.
- * - `button`: nút phụ, tab, chip: kính mỏng tự làm mờ. `primary`: nút chính, kính màu `primary`.
+ * - `button`: nút phụ, tab, chip: kính mỏng. `primary`: nút chính, kính màu `primary`.
  */
 export const glass = {
   light: {
@@ -40,5 +40,9 @@ export const glass = {
   },
 } as const;
 
-/** Độ làm mờ (px): khung làm mờ ảnh nền, thanh header và nút kính trôi trên nội dung. Mobile: pages/mobile.md. */
-export const glassBlur = { shell: 6, bar: 10, button: 6 } as const;
+/**
+ * Độ làm mờ (px). `shell`: ảnh nền được làm mờ sẵn một lần (không làm mờ phía sau khung, vì khung cao vài
+ * màn hình và cuộn trên ảnh đứng yên). `bar`: header dính, menu thả xuống, form đăng nhập: chỉ những lớp này dùng
+ * backdrop-filter. Mobile: pages/mobile.md.
+ */
+export const glassBlur = { shell: 6, bar: 10 } as const;

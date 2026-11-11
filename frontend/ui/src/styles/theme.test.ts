@@ -1,6 +1,15 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { categoryColors, colors, glass, glassBlur, statusColors } from "../tokens";
+import {
+  categoryColors,
+  colors,
+  duration,
+  enterOffset,
+  glass,
+  glassBlur,
+  stagger,
+  statusColors,
+} from "../tokens";
 
 const css = readFileSync(new URL("./theme.css", import.meta.url), "utf8");
 
@@ -45,4 +54,11 @@ describe.each([
 
 it.each(Object.entries(glassBlur))("độ làm mờ %s khớp tokens", (name, px) => {
   expect(css).toContain(`--blur-glass-${name}: ${px}px;`);
+});
+
+it("hiệu ứng hiện ra (rise-in) khớp tokens chuyển động", () => {
+  expect(css).toContain(
+    `rise-in ${duration.enter}ms var(--ease-enter) calc(min(var(--stagger, 0), ${stagger.maxSteps}) * ${stagger.step}ms) both`,
+  );
+  expect(css).toContain(`transform: translateY(${enterOffset}px);`);
 });

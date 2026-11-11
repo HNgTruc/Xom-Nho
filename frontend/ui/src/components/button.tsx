@@ -21,8 +21,7 @@ const buttonVariants = cva(
         outline: "glass-button hover:bg-glass-button-hover aria-expanded:bg-glass-button-hover",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_srgb,var(--secondary),var(--foreground)_12%)]",
-        ghost:
-          "text-foreground hover:bg-glass-button hover:backdrop-blur-glass-button aria-expanded:bg-glass-button",
+        ghost: "text-foreground hover:bg-glass-button aria-expanded:bg-glass-button",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-[color-mix(in_srgb,var(--destructive),var(--foreground)_12%)] focus-visible:ring-destructive",
         link: "text-link underline-offset-4 hover:underline",

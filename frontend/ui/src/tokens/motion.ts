@@ -8,12 +8,18 @@ export const duration = {
   base: 200,
   /** Hộp thoại, bottom sheet */
   slow: 280,
-  /** Khối nội dung hiện ra khi trang tải (rise-in) */
-  enter: 520,
+  /** Khối nội dung hiện ra khi trang tải (rise-in): ngắn để chuyển trang không thấy ì */
+  enter: 360,
 } as const;
 
-/** Khoảng trễ giữa hai khối liên tiếp khi hiện ra lần lượt (ms). Tối đa 8 bậc để trang không chờ lâu. */
-export const stagger = { step: 60, maxSteps: 8 } as const;
+/**
+ * Khoảng trễ giữa hai khối liên tiếp khi hiện ra lần lượt (ms). Tối đa 6 bậc: khối cuối xong sau
+ * 6 × 35 + 360 = 570ms (trước đây 8 × 60 + 520 = 1000ms, chuyển trang thấy ì).
+ */
+export const stagger = { step: 35, maxSteps: 6 } as const;
+
+/** Quãng trượt lên khi hiện ra (px). Không thu nhỏ: thu nhỏ làm chữ nhòe trong lúc chạy. */
+export const enterOffset = 8;
 
 /** cubic-bezier(0.2, 0, 0, 1); mobile dùng mảng điểm điều khiển cho Easing.bezier */
 export const easing = {
