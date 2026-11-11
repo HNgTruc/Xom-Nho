@@ -24,6 +24,19 @@ export const FEED_MESSAGES = {
   LOAD_ERROR: "Chưa tải được bài viết. Bạn thử lại sau ít phút nhé.",
 } as const;
 
+/** Bảng Thông báo ở header (docs/tinh-nang.md mục 6). */
+export const NOTIFICATION_MESSAGES = {
+  TITLE: "Thông báo",
+  EMPTY:
+    "Chưa có thông báo nào. Khi có người bình luận, thích bài hay mời kết bạn, bạn sẽ thấy ở đây.",
+} as const;
+
+/** Bảng Tin nhắn ở header (docs/tinh-nang.md mục 5). */
+export const INBOX_MESSAGES = {
+  TITLE: "Tin nhắn",
+  EMPTY: "Bạn chưa có tin nhắn nào. Ghé hồ sơ một hàng xóm để bắt chuyện nhé.",
+} as const;
+
 /** Câu của trang cài đặt tài khoản (docs/tinh-nang.md mục 1.4). */
 export const SETTINGS_MESSAGES = {
   SAVED: "Đã lưu hồ sơ của bạn.",

@@ -3,10 +3,13 @@ import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getCurrentUser, UserMenu } from "@/features/auth";
+import { MessagesMenu } from "@/features/messages";
+import { NotificationsMenu } from "@/features/notifications";
 import { CategoryNav, CategoryNavSkeleton } from "@/features/posts";
 
 /**
- * Phần bên phải header: menu tài khoản (đã đăng nhập) hoặc nút đăng nhập. Đọc cookie nên nằm trong Suspense.
+ * Phần bên phải header: đã đăng nhập thì nút Tin nhắn, Thông báo rồi menu tài khoản (như Facebook); khách thì
+ * nút đăng nhập, đăng ký. Đọc cookie nên nằm trong Suspense.
  * Backend không trả lời thì hiện như khách: header có mặt ở mọi trang, không được làm hỏng cả trang.
  */
 async function UserNav() {
@@ -25,7 +28,13 @@ async function UserNav() {
     );
   }
 
-  return <UserMenu user={{ name: user.name, username: user.username, image: user.image }} />;
+  return (
+    <div className="flex items-center gap-2">
+      <MessagesMenu />
+      <NotificationsMenu />
+      <UserMenu user={{ name: user.name, username: user.username, image: user.image }} />
+    </div>
+  );
 }
 
 /**

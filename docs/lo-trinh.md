@@ -83,6 +83,9 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Backend: `modules/messages` (REST), gateway Socket.IO ([ADR 0006](quyet-dinh/0006-chat-thoi-gian-thuc-bang-socket-io.md)), hộp Tin nhắn chờ cho người lạ
 - [ ] Web: trang `/tin-nhan`, gửi ảnh và video (5 MB / 25 MB), đã xem, đang gõ, số tin chưa đọc
 - [ ] Test: người ngoài cuộc trò chuyện không đọc được tin, không mở được file
+- [x] Web: nút Tin nhắn, Thông báo ở header (giao diện, chưa có dữ liệu)
+- [ ] Backend: `modules/notifications` (bảng `Notification`, tạo khi bình luận, thích, kết bạn, duyệt bài), đẩy qua Socket.IO
+- [ ] Web: bảng Thông báo, bảng Tin nhắn có dữ liệu thật, số chưa đọc
 
 **Xong khi:** hai tài khoản trên hai trình duyệt nhắn cho nhau, tin hiện ngay, gửi được ảnh và video.
 

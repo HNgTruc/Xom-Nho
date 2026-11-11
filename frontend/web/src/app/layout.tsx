@@ -32,7 +32,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // Script trong <head> đổi class `dark` và data-* của <html> trước khi trang vẽ (Hiển thị và trợ năng),
     // nên giá trị trên <html> khác bản server render: báo React bỏ qua chênh lệch ở riêng thẻ này.
-    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`} suppressHydrationWarning>
+    <html
+      lang="vi"
+      className={`${beVietnamPro.variable} ${lora.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Nội dung cố định từ ui, không có dữ liệu người dùng */}
         <script dangerouslySetInnerHTML={{ __html: displayPreferencesScript }} />

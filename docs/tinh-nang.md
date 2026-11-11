@@ -167,6 +167,19 @@ Tiêu chí:
 - [ ] Gửi liên tục bị giới hạn tần suất
 - [ ] Nội dung tin hiển thị dạng chữ thường (không render HTML)
 
+## 6. Thông báo 🌐📱
+
+- Nút chuông ở header, cạnh nút Tin nhắn và ảnh đại diện; có số thông báo chưa đọc.
+- Có thông báo khi: ai đó bình luận bài của mình, trả lời bình luận của mình, thích bài của mình, gửi hoặc chấp nhận lời mời kết bạn; bài được duyệt hoặc bị từ chối.
+- Bấm một thông báo thì đánh dấu đã đọc và mở chỗ liên quan; có "Đánh dấu tất cả đã đọc".
+
+Tiêu chí:
+
+- [x] Web: nút Thông báo và nút Tin nhắn ở header (giao diện, chưa có dữ liệu)
+- [ ] Số chưa đọc đúng, cập nhật ngay khi có thông báo mới (qua Socket.IO, ADR 0006)
+- [ ] Không tạo thông báo cho chính hành động của mình (tự thích bài mình)
+- [ ] Thông báo của bài, bình luận đã bị xóa hay ẩn không còn hiện
+
 ## 4. Quản trị 🛠️ (app admin riêng, `frontend/admin`)
 
 ### 4.1 Tổng quan
@@ -200,7 +213,6 @@ Tiêu chí chung cho admin:
 ## Để sau (chưa làm)
 
 - Tải ảnh lên cho bài (ảnh bìa bài, ảnh trong bài). Ảnh đại diện, ảnh bìa hồ sơ, file trong tin nhắn đã có ở mục 1.4 và 5
-- Thông báo khi có người trả lời, có lời mời kết bạn
 - Lưu bài
 - Nhóm chat nhiều người
 - Báo cáo vi phạm

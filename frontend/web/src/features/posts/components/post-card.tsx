@@ -9,12 +9,13 @@ import { CategoryBadge } from "./category-badge";
  * Thẻ bài trong feed (MASTER mục 7): badge danh mục, tiêu đề, tóm tắt 2 dòng, rồi tác giả, thời gian, số bình luận.
  * Cả thẻ bấm được nhờ liên kết tiêu đề phủ kín thẻ (`after:inset-0`); badge danh mục, tag nằm trên lớp đó
  * (`relative z-10`) nên vẫn bấm riêng được, không lồng thẻ `<a>` trong nhau.
- * Tấm `glass` (MASTER 2.4). Hover: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (MASTER 5).
+ * Tấm `glass` (MASTER 2.4). Hover: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (MASTER 5). Bóng đổi ngay,
+ * không chuyển mượt: bóng lớn chuyển mượt phải vẽ lại mỗi khung hình.
  * Số bình luận nằm trong viên `accent` (xanh nhạt), điểm nhấn như viên màu trong mẫu thiết kế.
  */
 export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
   return (
-    <article className="glass relative flex flex-col gap-3 rounded-xl p-4 transition-[translate,background-color,border-color,box-shadow] duration-200 ease-standard hover:-translate-y-0.5 hover:border-glass-border-hover hover:bg-glass-strong hover:shadow-glass-hover has-[[data-card-link]:focus-visible]:ring-2 has-[[data-card-link]:focus-visible]:ring-ring has-[[data-card-link]:focus-visible]:ring-offset-2 has-[[data-card-link]:focus-visible]:ring-offset-background sm:p-5">
+    <article className="glass relative flex flex-col gap-3 rounded-xl p-4 transition-[translate,background-color,border-color] duration-200 ease-standard hover:-translate-y-0.5 hover:border-glass-border-hover hover:bg-glass-strong hover:shadow-glass-hover has-[[data-card-link]:focus-visible]:ring-2 has-[[data-card-link]:focus-visible]:ring-ring has-[[data-card-link]:focus-visible]:ring-offset-2 has-[[data-card-link]:focus-visible]:ring-offset-background sm:p-5">
       <CategoryBadge category={post.category} className="relative z-10" />
 
       <h2 className="text-lg font-semibold text-card-foreground">
