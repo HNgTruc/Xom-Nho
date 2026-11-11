@@ -28,15 +28,44 @@ Tiêu chí:
 
 ### 1.3 Hồ sơ 🌐📱
 
-- Trang `/u/<username>`: ảnh, tên, giới thiệu, danh sách bài đã đăng.
-- Sửa tên, giới thiệu, ảnh (ảnh qua URL ở giai đoạn đầu).
+- Trang `/u/<username>`: ảnh bìa, ảnh đại diện, tên, giới thiệu, nơi ở, số bạn bè, danh sách bài đã đăng.
+- Chủ hồ sơ có ô viết bài ngay trên trang (cùng luồng duyệt như mục 2.3).
+- Người xem: nút Kết bạn / Hủy lời mời / Bạn bè, nút Nhắn tin.
+
+Tiêu chí:
+
+- [ ] Chưa có ảnh bìa thì hiện nền mặc định, chưa có ảnh đại diện thì hiện chữ cái đầu
+- [ ] Số bạn bè chỉ đếm lời mời đã chấp nhận
+- [ ] Hồ sơ của người bị cấm vẫn xem được nhưng không kết bạn, không nhắn tin được
+
+### 1.4 Cài đặt tài khoản 🌐📱
+
+- Đã đăng nhập: bấm ảnh đại diện ở header mở menu Hồ sơ, Cài đặt, Đăng xuất.
+- Trang `/cai-dat`: sửa tên, giới thiệu, nơi ở; tải ảnh đại diện, ảnh bìa (ảnh JPG/PNG/WebP tối đa 5 MB, [ADR 0005](quyet-dinh/0005-luu-file-tren-o-dia-backend.md)); đổi mật khẩu; chọn ai được nhắn tin thẳng (bạn bè, hay mọi người).
+
+Tiêu chí:
+
+- [ ] File sai loại (đổi đuôi .exe thành .jpg) bị từ chối, có lời báo tiếng Việt
+- [ ] File quá 5 MB bị chặn ngay ở trình duyệt, backend cũng chặn
+- [ ] Đổi ảnh thì file cũ bị xóa khỏi ổ đĩa
+
+### 1.5 Kết bạn 🌐📱
+
+- Gửi lời mời kết bạn, người nhận chấp nhận hoặc từ chối; người gửi hủy được lời mời; hai bên hủy kết bạn được.
+- Trang bạn bè: danh sách bạn, lời mời nhận được, lời mời đã gửi.
+
+Tiêu chí:
+
+- [ ] Không gửi được lời mời cho chính mình hay gửi trùng
+- [ ] A mời B trong lúc B cũng mời A thì thành bạn luôn
+- [ ] Người bị cấm không gửi, không nhận lời mời được
 
 ## 2. Bài viết
 
 ### 2.1 Danh sách bài 🌐📱
 
 - Trang chủ: bài mới nhất đã đăng, 10 bài/trang. Có tab "Mới" và "Nhiều người đọc".
-- Mỗi bài hiện: tiêu đề, tóm tắt, tác giả, danh mục, tag, ngày, số bình luận.
+- Mỗi bài hiện: ảnh đại diện và tên người đăng, thời gian cụ thể ("14:05, 4 tháng 11"), danh mục, tiêu đề, tóm tắt, tag, số thích, nút Thích, nút Chia sẻ, số bình luận, và **2 bình luận công khai mới nhất**. Bấm vào bài thì xem đủ bình luận.
 
 Tiêu chí:
 
@@ -72,6 +101,17 @@ Tiêu chí:
 
 - Trang `/danh-muc/<slug>` và `/tag/<slug>` liệt kê bài.
 
+### 2.6 Thích và chia sẻ 🌐📱
+
+- Hàng xóm đã đăng nhập bấm Thích / Bỏ thích bài đã đăng; ai cũng thấy số thích.
+- Chia sẻ: điện thoại mở bảng chia sẻ của hệ điều hành; máy tính sao chép liên kết bài, báo "Đã sao chép liên kết".
+
+Tiêu chí:
+
+- [ ] Mỗi người thích một bài một lần; bấm liên tục không làm sai số
+- [ ] Chưa đăng nhập bấm Thích thì chuyển tới đăng nhập rồi quay lại bài
+- [ ] Nút Thích có `aria-pressed`, không chỉ đổi màu
+
 ### 2.5 Tìm kiếm 🌐📱
 
 - Ô tìm ở thanh trên (web) và tab Tìm kiếm (app).
@@ -95,6 +135,22 @@ Tiêu chí:
 - [ ] Bình luận bị ẩn không hiện với người thường, hiện mờ với admin
 - [ ] Gửi liên tục bị giới hạn tần suất
 - [ ] Nội dung bình luận hiển thị dạng chữ thường (không render Markdown, không HTML)
+
+## 5. Tin nhắn riêng 🌐📱
+
+- Trang `/tin-nhan`: danh sách cuộc trò chuyện (người, tin cuối, số tin chưa đọc), khung chat.
+- Gửi chữ, ảnh (JPG/PNG/WebP tối đa 5 MB), video (MP4/WebM tối đa 25 MB), tối đa 4 file mỗi tin.
+- Tin hiện ra ngay, có "đã xem", "đang gõ" ([ADR 0006](quyet-dinh/0006-chat-thoi-gian-thuc-bang-socket-io.md)).
+- Bạn bè nhắn thẳng vào hộp chính. Người chưa kết bạn nhắn thì tin vào hộp **Tin nhắn chờ** của người nhận; người nhận chấp nhận thì cuộc trò chuyện sang hộp chính, từ chối thì bên gửi không nhắn tiếp được.
+- Chặn người dùng: không nhận tin, không nhận lời mời kết bạn từ người đó.
+
+Tiêu chí:
+
+- [ ] Chỉ hai người trong cuộc trò chuyện đọc được tin và mở được file đính kèm (người khác, kể cả trưởng xóm, nhận 404)
+- [ ] File sai loại hoặc quá giới hạn bị từ chối ở cả trình duyệt lẫn backend
+- [ ] Mất mạng rồi có lại thì tải bù tin bị lỡ
+- [ ] Gửi liên tục bị giới hạn tần suất
+- [ ] Nội dung tin hiển thị dạng chữ thường (không render HTML)
 
 ## 4. Quản trị 🛠️ (app admin riêng, `frontend/admin`)
 
@@ -128,9 +184,10 @@ Tiêu chí chung cho admin:
 
 ## Để sau (chưa làm)
 
-- Tải ảnh lên (bìa bài, ảnh trong bài, ảnh đại diện)
-- Thông báo khi có người trả lời
-- Thích / lưu bài
+- Tải ảnh lên cho bài (ảnh bìa bài, ảnh trong bài). Ảnh đại diện, ảnh bìa hồ sơ, file trong tin nhắn đã có ở mục 1.4 và 5
+- Thông báo khi có người trả lời, có lời mời kết bạn
+- Lưu bài
+- Nhóm chat nhiều người
 - Báo cáo vi phạm
 - Chế độ tối cho app
 - Deploy (web lên Vercel hoặc VPS, MySQL trên dịch vụ cloud, app build bằng EAS)
