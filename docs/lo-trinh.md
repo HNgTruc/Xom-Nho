@@ -55,12 +55,36 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] Test service + policy cho từng vai trò
 - [ ] Web: trang chủ có phân trang, chi tiết bài (Markdown an toàn), danh mục, tag, hồ sơ, tìm kiếm
 - [ ] Web: metadata, Open Graph, sitemap
+- [x] Web: giao diện kính trên ảnh nền, header viên thuốc, chuyển động (MASTER 2.4, 5)
+- [x] Web: menu người dùng (Hồ sơ, Cài đặt, Đăng xuất)
 
 ## Giai đoạn 4: Viết bài + bình luận
 
 - [ ] Backend: tạo/sửa/xóa bài, luồng trạng thái, `comments`, giới hạn tần suất
+- [ ] Backend: `PostLike` (thích / bỏ thích), feed trả số thích và 2 bình luận công khai mới nhất
 - [ ] Web: trình soạn Markdown có xem trước, bài của tôi, bình luận + trả lời
+- [ ] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất
 - [ ] Test Playwright: đăng ký → viết bài → bình luận
+
+## Giai đoạn 4b: Hồ sơ, cài đặt, kết bạn
+
+- [ ] `infrastructure/storage` + module `files`: tải ảnh, kiểm tra chữ ký nhị phân, giới hạn 5 MB ([ADR 0005](quyet-dinh/0005-luu-file-tren-o-dia-backend.md))
+- [ ] Migration: `user.coverImage`, `user.location`, bảng `Friendship`, `UserBlock`
+- [ ] Backend: `modules/friends` (mời, chấp nhận, từ chối, hủy), hồ sơ trả số bạn bè và quan hệ với người xem
+- [ ] Web: trang hồ sơ có ảnh bìa, ảnh đại diện, nơi ở, số bạn bè, bài viết, ô viết bài
+- [ ] Web: trang cài đặt, trang bạn bè
+- [ ] Test phân quyền cho từng vai trò, người bị cấm
+
+**Xong khi:** hai tài khoản kết bạn được với nhau, đổi được ảnh đại diện và ảnh bìa.
+
+## Giai đoạn 4c: Tin nhắn riêng
+
+- [ ] Migration: `Conversation`, `ConversationMember`, `Message`, `MessageAttachment`
+- [ ] Backend: `modules/messages` (REST), gateway Socket.IO ([ADR 0006](quyet-dinh/0006-chat-thoi-gian-thuc-bang-socket-io.md)), hộp Tin nhắn chờ cho người lạ
+- [ ] Web: trang `/tin-nhan`, gửi ảnh và video (5 MB / 25 MB), đã xem, đang gõ, số tin chưa đọc
+- [ ] Test: người ngoài cuộc trò chuyện không đọc được tin, không mở được file
+
+**Xong khi:** hai tài khoản trên hai trình duyệt nhắn cho nhau, tin hiện ngay, gửi được ảnh và video.
 
 ## Giai đoạn 5: Trang quản trị
 
@@ -82,7 +106,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 7: Hoàn thiện
 
-- [ ] Rà soát bảo mật (agent `kiem-tra-bao-mat`)
+- [ ] Rà soát bảo mật (agent `kiem-tra-bao-mat`), có WebSocket và tải file
+- [ ] Deploy: ổ đĩa lưu lâu dài cho `uploads/` và sao lưu; nhiều bản backend thì chuyển file lên cloud và thêm adapter Redis cho Socket.IO
 - [ ] Rà soát hiệu năng (agent `kiem-tra-hieu-nang`)
 - [ ] Ảnh chụp màn hình, GIF demo trong README
 - [ ] Deploy: backend + MySQL, web, admin (tên miền con riêng). MySQL cần `innodb_ft_min_token_size=1` và `innodb_ft_enable_stopword=OFF` (xem `co-so-du-lieu.md`, mục Tìm kiếm tiếng Việt)

@@ -152,7 +152,7 @@ const components: Components = {
       <a
         href={href}
         className={cn(
-          "rounded-sm text-primary underline underline-offset-2 hover:decoration-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+          "rounded-sm text-link underline underline-offset-2 hover:decoration-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
           className,
         )}
         {...(external ? { rel: "nofollow ugc noopener", target: "_blank" } : {})}

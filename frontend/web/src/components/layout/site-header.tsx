@@ -2,10 +2,11 @@ import { Button } from "@xom-nho/ui/components/button";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import Link from "next/link";
 import { Suspense } from "react";
-import { getCurrentUser, SignOutButton } from "@/features/auth";
+import { getCurrentUser, UserMenu } from "@/features/auth";
+import { CategoryNav, CategoryNavSkeleton } from "@/features/posts";
 
 /**
- * Phần bên phải header: tên người đang đăng nhập hoặc nút đăng nhập. Đọc cookie nên nằm trong Suspense.
+ * Phần bên phải header: menu tài khoản (đã đăng nhập) hoặc nút đăng nhập. Đọc cookie nên nằm trong Suspense.
  * Backend không trả lời thì hiện như khách: header có mặt ở mọi trang, không được làm hỏng cả trang.
  */
 async function UserNav() {
@@ -13,7 +14,7 @@ async function UserNav() {
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <Button asChild variant="ghost" size="sm">
           <Link href="/dang-nhap">Đăng nhập</Link>
         </Button>
@@ -24,25 +25,35 @@ async function UserNav() {
     );
   }
 
-  return (
-    <div className="flex items-center gap-2">
-      <span className="hidden max-w-40 truncate text-sm font-medium sm:inline">{user.name}</span>
-      <SignOutButton />
-    </div>
-  );
+  return <UserMenu user={{ name: user.name, username: user.username, image: user.image }} />;
 }
 
-/** Header cố định mỏng 56px (MASTER mục 8). Ô tìm kiếm, nút "Viết bài" thêm ở giai đoạn 3, 4. */
+/**
+ * Header dính trong khung kính (MASTER mục 8): thanh `glass-bar` dạng viên thuốc gồm logo, điều hướng
+ * danh mục, nút người dùng. Dưới 1024px: điều hướng xuống hàng thứ hai và cuộn ngang bên trong thanh.
+ */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-10 border-b border-border bg-background">
-      <div className="mx-auto flex h-14 max-w-[1120px] items-center justify-between gap-4 px-4 md:px-6 lg:px-8">
-        <Link href="/" className="text-lg font-bold text-primary">
+    <header className="sticky top-2 z-20 px-2 pt-2 sm:top-4 sm:px-4 sm:pt-4">
+      <div className="glass-bar grid animate-rise-in grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1 rounded-xl p-1.5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:rounded-full">
+        <Link
+          href="/"
+          className="inline-flex h-10 items-center rounded-full border border-input/50 px-4 text-base font-bold tracking-tight text-foreground transition-colors duration-200 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
           Xóm Nhỏ
         </Link>
-        <Suspense fallback={<Skeleton className="h-10 w-40" />}>
-          <UserNav />
-        </Suspense>
+
+        <div className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:row-start-auto">
+          <Suspense fallback={<CategoryNavSkeleton />}>
+            <CategoryNav />
+          </Suspense>
+        </div>
+
+        <div className="justify-self-end">
+          <Suspense fallback={<Skeleton className="h-10 w-40 rounded-full" />}>
+            <UserNav />
+          </Suspense>
+        </div>
       </div>
     </header>
   );

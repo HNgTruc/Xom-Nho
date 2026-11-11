@@ -20,7 +20,7 @@ export async function generateMetadata({
 // Cột đọc 720px (MASTER mục 4)
 export default function PostPage({ params }: PageProps<"/bai-viet/[slug]">) {
   return (
-    <main className="mx-auto w-full max-w-[720px] px-4 py-8 md:px-6 md:py-12">
+    <main className="mx-auto w-full max-w-[760px] flex-1 px-3 pt-4 pb-6 sm:px-4 md:px-6 md:pt-6 md:pb-8">
       <Suspense fallback={<PostDetailSkeleton />}>
         <PostDetailView params={params} />
       </Suspense>

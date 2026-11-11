@@ -3,7 +3,11 @@ import { Skeleton } from "@xom-nho/ui/components/skeleton";
 /** Giữ chỗ trang bài viết: cùng bố cục (badge, tiêu đề 2 dòng, hàng tác giả, các đoạn văn). */
 export function PostDetailSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Đang tải bài viết" className="flex flex-col gap-8">
+    <div
+      aria-busy="true"
+      aria-label="Đang tải bài viết"
+      className="glass-strong flex flex-col gap-8 rounded-xl p-5 sm:p-8"
+    >
       <div className="flex flex-col gap-4">
         <Skeleton className="h-6 w-20 rounded-sm" />
         <Skeleton className="h-10 w-full" />
