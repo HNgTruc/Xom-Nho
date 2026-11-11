@@ -13,7 +13,7 @@ paths:
 
 1. **Ai đang gọi?** `AuthGuard` toàn cục lấy phiên; route nào không cần đăng nhập phải ghi rõ `@Public()`. Người bị cấm bị chặn ở guard.
 2. **Có được phép không?** Vai trò: `@Roles()`. Quyền trên bản ghi: hàm trong `*.policy.ts`, gọi trên **bản ghi lấy từ DB**. Không tin `authorId`, `role`, `status` gửi từ client.
-3. **Dữ liệu có hợp lệ không?** `ZodValidationPipe` với schema từ `@xom-nho/shared`. Chỉ dùng dữ liệu đã parse.
+3. **Dữ liệu có hợp lệ không?** `ZodValidationPipe` với schema từ `@xom-nho/api`. Chỉ dùng dữ liệu đã parse.
 4. **Có bị lạm dụng không?** Tạo bài, bình luận qua `RateLimitService`.
 
 Thêm:

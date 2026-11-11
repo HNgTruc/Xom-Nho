@@ -1,5 +1,5 @@
-import type { Me } from "@xom-nho/shared";
-import { isApiError } from "@xom-nho/shared/api-client";
+import type { Me } from "@xom-nho/api";
+import { isApiError } from "@xom-nho/api/api-client";
 import { serverApi } from "@/lib/server-api";
 
 /** Người đang xem trang (đọc ở server), chưa đăng nhập hoặc bị khóa thì null. Lỗi khác ném tiếp. */

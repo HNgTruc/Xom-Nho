@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { HealthStatus } from "@xom-nho/shared";
+import type { HealthStatus } from "@xom-nho/api";
 import { HealthRepository } from "./health.repository.js";
 
 @Injectable()

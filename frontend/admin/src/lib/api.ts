@@ -1,4 +1,4 @@
-import { createClient } from "@xom-nho/shared/api-client";
+import { createClient } from "@xom-nho/api/api-client";
 
 /** api-client của admin. `credentials: "include"` để gửi cookie phiên sang backend khác origin. */
 export const api = createClient({

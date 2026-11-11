@@ -4,7 +4,7 @@ Cấu hình Claude Code cho Xóm Nhỏ. Mọi thứ ở đây được commit đ
 
 | Thư mục / file        | Là gì                                                      | Khi nào chạy                                        |
 | --------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
-| `../CLAUDE.md`        | Hướng dẫn chính: bối cảnh, cấu trúc, lệnh, quy ước         | Mỗi phiên, luôn nạp                                 |
+| `CLAUDE.md`           | Hướng dẫn chính: bối cảnh, cấu trúc, lệnh, quy ước         | Mỗi phiên, luôn nạp                                 |
 | `../<phần>/CLAUDE.md` | Hướng dẫn riêng của backend, web, admin, mobile-app, ui    | Khi làm việc trong thư mục đó                       |
 | `settings.json`       | Quyền (cho phép / hỏi / cấm lệnh) và hooks                 | Luôn áp dụng                                        |
 | `rules/`              | Quy tắc theo mảng, `paths` quyết định khi nào nạp          | Tự động theo file đang sửa                          |
@@ -19,12 +19,12 @@ Cấu hình Claude Code cho Xóm Nhỏ. Mọi thứ ở đây được commit đ
 | ------------------- | -------------------------------------------------------------------- |
 | `backend-nestjs.md` | `backend/src/**`                                                     |
 | `bao-mat.md`        | `backend/src/**`, `frontend/*/src/lib/**`, phần chặn quyền của admin |
-| `prisma-mysql.md`   | `backend/prisma/**`, `infrastructure/database`, `*.repository.ts`    |
+| `prisma-mysql.md`   | `database/prisma/**`, `infrastructure/database`, `*.repository.ts`   |
 | `frontend-web.md`   | `frontend/web/**`                                                    |
 | `frontend-admin.md` | `frontend/admin/**`                                                  |
 | `mobile-expo.md`    | `frontend/mobile-app/**`                                             |
-| `ui-package.md`     | `ui/**`                                                              |
-| `shared-package.md` | `shared/**`                                                          |
+| `ui-package.md`     | `frontend/ui/**`                                                     |
+| `api-package.md`    | `api/**`                                                             |
 | `testing.md`        | File test, cấu hình test                                             |
 | `giong-van.md`      | File giao diện, messages, schema, service (chữ hiển thị)             |
 
@@ -67,7 +67,7 @@ Hooks chạy bằng `node`, dùng được trên Windows, macOS, Linux.
 
 ## File cá nhân (không commit)
 
-- `../CLAUDE.local.md`: ghi chú riêng cho máy bạn (xem `CLAUDE.local.md.example`)
+- `../CLAUDE.local.md`: ghi chú riêng cho máy bạn (chép từ `.claude/CLAUDE.local.md.example`)
 - `settings.local.json`: quyền riêng cho máy bạn
 
 ## Thêm mới
@@ -77,4 +77,4 @@ Hooks chạy bằng `node`, dùng được trên Windows, macOS, Linux.
 - Agent: `agents/<ten>.md` với `name`, `description`, `tools`, `model`.
 - Command: `commands/<ten>.md`; `$ARGUMENTS` để nhận tham số.
 
-Giữ `CLAUDE.md` gốc dưới khoảng 200 dòng; thứ chỉ cần cho một phần thì đưa vào `CLAUDE.md` của phần đó hoặc `rules/`.
+Giữ `.claude/CLAUDE.md` dưới khoảng 200 dòng; thứ chỉ cần cho một phần thì đưa vào `CLAUDE.md` của phần đó hoặc `rules/`.

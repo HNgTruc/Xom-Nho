@@ -1,6 +1,6 @@
 # API (`backend`, `/api/v1`)
 
-Backend NestJS là nguồn dữ liệu duy nhất cho cả ba frontend. Frontend gọi qua `@xom-nho/shared/api-client`, không tự viết `fetch`.
+Backend NestJS là nguồn dữ liệu duy nhất cho cả ba frontend. Frontend gọi qua `@xom-nho/api/api-client`, không tự viết `fetch`.
 
 - `/api/auth/*`: Better Auth (đăng ký, đăng nhập, OAuth, phiên)
 - `/api/v1/*`: dùng cho web và mobile-app
@@ -25,7 +25,7 @@ Backend NestJS là nguồn dữ liệu duy nhất cho cả ba frontend. Frontend
 
 Interceptor (`common/interceptors/response.interceptor.ts`) bọc `data`/`meta`; exception filter (`common/filters/`) tạo khối `error`. Controller chỉ trả dữ liệu hoặc ném `AppException`.
 
-**Mã lỗi** (khai báo ở `shared/src/constants/error-codes.ts`):
+**Mã lỗi** (khai báo ở `api/src/constants/error-codes.ts`):
 
 | code               | HTTP | Khi nào                                   |
 | ------------------ | ---- | ----------------------------------------- |
@@ -37,7 +37,7 @@ Interceptor (`common/interceptors/response.interceptor.ts`) bọc `data`/`meta`;
 | `RATE_LIMITED`     | 429  | Gửi quá nhanh                             |
 | `INTERNAL_ERROR`   | 500  | Lỗi không lường trước (không lộ chi tiết) |
 
-**Kiểu dữ liệu**: mọi phản hồi khai báo trong `shared/src/types/`. Mọi body nhận vào có schema trong `shared/src/schemas/`.
+**Kiểu dữ liệu**: mọi phản hồi khai báo trong `api/src/types/`. Mọi body nhận vào có schema trong `api/src/schemas/`.
 
 **Phân trang**: `?page=1&pageSize=10`; `pageSize` tối đa 50 (admin tối đa 100).
 
@@ -45,7 +45,7 @@ Interceptor (`common/interceptors/response.interceptor.ts`) bọc `data`/`meta`;
 
 ### Quy tắc thay đổi API v1
 
-Kiểu trong `shared` chỉ bảo vệ lúc build. App đã cài trên điện thoại vẫn chạy code cũ và có thể không được cập nhật trong nhiều tháng. Vì vậy mọi thay đổi trong `/api/v1` phải để client cũ chạy tiếp được.
+Kiểu trong `api` chỉ bảo vệ lúc build. App đã cài trên điện thoại vẫn chạy code cũ và có thể không được cập nhật trong nhiều tháng. Vì vậy mọi thay đổi trong `/api/v1` phải để client cũ chạy tiếp được.
 
 **Được làm (không phá client cũ):**
 
@@ -69,7 +69,7 @@ Kiểu trong `shared` chỉ bảo vệ lúc build. App đã cài trên điện t
 - Gặp giá trị enum lạ thì có nhánh mặc định (hiện như giá trị trung tính, không crash). Trên mobile, đây là điều kiện để thêm giá trị enum mới.
 - Không dựa vào thứ tự trường hay số phần tử cố định trong mảng.
 
-**Khi cần bỏ một thứ cũ:** thêm cái mới bên cạnh, đánh dấu cái cũ là "sắp bỏ" (comment `@deprecated` trong `shared`, ghi chú ở bảng endpoint), chờ bản app mới đủ phổ biến rồi mới xóa ở `/api/v2`.
+**Khi cần bỏ một thứ cũ:** thêm cái mới bên cạnh, đánh dấu cái cũ là "sắp bỏ" (comment `@deprecated` trong `api`, ghi chú ở bảng endpoint), chờ bản app mới đủ phổ biến rồi mới xóa ở `/api/v2`.
 
 **Ví dụ đã tính sẵn:** muốn chuyển app sang cuộn bằng con trỏ thì thêm `?cursor=` tùy chọn cạnh `page` (được làm). Đổi `page` thành `cursor` thì không được làm.
 
@@ -96,7 +96,7 @@ Cache của `GET /posts/:slug`: mọi phản hồi (cả 404) có `Vary: Cookie`
 
 `sort=top` sắp theo `viewCount`, không có index (cột bị ghi mỗi lượt xem, thêm index thì ghi chậm). MySQL sắp mọi bài đã đăng mỗi lần gọi: ổn với vài nghìn bài, xem lại ở giai đoạn 7. Lượt xem chưa giới hạn tần suất (xem mục Giới hạn tần suất) nên tab "Nhiều người đọc" dễ bị đẩy số tới khi làm giai đoạn 4.
 
-Kiểu khai báo ở `shared/src/types/post.ts`, `user.ts`, `tag.ts`; schema query ở `shared/src/schemas/post.ts`, `search.ts`, `tag.ts`.
+Kiểu khai báo ở `api/src/types/post.ts`, `user.ts`, `tag.ts`; schema query ở `api/src/schemas/post.ts`, `search.ts`, `tag.ts`.
 
 ### Tìm kiếm (`modules/search`)
 
@@ -129,10 +129,10 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 
 `Category`: `id, name, slug, description, color, postCount`. `postCount` chỉ đếm bài đã đăng.
 `Tag`: `id, name, slug`.
-`color` (trong `Category` và `category` của bài) là khóa màu badge: `amber | blue | green | purple | rose` (`CATEGORY_COLORS` trong `shared`, MASTER mục 2.2). Sau này có thể thêm màu, nên client gặp giá trị lạ thì dùng `toCategoryColor` để về màu mặc định, không báo lỗi.
+`color` (trong `Category` và `category` của bài) là khóa màu badge: `amber | blue | green | purple | rose` (`CATEGORY_COLORS` trong `api`, MASTER mục 2.2). Sau này có thể thêm màu, nên client gặp giá trị lạ thì dùng `toCategoryColor` để về màu mặc định, không báo lỗi.
 `PublicProfile`: `id, name, username, image, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
 
-Ràng buộc `username` trong `shared` (chỉ a-z, 0-9, tối đa 20 ký tự) hẹp hơn cột `user.username` (50 ký tự). Sau này cho người dùng tự đặt username theo quy tắc rộng hơn thì phải nới schema cùng lúc, nếu không `?author=` và `/users/:username` sẽ từ chối username hợp lệ. Nới ra là được phép trong v1, siết lại thì không.
+Ràng buộc `username` trong `api` (chỉ a-z, 0-9, tối đa 20 ký tự) hẹp hơn cột `user.username` (50 ký tự). Sau này cho người dùng tự đặt username theo quy tắc rộng hơn thì phải nới schema cùng lúc, nếu không `?author=` và `/users/:username` sẽ từ chối username hợp lệ. Nới ra là được phép trong v1, siết lại thì không.
 `Me`: `id, name, email, username, image, bio, role, createdAt`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
 
 ### Đăng nhập (`/api/auth/*`, Better Auth)
@@ -147,7 +147,7 @@ Không nằm dưới `/api/v1`, định dạng phản hồi là của Better Aut
 | POST   | `/api/auth/sign-out`       | Đăng xuất                                                                            |
 | GET    | `/api/auth/get-session`    | Phiên hiện tại                                                                       |
 
-Mã lỗi Better Auth → câu tiếng Việt: `authErrorMessage()` trong `shared/src/constants/auth-messages.ts`. Origin được tin (chống CSRF): các origin trong `CORS_ORIGINS`, `xomnho://` (app), `exp://**` khi không phải production.
+Mã lỗi Better Auth → câu tiếng Việt: `authErrorMessage()` trong `api/src/constants/auth-messages.ts`. Origin được tin (chống CSRF): các origin trong `CORS_ORIGINS`, `xomnho://` (app), `exp://**` khi không phải production.
 
 ### Hệ thống
 

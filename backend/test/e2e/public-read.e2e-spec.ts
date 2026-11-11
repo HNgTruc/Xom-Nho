@@ -1,5 +1,5 @@
 import type { NestExpressApplication } from "@nestjs/platform-express";
-import type { PostListItem } from "@xom-nho/shared";
+import type { PostListItem } from "@xom-nho/api";
 import request from "supertest";
 import type { PostStatus, PrismaClient } from "../../src/generated/prisma/client.js";
 import { buildPostSearchText } from "../../src/modules/posts/posts.search-text.js";

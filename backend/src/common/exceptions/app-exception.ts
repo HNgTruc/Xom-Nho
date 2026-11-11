@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { ERROR_MESSAGES, type ErrorCode } from "@xom-nho/shared";
+import { ERROR_MESSAGES, type ErrorCode } from "@xom-nho/api";
 
 /** Mã lỗi → HTTP status. Bảng gốc: docs/api.md. */
 export const ERROR_HTTP_STATUS: Record<ErrorCode, HttpStatus> = {

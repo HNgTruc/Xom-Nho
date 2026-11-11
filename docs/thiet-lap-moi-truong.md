@@ -42,18 +42,18 @@ Mỗi phần đọc biến môi trường ở đâu:
 ## 3. Database
 
 ```bash
-docker compose up -d
-docker compose ps          # mysql phải "healthy"
+pnpm db:up                 # chạy database/docker-compose.yml với .env ở gốc
+pnpm db:ps                 # mysql phải "healthy"
 ```
 
 - MySQL: `localhost:3307` (cổng 3307 để không đụng MySQL/XAMPP có sẵn trên máy).
 - Adminer: http://localhost:8080, Server: `mysql`, user và mật khẩu theo `.env`.
 
-File `docker/mysql/init/01-grant-shadow-db.sql` chỉ chạy **lần đầu** tạo container. Nếu đổi `MYSQL_USER` sau đó, phải xóa volume (`docker compose down -v`, mất dữ liệu) hoặc tự cấp quyền trong Adminer.
+File `database/mysql/init/01-grant-shadow-db.sql` chỉ chạy **lần đầu** tạo container. Nếu đổi `MYSQL_USER` sau đó, phải xóa volume (`pnpm db:compose down -v`, mất dữ liệu) hoặc tự cấp quyền trong Adminer.
 
 Lỗi hay gặp:
 
-- `port is already allocated`: có chương trình khác dùng cổng 3307 hoặc 8080. Đổi số bên trái trong `ports` ở `docker-compose.yml` và sửa `DATABASE_URL`.
+- `port is already allocated`: có chương trình khác dùng cổng 3307 hoặc 8080. Đổi số bên trái trong `ports` ở `database/docker-compose.yml` và sửa `DATABASE_URL`.
 - Prisma báo không tạo được shadow database: user thiếu quyền, xem lại bước trên.
 
 ## 4. Chạy backend, web, admin
@@ -162,6 +162,6 @@ Không có khóa thì nút "Tiếp tục với Google/GitHub" tự ẩn, mọi t
 
 ## 7. Claude Code
 
-- Mở Claude Code ở thư mục gốc repo. Nó tự đọc `CLAUDE.md` và `.claude/`.
-- Muốn ghi chú riêng cho máy mình: đổi tên `CLAUDE.local.md.example` thành `CLAUDE.local.md`.
+- Mở Claude Code ở thư mục gốc repo. Nó tự đọc `.claude/CLAUDE.md` và phần còn lại của `.claude/`.
+- Muốn ghi chú riêng cho máy mình: chép `.claude/CLAUDE.local.md.example` ra thư mục gốc với tên `CLAUDE.local.md`.
 - Hook tự format cần Prettier, có sau khi chạy `pnpm install` ở gốc.

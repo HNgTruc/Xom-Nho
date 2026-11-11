@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { AuthProviders, Me, UpdateMeInput } from "@xom-nho/shared";
+import type { AuthProviders, Me, UpdateMeInput } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { ConfigService } from "../../config/config.service.js";

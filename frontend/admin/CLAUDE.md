@@ -1,8 +1,8 @@
 # frontend/admin
 
-Trang quản trị của Xóm Nhỏ: React + Vite, ứng dụng một trang (SPA). **Chỉ trưởng xóm (`admin`) dùng.** Gọi `backend` ở `/api/v1/admin/*` qua `@xom-nho/shared/api-client`.
+Trang quản trị của Xóm Nhỏ: React + Vite, ứng dụng một trang (SPA). **Chỉ trưởng xóm (`admin`) dùng.** Gọi `backend` ở `/api/v1/admin/*` qua `@xom-nho/api/api-client`.
 
-> **Giao diện**: theo `design-system/xom-nho/MASTER.md` và override `design-system/xom-nho/pages/admin.md` (override thắng). Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
+> **Giao diện**: theo `docs/design-system/xom-nho/MASTER.md` và override `docs/design-system/xom-nho/pages/admin.md` (override thắng). Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
 
 ## Cấu trúc
 

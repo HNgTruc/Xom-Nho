@@ -1,4 +1,4 @@
-import { createClient } from "@xom-nho/shared/api-client";
+import { createClient } from "@xom-nho/api/api-client";
 import { cookies } from "next/headers";
 
 const baseUrl = process.env.API_URL ?? "http://localhost:4000";

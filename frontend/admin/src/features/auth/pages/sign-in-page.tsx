@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ROLES, safeNext } from "@xom-nho/shared";
+import { ROLES, safeNext } from "@xom-nho/api";
 import {
   Card,
   CardContent,

@@ -14,7 +14,7 @@ rm -rf backend-tmp
 
 Sau đó:
 
-1. `package.json`: đặt `"name": "backend"`, thêm `"@xom-nho/shared": "workspace:*"`.
+1. `package.json`: đặt `"name": "backend"`, thêm `"@xom-nho/api": "workspace:*"`.
 2. Đổi cổng mặc định trong `src/main.ts` thành `4000` (đọc từ biến `PORT`).
 3. Xóa `app.controller.ts`, `app.service.ts` mẫu; dựng theo cây bên dưới.
 4. Cài Prisma, Better Auth, Zod theo tài liệu bản mới nhất.
@@ -23,10 +23,9 @@ Sau đó:
 
 ```
 backend/
-├── prisma/
-│   ├── schema.prisma
-│   ├── migrations/
-│   └── seed.ts
+├── prisma.config.ts                 trỏ tới ../database/prisma (schema.prisma, migrations/)
+├── scripts/
+│   └── seed.ts                      dữ liệu mẫu
 ├── src/
 │   ├── main.ts
 │   ├── app.module.ts

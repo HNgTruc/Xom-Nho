@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { Category } from "@xom-nho/shared";
+import type { Category } from "@xom-nho/api";
 import { toCategory } from "./categories.mapper.js";
 import { CategoriesRepository } from "./categories.repository.js";
 

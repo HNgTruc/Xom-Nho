@@ -1,16 +1,16 @@
 ---
 name: prisma-migration
-description: Thay đổi schema MySQL của Xóm Nhỏ an toàn bằng Prisma migration trong backend/prisma (thêm bảng, cột, chỉ mục, quan hệ, đổi tên). Dùng khi cần sửa backend/prisma/schema.prisma hoặc khi tính năng mới cần lưu dữ liệu mới.
+description: Thay đổi schema MySQL của Xóm Nhỏ an toàn bằng Prisma migration trong database/prisma (thêm bảng, cột, chỉ mục, quan hệ, đổi tên). Dùng khi cần sửa database/prisma/schema.prisma hoặc khi tính năng mới cần lưu dữ liệu mới.
 ---
 
 # Đổi schema bằng Prisma migration
 
 ## 1. Chuẩn bị
 
-- `docker compose ps`: MySQL phải `healthy`.
+- `pnpm db:ps`: MySQL phải `healthy`.
 - `git status`: nên bắt đầu từ trạng thái sạch.
 - Đọc `docs/co-so-du-lieu.md` và `.claude/rules/prisma-mysql.md`.
-- Xem bản Prisma trong `backend/package.json` và cấu hình hiện có (`prisma.config.ts`, generator). Làm theo tài liệu bản đó.
+- Xem bản Prisma trong `backend/package.json` và cấu hình hiện có (`backend/prisma.config.ts` trỏ tới `database/prisma/`, generator). Làm theo tài liệu bản đó.
 
 ## 2. Thiết kế
 
@@ -23,7 +23,7 @@ Trình bày cho người dùng trước khi sửa:
 ## 3. Thực hiện
 
 ```bash
-# sửa backend/prisma/schema.prisma
+# sửa database/prisma/schema.prisma
 pnpm --filter backend exec prisma format
 pnpm --filter backend exec prisma validate
 pnpm --filter backend exec prisma migrate dev --name <ten_tieng_anh> --create-only
@@ -39,9 +39,9 @@ pnpm --filter backend exec prisma migrate dev     # áp dụng + generate client
 
 ## 4. Sau khi áp dụng
 
-- Cập nhật `backend/prisma/seed.ts`, chạy thử seed.
+- Cập nhật `backend/scripts/seed.ts`, chạy thử seed.
 - Cập nhật `docs/co-so-du-lieu.md` (sơ đồ ER, bảng chỉ mục).
-- Cập nhật repository, mapper, và kiểu trong `shared/src/types` nếu dữ liệu trả về thay đổi.
+- Cập nhật repository, mapper, và kiểu trong `api/src/types` nếu dữ liệu trả về thay đổi.
 - `pnpm typecheck` ở gốc.
 - Commit migration cùng schema và tài liệu: `feat(backend): <mô tả>`.
 

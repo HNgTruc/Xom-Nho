@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { pathUsernameSchema, POST_STATUSES, type PublicProfile } from "@xom-nho/shared";
+import { pathUsernameSchema, POST_STATUSES, type PublicProfile } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import { toPublicProfile } from "./users.mapper.js";
 import { UsersRepository } from "./users.repository.js";

@@ -27,15 +27,17 @@ Diễn đàn nhỏ cho những người thích viết và thích trò chuyện. 
                        MySQL 8.4 (Docker)
 ```
 
-| Thư mục                                        | Nội dung                                              |
-| ---------------------------------------------- | ----------------------------------------------------- |
-| [`backend/`](backend/)                         | API NestJS, đăng nhập, database                       |
-| [`frontend/web/`](frontend/web/)               | Trang web cho người đọc và người viết                 |
-| [`frontend/admin/`](frontend/admin/)           | Trang quản trị                                        |
-| [`frontend/mobile-app/`](frontend/mobile-app/) | App Android / iOS                                     |
-| [`ui/`](ui/)                                   | Design system: màu, chữ, component dùng chung         |
-| [`shared/`](shared/)                           | Kiểu dữ liệu, kiểm tra dữ liệu, API client dùng chung |
-| [`docs/`](docs/)                               | Tài liệu thiết kế                                     |
+| Thư mục                                        | Nội dung                                                            |
+| ---------------------------------------------- | ------------------------------------------------------------------- |
+| [`backend/`](backend/)                         | API NestJS, đăng nhập, database                                     |
+| [`frontend/web/`](frontend/web/)               | Trang web cho người đọc và người viết                               |
+| [`frontend/admin/`](frontend/admin/)           | Trang quản trị                                                      |
+| [`frontend/mobile-app/`](frontend/mobile-app/) | App Android / iOS                                                   |
+| [`frontend/ui/`](frontend/ui/)                 | Design system: màu, chữ, component dùng chung                       |
+| [`api/`](api/)                                 | Hợp đồng API: kiểu dữ liệu, kiểm tra dữ liệu, API client dùng chung |
+| [`database/`](database/)                       | Docker MySQL, Prisma schema và migration                            |
+| [`config/`](config/)                           | Cấu hình TypeScript dùng chung                                      |
+| [`docs/`](docs/)                               | Tài liệu thiết kế                                                   |
 
 ## Công nghệ
 
@@ -48,7 +50,7 @@ Cần: Node.js 22+, pnpm, Docker Desktop, app Expo Go trên điện thoại.
 ```bash
 cp .env.example .env            # rồi điền mật khẩu MySQL và BETTER_AUTH_SECRET (lệnh tạo có trong file)
 cp .env backend/.env            # backend đọc DATABASE_URL, CORS_ORIGINS từ đây
-docker compose up -d            # MySQL :3307, Adminer http://localhost:8080
+pnpm db:up                      # MySQL :3307, Adminer http://localhost:8080
 pnpm install                    # tự sinh Prisma client
 pnpm --filter backend db:migrate
 pnpm --filter backend db:seed

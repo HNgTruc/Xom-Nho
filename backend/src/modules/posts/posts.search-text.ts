@@ -1,4 +1,4 @@
-import { toSearchText } from "@xom-nho/shared";
+import { toSearchText } from "@xom-nho/api";
 
 export interface PostSearchTextSource {
   title: string;

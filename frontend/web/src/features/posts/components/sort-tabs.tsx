@@ -1,4 +1,4 @@
-import { POST_SORT_LABELS, POST_SORT_VALUES, type PostSort } from "@xom-nho/shared";
+import { POST_SORT_LABELS, POST_SORT_VALUES, type PostSort } from "@xom-nho/api";
 import { cn } from "@xom-nho/ui/lib/utils";
 import Link from "next/link";
 import { feedHref } from "../lib/feed-href";

@@ -14,7 +14,7 @@ paths:
 
 | Phần             | Công cụ                                       | Test gì                                                     |
 | ---------------- | --------------------------------------------- | ----------------------------------------------------------- |
-| `shared`         | Vitest                                        | tiện ích tiếng Việt, schema Zod                             |
+| `api`            | Vitest                                        | tiện ích tiếng Việt, schema Zod                             |
 | `backend`        | Jest (mặc định NestJS) hoặc Vitest nếu đã đổi | policy, service (ca được phép và bị từ chối), e2e cho route |
 | `frontend/web`   | Playwright                                    | luồng chính: đăng ký, viết bài, bình luận                   |
 | `frontend/admin` | Vitest + Testing Library                      | component phức tạp (bảng, form) khi cần                     |

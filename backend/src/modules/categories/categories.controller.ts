@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import type { Category } from "@xom-nho/shared";
+import type { Category } from "@xom-nho/api";
 import { Public } from "../../common/decorators/public.decorator.js";
 import { CategoriesService } from "./categories.service.js";
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { safeNext } from "@xom-nho/shared";
+import { safeNext } from "@xom-nho/api";
 import { getCurrentUser, SignUpForm } from "@/features/auth";
 import { serverApi } from "@/lib/server-api";
 

@@ -1,4 +1,4 @@
-import { createClient } from "@xom-nho/shared/api-client";
+import { createClient } from "@xom-nho/api/api-client";
 import { authClient } from "./auth-client";
 import { backendUrl, backendUrlOrInvalid } from "./backend-url";
 

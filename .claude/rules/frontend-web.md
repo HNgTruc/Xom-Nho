@@ -5,7 +5,7 @@ paths:
 
 # Quy tắc frontend/web (Next.js)
 
-- Web **không có database và không có API riêng**. Đọc/ghi dữ liệu qua `@xom-nho/shared/api-client` (cấu hình ở `src/lib/server-api.ts` và `src/lib/browser-api.ts`).
+- Web **không có database và không có API riêng**. Đọc/ghi dữ liệu qua `@xom-nho/api/api-client` (cấu hình ở `src/lib/server-api.ts` và `src/lib/browser-api.ts`).
 - `src/app/` chỉ định tuyến: lấy tham số, gọi dữ liệu, ghép component từ `src/features/`. Không viết giao diện dài hay logic trong `page.tsx`.
 - Code theo tính năng trong `src/features/<tính-năng>/{components,api,hooks}`, export ra ngoài qua `index.ts`. Feature không import vào bên trong feature khác.
 - Đọc dữ liệu: Server Component + `server-api.ts` (chuyển tiếp cookie người dùng). Ghi dữ liệu: Client Component + `browser-api.ts` + TanStack Query `useMutation`, xong thì `router.refresh()` hoặc invalidate.

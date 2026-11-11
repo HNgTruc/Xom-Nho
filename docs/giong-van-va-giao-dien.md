@@ -40,14 +40,14 @@ Tên vai trò hiển thị: Hàng xóm, Cây bút, Trưởng xóm.
 | Lỗi máy chủ                       | Có trục trặc bên mình. Bạn thử lại sau ít phút nhé.       |
 | Bị giới hạn tần suất              | Từ từ thôi bạn ơi, chờ vài giây rồi gửi tiếp.             |
 
-Toàn bộ chữ hiển thị nên gom về một chỗ (`shared/src/constants/messages.ts`) để web, admin và app nói giống nhau.
+Toàn bộ chữ hiển thị nên gom về một chỗ (`api/src/constants/messages.ts`) để web, admin và app nói giống nhau.
 
 ## Giao diện
 
-Toàn bộ quyết định giao diện (màu, chữ, khoảng cách, chuyển động, biểu tượng, thành phần, checklist) nằm ở **[design-system/xom-nho/MASTER.md](../design-system/xom-nho/MASTER.md)**, lập bằng skill ui-ux-pro-max, mọi cặp màu đã tính tương phản WCAG. Quy tắc riêng:
+Toàn bộ quyết định giao diện (màu, chữ, khoảng cách, chuyển động, biểu tượng, thành phần, checklist) nằm ở **[docs/design-system/xom-nho/MASTER.md](design-system/xom-nho/MASTER.md)**, lập bằng skill ui-ux-pro-max, mọi cặp màu đã tính tương phản WCAG. Quy tắc riêng:
 
-- Trang quản trị: [design-system/xom-nho/pages/admin.md](../design-system/xom-nho/pages/admin.md)
-- App điện thoại: [design-system/xom-nho/pages/mobile.md](../design-system/xom-nho/pages/mobile.md)
+- Trang quản trị: [docs/design-system/xom-nho/pages/admin.md](design-system/xom-nho/pages/admin.md)
+- App điện thoại: [docs/design-system/xom-nho/pages/mobile.md](design-system/xom-nho/pages/mobile.md)
 
 Tóm tắt nhanh:
 

@@ -17,7 +17,7 @@ NestJS API cho Xóm Nhỏ. Nơi **duy nhất** chạm database và giữ quy t�
 | Service    | `*.service.ts`                             | Quy tắc nghiệp vụ, gọi policy, giới hạn tần suất, transaction | Đọc `Request`, trả HTTP status |
 | Policy     | `*.policy.ts`                              | Hàm thuần trả `boolean`: ai được làm gì với bản ghi nào       | Gọi DB                         |
 | Repository | `*.repository.ts`                          | Truy vấn Prisma, chọn đúng cột                                | Quy tắc, kiểm tra quyền        |
-| Mapper     | `*.mapper.ts`                              | Prisma model → kiểu trong `@xom-nho/shared`                   |                                |
+| Mapper     | `*.mapper.ts`                              | Prisma model → kiểu trong `@xom-nho/api`                      |                                |
 
 Mỗi tầng chỉ gọi tầng ngay dưới. Module khác muốn dùng dữ liệu của module này thì gọi qua **service** được export, không import repository của nhau.
 
@@ -30,7 +30,7 @@ Mỗi tầng chỉ gọi tầng ngay dưới. Module khác muốn dùng dữ li�
 
 ## Kiểm tra dữ liệu
 
-Không dùng `class-validator`. Dữ liệu vào kiểm tra bằng schema Zod từ `@xom-nho/shared` qua `ZodValidationPipe`:
+Không dùng `class-validator`. Dữ liệu vào kiểm tra bằng schema Zod từ `@xom-nho/api` qua `ZodValidationPipe`:
 
 ```ts
 // minh họa

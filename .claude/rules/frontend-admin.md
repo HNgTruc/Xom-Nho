@@ -5,7 +5,7 @@ paths:
 
 # Quy tắc frontend/admin (React + Vite)
 
-- SPA chỉ dành cho `admin`. Gọi `/api/v1/admin/*` qua `@xom-nho/shared/api-client` (cấu hình ở `src/lib/api.ts`, `credentials: "include"`).
+- SPA chỉ dành cho `admin`. Gọi `/api/v1/admin/*` qua `@xom-nho/api/api-client` (cấu hình ở `src/lib/api.ts`, `credentials: "include"`).
 - Mỗi màn hình quản trị là một feature trong `src/features/<tính-năng>/{pages,components,api}`, export route qua `index.ts`; `src/app/router.tsx` gom route và lazy load từng trang.
 - Dữ liệu server chỉ qua TanStack Query (query key có đủ tham số lọc). Không chép dữ liệu server vào `useState`. Sau mutation thì `invalidateQueries`.
 - Trang, bộ lọc, từ khóa, sắp xếp **lưu trên URL** (`useSearchParams`). Ô tìm có debounce khoảng 300ms.

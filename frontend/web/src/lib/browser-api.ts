@@ -1,4 +1,4 @@
-import { createClient } from "@xom-nho/shared/api-client";
+import { createClient } from "@xom-nho/api/api-client";
 
 /** api-client cho Client Components. Trình duyệt tự gửi cookie phiên sang backend (khác cổng). */
 export const browserApi = createClient({

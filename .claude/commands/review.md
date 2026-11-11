@@ -8,13 +8,13 @@ argument-hint: "[nhánh gốc, mặc định main]"
 Nhánh gốc: `$ARGUMENTS` (trống thì dùng `main`).
 
 1. `git diff <nhánh gốc>...HEAD --stat` rồi `git diff <nhánh gốc>...HEAD`. Có thay đổi chưa commit thì xem thêm `git diff`.
-2. Xác định phần bị đổi (backend, web, admin, mobile-app, ui, shared), đọc `CLAUDE.md` của phần đó và rule trong `.claude/rules/` áp dụng.
+2. Xác định phần bị đổi (backend, web, admin, mobile-app, ui, api), đọc `CLAUDE.md` của phần đó và rule trong `.claude/rules/` áp dụng.
 3. Kiểm tra:
    - **Chức năng**: khớp tiêu chí trong `docs/tinh-nang.md`? Ca biên?
    - **Bảo mật**: endpoint mới có guard, `@Roles` (admin), policy, Zod pipe, giới hạn tần suất?
-   - **Ranh giới**: frontend không import lẫn nhau; gọi API qua `shared/api-client`; component nền ở `ui`; mobile không dùng component web.
+   - **Ranh giới**: frontend không import lẫn nhau; gọi API qua `api/api-client`; component nền ở `ui`; mobile không dùng component web.
    - **Tầng backend**: controller mỏng, quy tắc ở service, truy vấn ở repository.
-   - **Hợp đồng API**: đổi endpoint có cập nhật `docs/api.md`, `shared/types`, `shared/api-client`?
+   - **Hợp đồng API**: đổi endpoint có cập nhật `docs/api.md`, `api/types`, `api/api-client`?
    - **Kiểu**: `any`, `as`, `!` không cần thiết?
    - **Giao diện**: chữ tiếng Việt đúng giọng văn; đủ trạng thái tải/lỗi/trống; nhãn tiếp cận.
    - **Hiệu năng**: N+1, lấy thừa cột, client component không cần thiết.

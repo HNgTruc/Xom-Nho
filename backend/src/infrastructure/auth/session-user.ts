@@ -1,4 +1,4 @@
-import { type Role, ROLE_VALUES, ROLES } from "@xom-nho/shared";
+import { type Role, ROLE_VALUES, ROLES } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 
 /** Phần `user` trong phiên Better Auth (cột lõi + plugin admin + additionalFields). */

@@ -7,10 +7,10 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 ## Giai đoạn 0: Khung project
 
 - [x] Tài liệu thiết kế, `CLAUDE.md`, cấu hình `.claude/`
-- [x] Cây thư mục `backend/`, `frontend/`, `ui/`, `shared/`
-- [x] `docker-compose.yml` cho MySQL + Adminer
-- [x] `docker compose up -d` chạy được, vào được Adminer
-- [x] `shared`: package.json, tsconfig, `src/index.ts`
+- [x] Cây thư mục `backend/`, `frontend/`, `frontend/ui/`, `api/`
+- [x] `database/docker-compose.yml` cho MySQL + Adminer
+- [x] `pnpm db:up` chạy được, vào được Adminer
+- [x] `api`: package.json, tsconfig, `src/index.ts`
 - [x] `ui`: package.json, `tokens/`, `styles/theme.css`, shadcn init, vài component đầu tiên
 - [x] `backend`: `nest new`, cổng 4000, endpoint `GET /api/v1/health`
 - [x] `frontend/web`: `create-next-app`, import theme từ `ui`
@@ -30,9 +30,9 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] `common/`: `ZodValidationPipe`, `AppException` + filter, response interceptor, `@Public`, `@CurrentUser`, `@Roles`
 - [x] `infrastructure/database`: Prisma kết nối MySQL Docker
 - [x] Schema Prisma theo `co-so-du-lieu.md`, migration đầu tiên
-- [x] `shared`: `slugify`, `removeVietnameseTones`, `Result`, hằng số vai trò/trạng thái/mã lỗi, có test
+- [x] `api`: `slugify`, `removeVietnameseTones`, `Result`, hằng số vai trò/trạng thái/mã lỗi, có test
 - [x] Seed dữ liệu mẫu
-- [x] `shared/api-client`: `createClient`, `ApiError`
+- [x] `api/api-client`: `createClient`, `ApiError`
 
 **Xong khi:** mở Adminer thấy đủ bảng và dữ liệu mẫu; `GET /api/v1/categories` trả đúng định dạng.
 

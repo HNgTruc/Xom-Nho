@@ -3,7 +3,7 @@ import type { z } from "zod";
 import { AppException } from "../exceptions/app-exception.js";
 
 /**
- * Kiểm tra body/query/param bằng schema Zod từ `@xom-nho/shared`, trả dữ liệu đã parse.
+ * Kiểm tra body/query/param bằng schema Zod từ `@xom-nho/api`, trả dữ liệu đã parse.
  * Sai thì ném `VALIDATION_ERROR` kèm lỗi từng trường để form hiện cạnh ô nhập.
  *
  *   @Body(new ZodValidationPipe(createPostSchema)) input: CreatePostInput

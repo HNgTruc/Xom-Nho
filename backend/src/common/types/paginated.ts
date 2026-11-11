@@ -1,4 +1,4 @@
-import type { PaginationMeta } from "@xom-nho/shared";
+import type { PaginationMeta } from "@xom-nho/api";
 
 /** Controller danh sách trả kiểu này; `ResponseInterceptor` đổi thành `{ data: items, meta }`. */
 export interface Paginated<T> {

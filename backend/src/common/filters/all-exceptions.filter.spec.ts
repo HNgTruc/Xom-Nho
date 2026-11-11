@@ -1,5 +1,5 @@
 import { Logger, NotFoundException, PayloadTooLargeException } from "@nestjs/common";
-import { ERROR_MESSAGES } from "@xom-nho/shared";
+import { ERROR_MESSAGES } from "@xom-nho/api";
 import { AppException } from "../exceptions/app-exception.js";
 import { AllExceptionsFilter } from "./all-exceptions.filter.js";
 

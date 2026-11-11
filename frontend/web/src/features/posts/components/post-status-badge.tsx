@@ -1,4 +1,4 @@
-import { POST_STATUS_LABELS, type PostStatus } from "@xom-nho/shared";
+import { POST_STATUS_LABELS, type PostStatus } from "@xom-nho/api";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { Check, Clock, EyeOff, type LucideIcon, Pencil, X } from "lucide-react";
 

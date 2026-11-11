@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
-import type { Me } from "@xom-nho/shared";
-import { isApiError } from "@xom-nho/shared/api-client";
+import type { Me } from "@xom-nho/api";
+import { isApiError } from "@xom-nho/api/api-client";
 import { api } from "@/lib/api";
 
 /** Người đang đăng nhập; chưa đăng nhập (401) hoặc bị khóa (403) thì null. */

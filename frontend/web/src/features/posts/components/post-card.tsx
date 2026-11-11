@@ -1,4 +1,4 @@
-import { formatDate, formatRelativeTime, type PostListItem } from "@xom-nho/shared";
+import { formatDate, formatRelativeTime, type PostListItem } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";

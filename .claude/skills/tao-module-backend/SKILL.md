@@ -8,7 +8,7 @@ description: Tạo hoặc mở rộng module NestJS trong backend/src/modules c�
 ## Trước khi viết
 
 1. Endpoint đã có trong `docs/api.md` chưa? Chưa thì thêm trước (method, đường dẫn, 🌐/🔒/🛡️, body, kiểu trả về) và xác nhận.
-2. Schema Zod và kiểu phản hồi đã có trong `shared` chưa? Chưa thì viết trước.
+2. Schema Zod và kiểu phản hồi đã có trong `api` chưa? Chưa thì viết trước.
 3. Đọc tài liệu NestJS bản đã cài nếu dùng tính năng mới (guard, interceptor, module động).
 4. Xem một module đã có để làm theo cùng phong cách.
 
@@ -33,7 +33,7 @@ Tạo khung bằng Nest CLI nếu muốn (`nest g module`, `nest g controller`, 
 
 1. **Policy**: hàm thuần `(user, record) => boolean` theo `docs/phan-quyen.md`. Viết test ngay (mỗi vai trò một ca).
 2. **Repository**: hàm truy vấn với `select` rõ ràng, nhận tham số đã kiểm tra, trả Prisma model. Không quy tắc.
-3. **Mapper**: Prisma model → kiểu trong `@xom-nho/shared`.
+3. **Mapper**: Prisma model → kiểu trong `@xom-nho/api`.
 4. **Service**: kiểm tra policy → giới hạn tần suất (nếu tạo nội dung) → repository (transaction nếu ghi nhiều bảng) → mapper. Lỗi ném `AppException(code, message)`.
 5. **Controller**: route mỏng, mẫu:
 
@@ -56,6 +56,6 @@ Tạo khung bằng Nest CLI nếu muốn (`nest g module`, `nest g controller`, 
 
 ## Sau khi xong
 
-- Thêm hàm tương ứng vào `shared/src/api-client/`.
+- Thêm hàm tương ứng vào `api/src/api-client/`.
 - Thử bằng tay (curl hoặc file `.http`): thành công, 400, 401, 403, 404.
 - `pnpm --filter backend test`, `pnpm typecheck` ở gốc.

@@ -1,4 +1,4 @@
-import { type Me, type Role, ROLE_VALUES, ROLES } from "@xom-nho/shared";
+import { type Me, type Role, ROLE_VALUES, ROLES } from "@xom-nho/api";
 import type { MeRow } from "./auth.repository.js";
 
 export function toMe(row: MeRow): Me {

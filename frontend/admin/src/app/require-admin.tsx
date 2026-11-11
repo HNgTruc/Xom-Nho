@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ROLES } from "@xom-nho/shared";
+import { ROLES } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import { useEffect } from "react";

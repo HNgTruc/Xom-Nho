@@ -1,4 +1,4 @@
-import { FEED_MESSAGES } from "@xom-nho/shared";
+import { FEED_MESSAGES } from "@xom-nho/api";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import type { Metadata } from "next";
 import { Suspense } from "react";

@@ -22,7 +22,7 @@ Biến môi trường (`.env.local`, không bắt buộc khi chạy trên máy):
 
 - Tạo bằng `create-next-app@16.4.4` (template rỗng) ở thư mục tạm rồi chép vào, vì thư mục này đã có sẵn cây `src/`.
 - Bỏ ESLint của template, dùng oxlint như các package khác.
-- `transpilePackages: ["@xom-nho/ui"]` vì `ui` xuất thẳng file `.tsx`. `@xom-nho/shared` đã build sẵn ra `dist/` nên không cần.
+- `transpilePackages: ["@xom-nho/ui"]` vì `ui` xuất thẳng file `.tsx`. `@xom-nho/api` đã build sẵn ra `dist/` nên không cần.
 - Tailwind chạy bằng loader `@tailwindcss/turbopack` (mặc định của Next 16.4), không có `postcss.config`.
 - Font Be Vietnam Pro và Lora nạp bằng `next/font/google` với subset `vietnamese`, đặt biến `--font-be-vietnam-pro`, `--font-lora` mà theme đọc.
 - Cache Components đang bật: dữ liệu lấy lúc có request phải nằm trong `<Suspense>` (ví dụ `BackendStatus` ở trang chủ).

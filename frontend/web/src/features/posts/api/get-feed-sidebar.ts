@@ -1,4 +1,4 @@
-import type { Category, Tag } from "@xom-nho/shared";
+import type { Category, Tag } from "@xom-nho/api";
 import { publicApi } from "@/lib/server-api";
 
 export interface FeedSidebarData {

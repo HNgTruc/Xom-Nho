@@ -1,4 +1,4 @@
-import { type PublicProfile, type Role, ROLE_VALUES, ROLES } from "@xom-nho/shared";
+import { type PublicProfile, type Role, ROLE_VALUES, ROLES } from "@xom-nho/api";
 import type { ProfileRow } from "./users.repository.js";
 
 /** Cột `role` là chuỗi tự do (plugin admin của Better Auth). Giá trị lạ coi như hàng xóm thường. */

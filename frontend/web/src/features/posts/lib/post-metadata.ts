@@ -1,4 +1,4 @@
-import type { PostDetail } from "@xom-nho/shared";
+import type { PostDetail } from "@xom-nho/api";
 import type { Metadata } from "next";
 
 /** Thẻ meta khi bài không có hoặc chưa đăng: tiêu đề chung, không cho máy tìm kiếm lập chỉ mục. */

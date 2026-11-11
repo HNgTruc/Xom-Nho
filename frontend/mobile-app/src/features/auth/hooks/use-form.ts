@@ -4,7 +4,7 @@ import type { z } from "zod";
 type Shape = Record<string, z.ZodType>;
 
 /**
- * Form kiểm tra bằng schema Zod của `shared`: một ô khi rời ô, cả form khi gửi.
+ * Form kiểm tra bằng schema Zod của `api`: một ô khi rời ô, cả form khi gửi.
  * Không dùng hook của `@xom-nho/ui` (ui resolve React của nó, app sẽ có hai bản React).
  */
 export function useForm<S extends Shape>(

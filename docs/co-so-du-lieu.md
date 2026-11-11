@@ -86,15 +86,15 @@ Ghi chú cài đặt:
 - Tên bảng viết thường, số ít, gạch dưới (`user`, `post`, `post_tag`) qua `@@map`; tên cột giữ camelCase như Better Auth.
 - `Post.content` là `MEDIUMTEXT` (16 MB): `TEXT` chỉ 64 KB, bài tiếng Việt dài (mỗi chữ có dấu 2-3 byte) dễ vượt.
 - Server MySQL mặc định `utf8mb4_0900_ai_ci`, nhưng Prisma tạo từng bảng với `utf8mb4_unicode_ci` và không theo dõi collation. Giữ nguyên `unicode_ci` cho mọi bảng (không sửa tay migration) để các bảng luôn đồng nhất. Cả hai collation đều không phân biệt dấu khi so sánh, nên cột `UNIQUE` coi "bàn" và "ban" là trùng (hai tag này không cùng tồn tại được). Đây là hành vi mong muốn cho tên tag, danh mục. Tìm kiếm không phụ thuộc collation vì `searchText` đã bỏ dấu sẵn.
-- Kết nối qua driver adapter `@prisma/adapter-mariadb` (Prisma 7 bắt buộc dùng adapter). `DATABASE_URL` khai báo trong `prisma.config.ts`, không còn trong `schema.prisma`.
+- Kết nối qua driver adapter `@prisma/adapter-mariadb` (Prisma 7 bắt buộc dùng adapter). `DATABASE_URL` khai báo trong `backend/prisma.config.ts` (file này trỏ tới `database/prisma/`), không còn trong `schema.prisma`.
 
 ## Quy ước
 
 - Khóa chính: chuỗi `cuid()` (hoặc id do Better Auth sinh cho bảng của nó), không dùng số tự tăng lộ ra URL.
-- URL dùng `slug`, không dùng `id`. Slug sinh từ tiêu đề đã bỏ dấu (`shared/src/utils/slugify.ts`), trùng thì thêm hậu tố `-2`, `-3`.
+- URL dùng `slug`, không dùng `id`. Slug sinh từ tiêu đề đã bỏ dấu (`api/src/utils/slugify.ts`), trùng thì thêm hậu tố `-2`, `-3`.
 - Mọi bảng có `createdAt`; bảng sửa được có `updatedAt @updatedAt`.
 - Xóa bài: xóa thật kèm bình luận (`onDelete: Cascade`). Xóa người dùng: không cho xóa nếu còn bài; dùng `banned` thay thế.
-- Enum đặt tên tiếng Anh viết hoa (`PUBLISHED`), tên hiển thị tiếng Việt nằm ở `shared/src/constants`.
+- Enum đặt tên tiếng Anh viết hoa (`PUBLISHED`), tên hiển thị tiếng Việt nằm ở `api/src/constants`.
 
 ## Chỉ mục
 
@@ -116,7 +116,7 @@ Vấn đề: người dùng hay gõ không dấu ("ban tron"), và collation c�
 
 Cách làm:
 
-1. Cột `Post.searchText` = tiêu đề + tóm tắt + tên tag, **chuyển chữ thường, bỏ dấu, đổi `đ` thành `d`**. Chỉ tạo bằng `buildPostSearchText` (`backend/src/modules/posts/posts.search-text.ts`, dùng `toSearchText` của `shared`), không tự ghép ở chỗ khác.
+1. Cột `Post.searchText` = tiêu đề + tóm tắt + tên tag, **chuyển chữ thường, bỏ dấu, đổi `đ` thành `d`**. Chỉ tạo bằng `buildPostSearchText` (`backend/src/modules/posts/posts.search-text.ts`, dùng `toSearchText` của `api`), không tự ghép ở chỗ khác.
 2. `FULLTEXT` index trên `searchText`, **không dùng stopword**. Docker đặt `innodb_ft_min_token_size=1` để không bỏ sót từ ngắn như "ăn", "đi".
 3. Từ khóa người dùng gõ đi qua `toBooleanQuery` (`backend/src/modules/search/search.query.ts`): `toSearchText`, đổi mọi ký tự ngoài a-z, 0-9 thành khoảng trắng (nên toán tử boolean `+ - < > ( ) ~ * " @` không lọt vào), bỏ từ trùng, rồi tìm bằng `MATCH ... AGAINST ('+tu1 +tu2' IN BOOLEAN MODE)`. Không còn từ nào thì không truy vấn.
 4. Truy vấn tìm kiếm viết bằng `$queryRaw` dạng tagged template (có tham số, không nối chuỗi).
@@ -141,7 +141,7 @@ Cách làm:
 
 ## Dữ liệu mẫu (seed)
 
-`backend/prisma/seed.ts` tạo:
+`backend/scripts/seed.ts` tạo:
 
 - 1 trưởng xóm, 2 cây bút, 3 hàng xóm (mật khẩu ghi trong file seed, chỉ dùng ở máy dev)
 - 5 danh mục: Đời sống, Công nghệ, Học tập, Góc kể chuyện, Hỏi đáp

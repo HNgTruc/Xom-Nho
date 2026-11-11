@@ -1,4 +1,4 @@
-import { formatDate, POST_STATUSES } from "@xom-nho/shared";
+import { formatDate, POST_STATUSES } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { notFound } from "next/navigation";

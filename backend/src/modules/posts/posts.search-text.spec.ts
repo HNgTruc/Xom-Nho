@@ -1,4 +1,4 @@
-import { toSearchText } from "@xom-nho/shared";
+import { toSearchText } from "@xom-nho/api";
 import { buildPostSearchText } from "./posts.search-text.js";
 
 describe("buildPostSearchText", () => {

@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
-import { type ApiErrorBody, ERROR_CODES, ERROR_MESSAGES, type ErrorCode } from "@xom-nho/shared";
+import { type ApiErrorBody, ERROR_CODES, ERROR_MESSAGES, type ErrorCode } from "@xom-nho/api";
 import type { Response } from "express";
 import { AppException } from "../exceptions/app-exception.js";
 

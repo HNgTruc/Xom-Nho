@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { POST_STATUSES, type PostListItem, type SearchQuery } from "@xom-nho/shared";
+import { POST_STATUSES, type PostListItem, type SearchQuery } from "@xom-nho/api";
 import { paginate, type Paginated } from "../../common/types/paginated.js";
 import { PostsService } from "../posts/posts.service.js";
 import { toBooleanQuery } from "./search.query.js";

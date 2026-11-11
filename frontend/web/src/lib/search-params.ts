@@ -13,7 +13,7 @@ function firstValues(raw: RawSearchParams): Record<string, string> {
 }
 
 /**
- * Đọc query của URL bằng schema trong `shared`, kiểu dễ dãi: trường nào sai thì bỏ trường đó (về mặc định),
+ * Đọc query của URL bằng schema trong `api`, kiểu dễ dãi: trường nào sai thì bỏ trường đó (về mặc định),
  * các trường đúng vẫn giữ. `?sort=top&page=abc` thành trang 1, sắp theo lượt đọc, thay vì trang lỗi.
  */
 export function parseSearchParams<T extends z.ZodType>(
@@ -29,6 +29,6 @@ export function parseSearchParams<T extends z.ZodType>(
     if (typeof key === "string") delete values[key];
   }
   const second = schema.safeParse(values);
-  // Schema query trong shared đều có mặc định cho mọi trường, nên object rỗng luôn hợp lệ
+  // Schema query trong api đều có mặc định cho mọi trường, nên object rỗng luôn hợp lệ
   return second.success ? second.data : schema.parse({});
 }

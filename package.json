@@ -12,9 +12,18 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "format": "prettier --write .",
-    "db:up": "docker compose up -d",
-    "db:down": "docker compose down"
+    "format": "prettier --write . \"!pnpm-lock.yaml\"",
+    "db:compose": "docker compose --env-file .env -f database/docker-compose.yml",
+    "db:up": "pnpm db:compose up -d",
+    "db:down": "pnpm db:compose down",
+    "db:ps": "pnpm db:compose ps"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": false,
+    "trailingComma": "all",
+    "printWidth": 100,
+    "endOfLine": "lf"
   },
   "devDependencies": {
     "prettier": "^3.6.0",

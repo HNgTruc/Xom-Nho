@@ -1,4 +1,4 @@
-import type { ListPostsQuery } from "@xom-nho/shared";
+import type { ListPostsQuery } from "@xom-nho/api";
 import { publicApi } from "@/lib/server-api";
 
 /** Một trang bài đã đăng. Dữ liệu công khai nên không gửi cookie. Lỗi (backend tắt, 5xx) ném tiếp cho ErrorBoundary. */

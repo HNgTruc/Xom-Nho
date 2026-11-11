@@ -1,4 +1,4 @@
-import { type Category, toCategoryColor } from "@xom-nho/shared";
+import { type Category, toCategoryColor } from "@xom-nho/api";
 import type { CategoryListRow } from "./categories.repository.js";
 
 export function toCategory(row: CategoryListRow): Category {

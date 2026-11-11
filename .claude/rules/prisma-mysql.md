@@ -1,6 +1,6 @@
 ---
 paths:
-  - "backend/prisma/**"
+  - "database/prisma/**"
   - "backend/prisma.config.ts"
   - "backend/src/infrastructure/database/**"
   - "backend/src/modules/**/*.repository.ts"
@@ -18,5 +18,5 @@ paths:
 - `@@index` cho mọi cột dùng để lọc/sắp xếp thường xuyên.
 - Quan hệ ghi rõ `onDelete`.
 - Repository chỉ truy vấn, không có quy tắc nghiệp vụ hay kiểm tra quyền. Luôn `select` đúng cột cần.
-- Seed (`prisma/seed.ts`) chạy lại được nhiều lần.
+- Seed (`backend/scripts/seed.ts`) chạy lại được nhiều lần.
 - Đổi schema xong: `prisma format`, `prisma validate`, rồi mới tạo migration.

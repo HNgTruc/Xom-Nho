@@ -1,6 +1,6 @@
 "use client";
 
-import { ERROR_MESSAGES } from "@xom-nho/shared";
+import { ERROR_MESSAGES } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 
 // Lỗi không lường trước trong các trang chính: câu tiếng Việt + nút thử lại, không hiện chi tiết kỹ thuật

@@ -1,4 +1,4 @@
-import type { CategoryRef } from "@xom-nho/shared";
+import type { CategoryRef } from "@xom-nho/api";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { cn } from "@xom-nho/ui/lib/utils";
 import Link from "next/link";

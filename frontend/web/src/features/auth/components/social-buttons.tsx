@@ -1,6 +1,6 @@
 "use client";
 
-import type { AuthProviders } from "@xom-nho/shared";
+import type { AuthProviders } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";

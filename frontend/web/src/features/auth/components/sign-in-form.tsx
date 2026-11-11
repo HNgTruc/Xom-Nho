@@ -1,6 +1,6 @@
 "use client";
 
-import { type AuthProviders, authErrorMessage, signInSchema } from "@xom-nho/shared";
+import { type AuthProviders, authErrorMessage, signInSchema } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 import { FieldError } from "@xom-nho/ui/components/field-error";
 import { Input } from "@xom-nho/ui/components/input";

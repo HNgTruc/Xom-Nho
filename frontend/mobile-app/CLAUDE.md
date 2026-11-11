@@ -1,8 +1,8 @@
 # frontend/mobile-app
 
-App Expo (Expo Router, TypeScript), chạy thử bằng **Expo Go trên điện thoại thật** qua Wi-Fi. Có mọi tính năng của web **trừ quản trị**. Gọi `backend` qua `@xom-nho/shared/api-client`.
+App Expo (Expo Router, TypeScript), chạy thử bằng **Expo Go trên điện thoại thật** qua Wi-Fi. Có mọi tính năng của web **trừ quản trị**. Gọi `backend` qua `@xom-nho/api/api-client`.
 
-> **Giao diện**: theo `design-system/xom-nho/MASTER.md` và override `design-system/xom-nho/pages/mobile.md` (override thắng). Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
+> **Giao diện**: theo `docs/design-system/xom-nho/MASTER.md` và override `docs/design-system/xom-nho/pages/mobile.md` (override thắng). Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
 
 ## Trước khi viết code
 

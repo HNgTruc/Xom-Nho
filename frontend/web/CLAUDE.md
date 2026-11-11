@@ -1,8 +1,8 @@
 # frontend/web
 
-Next.js App Router. Trang cho **khách, hàng xóm, cây bút**: đọc, tìm, viết bài, bình luận, hồ sơ. **Không có trang quản trị** (ở `frontend/admin`). **Không có database, không có API riêng**: mọi dữ liệu lấy từ `backend` qua `@xom-nho/shared/api-client`.
+Next.js App Router. Trang cho **khách, hàng xóm, cây bút**: đọc, tìm, viết bài, bình luận, hồ sơ. **Không có trang quản trị** (ở `frontend/admin`). **Không có database, không có API riêng**: mọi dữ liệu lấy từ `backend` qua `@xom-nho/api/api-client`.
 
-> **Giao diện**: theo `design-system/xom-nho/MASTER.md`. Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
+> **Giao diện**: theo `docs/design-system/xom-nho/MASTER.md`. Dùng skill ui-ux-pro-max khi làm trang/màn hình/component, chạy checklist trong các file đó trước khi xong.
 
 ## Trước khi viết code
 

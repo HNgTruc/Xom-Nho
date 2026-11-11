@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import type { HealthStatus } from "@xom-nho/shared";
+import type { HealthStatus } from "@xom-nho/api";
 import { Public } from "../../common/decorators/public.decorator.js";
 import { HealthService } from "./health.service.js";
 

@@ -1,4 +1,4 @@
-import { FEED_MESSAGES, listPostsQuerySchema } from "@xom-nho/shared";
+import { FEED_MESSAGES, listPostsQuerySchema } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 import Link from "next/link";
 import { EmptyState } from "@/components/common/empty-state";

@@ -1,4 +1,4 @@
-import { toSearchText } from "@xom-nho/shared";
+import { toSearchText } from "@xom-nho/api";
 
 /**
  * Đổi từ khóa người dùng gõ thành biểu thức `MATCH ... AGAINST (... IN BOOLEAN MODE)`: mọi từ đều phải có.

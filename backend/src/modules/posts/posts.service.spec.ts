@@ -1,4 +1,4 @@
-import type { PostStatus, Role } from "@xom-nho/shared";
+import type { PostStatus, Role } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 import type { PostDetailRow, PostListRow, PostsRepository } from "./posts.repository.js";
 import { PostsService } from "./posts.service.js";

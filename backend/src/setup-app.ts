@@ -1,5 +1,5 @@
 import type { NestExpressApplication } from "@nestjs/platform-express";
-import { API_PREFIX, AUTH_PREFIX } from "@xom-nho/shared";
+import { API_PREFIX, AUTH_PREFIX } from "@xom-nho/api";
 import { toNodeHandler } from "better-auth/node";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter.js";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor.js";

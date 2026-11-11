@@ -1,4 +1,4 @@
-import { POST_STATUS_VALUES, type Role } from "@xom-nho/shared";
+import { POST_STATUS_VALUES, type Role } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { PostsPolicy } from "./posts.policy.js";
 

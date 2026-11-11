@@ -1,4 +1,4 @@
-import { listPostsQuerySchema } from "@xom-nho/shared";
+import { listPostsQuerySchema } from "@xom-nho/api";
 import { describe, expect, it } from "vitest";
 import { parseSearchParams } from "./search-params";
 

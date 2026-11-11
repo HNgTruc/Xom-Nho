@@ -1,5 +1,5 @@
 import { expo } from "@better-auth/expo";
-import { ROLES } from "@xom-nho/shared";
+import { ROLES } from "@xom-nho/api";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";

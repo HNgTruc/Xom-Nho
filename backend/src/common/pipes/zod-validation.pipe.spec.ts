@@ -1,4 +1,4 @@
-import { paginationQuerySchema } from "@xom-nho/shared";
+import { paginationQuerySchema } from "@xom-nho/api";
 import { z } from "zod";
 import { AppException } from "../exceptions/app-exception.js";
 import { ZodValidationPipe } from "./zod-validation.pipe.js";

@@ -1,5 +1,5 @@
-import type { PostDetail } from "@xom-nho/shared";
-import { isApiError } from "@xom-nho/shared/api-client";
+import type { PostDetail } from "@xom-nho/api";
+import { isApiError } from "@xom-nho/api/api-client";
 import { publicApi, serverApi } from "@/lib/server-api";
 
 function nullOn404(error: unknown): null {

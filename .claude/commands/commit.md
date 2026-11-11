@@ -15,7 +15,7 @@ description: Soạn commit message theo Conventional Commits cho thay đổi hi�
    ```
 
    - `type`: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`, `build`, `ci`
-   - `scope`: `backend`, `web`, `admin`, `mobile`, `ui`, `shared`, `db`, `auth`, `docker`, `claude`, `docs`
+   - `scope`: `backend`, `web`, `admin`, `mobile`, `ui`, `api`, `db`, `auth`, `docker`, `claude`, `docs`
    - Dòng đầu tối đa 72 ký tự
 
 4. Kiểm tra không có file nhạy cảm bị stage (`.env`, khóa, file lớn). Có thì cảnh báo.

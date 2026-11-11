@@ -1,4 +1,4 @@
-import { POST_STATUS_NOTES, POST_STATUSES, type PostDetail, rejectedNote } from "@xom-nho/shared";
+import { POST_STATUS_NOTES, POST_STATUSES, type PostDetail, rejectedNote } from "@xom-nho/api";
 import { CircleAlert, Info } from "lucide-react";
 import { PostStatusBadge } from "./post-status-badge";
 

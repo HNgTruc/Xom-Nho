@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "@xom-nho/shared";
+import { ERROR_MESSAGES } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 import Link from "next/link";
 

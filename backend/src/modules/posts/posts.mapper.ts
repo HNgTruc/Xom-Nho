@@ -6,7 +6,7 @@ import {
   type PostListItem,
   type TagRef,
   type UserSummary,
-} from "@xom-nho/shared";
+} from "@xom-nho/api";
 import type { PostDetailRow, PostListRow } from "./posts.repository.js";
 
 // Map từng trường thay vì trả nguyên object quan hệ: thêm cột vào `select` (ví dụ `email`) không tự lọt ra API

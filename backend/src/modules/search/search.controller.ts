@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { type PostListItem, type SearchQuery, searchQuerySchema } from "@xom-nho/shared";
+import { type PostListItem, type SearchQuery, searchQuerySchema } from "@xom-nho/api";
 import { Public } from "../../common/decorators/public.decorator.js";
 import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import type { Paginated } from "../../common/types/paginated.js";

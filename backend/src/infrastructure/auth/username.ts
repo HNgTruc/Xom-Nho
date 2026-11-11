@@ -1,6 +1,6 @@
-import { LIMITS, slugify } from "@xom-nho/shared";
+import { LIMITS, slugify } from "@xom-nho/api";
 
-// Dùng chung với `usernameSchema` trong shared (kiểm tra `/users/:username`, `?author=`)
+// Dùng chung với `usernameSchema` trong api (kiểm tra `/users/:username`, `?author=`)
 const USERNAME_MAX = LIMITS.USERNAME_MAX;
 const FALLBACK = "hangxom";
 

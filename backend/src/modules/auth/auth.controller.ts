@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch } from "@nestjs/common";
-import { type AuthProviders, type Me, type UpdateMeInput, updateMeSchema } from "@xom-nho/shared";
+import { type AuthProviders, type Me, type UpdateMeInput, updateMeSchema } from "@xom-nho/api";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
 import { Public } from "../../common/decorators/public.decorator.js";
 import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";

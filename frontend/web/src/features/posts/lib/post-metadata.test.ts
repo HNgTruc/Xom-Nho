@@ -1,4 +1,4 @@
-import type { PostDetail } from "@xom-nho/shared";
+import type { PostDetail } from "@xom-nho/api";
 import { describe, expect, it } from "vitest";
 import { postMetadata } from "./post-metadata";
 

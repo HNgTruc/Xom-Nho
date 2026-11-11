@@ -1,4 +1,4 @@
-import { type CategoryColor, toCategoryColor } from "@xom-nho/shared";
+import { type CategoryColor, toCategoryColor } from "@xom-nho/api";
 
 // Viết đủ tên class (không ghép chuỗi) để Tailwind tìm thấy. Màu và tương phản: MASTER mục 2.2.
 // Hover giữ nguyên nền (đổi nền sẽ mất màu danh mục), badge tự gạch chân để báo bấm được.

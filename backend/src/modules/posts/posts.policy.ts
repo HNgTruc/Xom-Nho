@@ -1,4 +1,4 @@
-import { POST_STATUSES, type PostStatus, ROLES } from "@xom-nho/shared";
+import { POST_STATUSES, type PostStatus, ROLES } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 
 /** Phần của bài mà policy cần. Luôn lấy từ database, không tin dữ liệu client gửi. */

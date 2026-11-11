@@ -1,4 +1,4 @@
-import type { PostListItem } from "@xom-nho/shared";
+import type { PostListItem } from "@xom-nho/api";
 import type { PostsService } from "../posts/posts.service.js";
 import type { SearchRepository } from "./search.repository.js";
 import { SearchService } from "./search.service.js";

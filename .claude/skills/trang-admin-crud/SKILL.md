@@ -7,7 +7,7 @@ description: Dựng màn hình quản trị dạng bảng (danh sách, lọc, t�
 
 ## Trước khi làm
 
-- API `/api/v1/admin/<tài-nguyên>` đã có ở backend và trong `shared/src/api-client/admin/` chưa? Chưa thì dùng skill `tao-module-backend` trước.
+- API `/api/v1/admin/<tài-nguyên>` đã có ở backend và trong `api/src/api-client/admin/` chưa? Chưa thì dùng skill `tao-module-backend` trước.
 - Đọc mục "Quản trị" trong `docs/tinh-nang.md` và `.claude/rules/frontend-admin.md`.
 
 ## Cấu trúc một feature

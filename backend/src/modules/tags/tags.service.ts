@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { LIMITS, pathSlugSchema, slugify, type Tag, type TagSuggestQuery } from "@xom-nho/shared";
+import { LIMITS, pathSlugSchema, slugify, type Tag, type TagSuggestQuery } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import { toTag } from "./tags.mapper.js";
 import { TagsRepository } from "./tags.repository.js";

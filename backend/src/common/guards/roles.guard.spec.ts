@@ -1,6 +1,6 @@
 import type { ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import type { Role } from "@xom-nho/shared";
+import type { Role } from "@xom-nho/api";
 import type { SessionUser } from "../types/session-user.js";
 import { RolesGuard } from "./roles.guard.js";
 

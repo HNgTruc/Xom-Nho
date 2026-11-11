@@ -6,7 +6,7 @@ import {
   type PostListItem,
   pathIdSchema,
   pathSlugSchema,
-} from "@xom-nho/shared";
+} from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import { paginate, type Paginated } from "../../common/types/paginated.js";
 import type { SessionUser } from "../../common/types/session-user.js";

@@ -9,14 +9,14 @@ paths:
 - Tầng chỉ gọi tầng ngay dưới: controller → service → (policy, repository) → Prisma. Controller không gọi repository; service không đọc `Request`.
 - Module khác cần dữ liệu thì import **module** và gọi **service** được export; không import repository của module khác.
 - Route công khai đặt `@Public()`. Route admin nằm trong `*.admin.controller.ts`, `@Controller("admin/<tài-nguyên>")` + `@Roles("admin")` ở cấp class.
-- Body, query, param kiểm tra bằng `new ZodValidationPipe(<schema từ @xom-nho/shared>)`. Không dùng `class-validator`/DTO class.
-- Lỗi nghiệp vụ: `throw new AppException("NOT_FOUND", "Không tìm thấy bài viết")` với mã trong `shared/src/constants/error-codes.ts`. Không ném `HttpException` trực tiếp, không trả `{ error }` tự chế.
+- Body, query, param kiểm tra bằng `new ZodValidationPipe(<schema từ @xom-nho/api>)`. Không dùng `class-validator`/DTO class.
+- Lỗi nghiệp vụ: `throw new AppException("NOT_FOUND", "Không tìm thấy bài viết")` với mã trong `api/src/constants/error-codes.ts`. Không ném `HttpException` trực tiếp, không trả `{ error }` tự chế.
 - Controller trả dữ liệu thuần (hoặc `{ items, meta }` cho danh sách); interceptor lo bọc `{ data, meta }`.
 - Repository luôn `select` đúng cột cần; danh sách không lấy `content` của bài.
 - Thao tác ghi nhiều bảng (bài + tag) dùng `prisma.$transaction`.
-- Mapper chuyển Prisma model sang kiểu trong `@xom-nho/shared`; không trả Prisma model thẳng ra ngoài.
+- Mapper chuyển Prisma model sang kiểu trong `@xom-nho/api`; không trả Prisma model thẳng ra ngoài.
 - Biến môi trường chỉ qua `ConfigService`; không `process.env` rải rác.
 - Không `console.log`; dùng logger trong `infrastructure/logger`.
 - Đăng ký module mới trong `app.module.ts`.
-- Thêm/đổi endpoint: cập nhật `docs/api.md` và `shared/src/api-client` trong cùng thay đổi.
+- Thêm/đổi endpoint: cập nhật `docs/api.md` và `api/src/api-client` trong cùng thay đổi.
 - Đổi endpoint đang có trong `/api/v1`: theo mục "Quy tắc thay đổi API v1" trong `docs/api.md`; thay đổi phá vỡ client cũ thì làm ở `/api/v2`.

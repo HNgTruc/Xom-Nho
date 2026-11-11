@@ -12,7 +12,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@xom-nho/shared": "workspace:*",
+    "@xom-nho/api": "workspace:*",
     "@xom-nho/ui": "workspace:*",
     "better-auth": "1.7.15",
     "lucide-react": "^1.66.0",

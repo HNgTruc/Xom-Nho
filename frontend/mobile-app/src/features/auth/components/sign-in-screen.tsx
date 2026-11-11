@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { authErrorMessage, signInSchema } from "@xom-nho/shared";
+import { authErrorMessage, signInSchema } from "@xom-nho/api";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { AppButton } from "@/components/app-button";

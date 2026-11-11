@@ -1,8 +1,7 @@
 packages:
   - "backend"
   - "frontend/*"
-  - "ui"
-  - "shared"
+  - "api"
 
 # Một phiên bản cho công cụ dùng chung giữa các package. Package khai báo "catalog:" thay vì số bản.
 catalog:

@@ -1,6 +1,6 @@
 ---
 name: tao-tinh-nang
-description: Quy trình làm một tính năng trọn vẹn cho Xóm Nhỏ, đi qua shared → database → backend → api-client → web / mobile-app / admin. Dùng khi người dùng muốn làm một tính năng mới (ví dụ "làm bình luận", "thêm lưu bài", "làm tìm kiếm") hoặc một việc trong docs/lo-trinh.md đụng nhiều phần.
+description: Quy trình làm một tính năng trọn vẹn cho Xóm Nhỏ, đi qua api → database → backend → api-client → web / mobile-app / admin. Dùng khi người dùng muốn làm một tính năng mới (ví dụ "làm bình luận", "thêm lưu bài", "làm tìm kiếm") hoặc một việc trong docs/lo-trinh.md đụng nhiều phần.
 ---
 
 # Làm một tính năng trọn vẹn
@@ -11,12 +11,12 @@ Làm từ trong ra ngoài: hợp đồng dữ liệu trước, backend sau, giao
 
 - Đọc mục tương ứng trong `docs/tinh-nang.md` (tiêu chí) và `docs/phan-quyen.md` (ai được làm gì).
 - Chưa có trong tài liệu: hỏi các điểm chưa rõ, **đề xuất bổ sung tài liệu trước**.
-- Lập kế hoạch: phần nào đổi (shared, backend, web, admin, mobile), file nào tạo mới. Xác nhận với người dùng nếu đổi schema DB hoặc đụng hơn khoảng 10 file.
+- Lập kế hoạch: phần nào đổi (api, backend, web, admin, mobile), file nào tạo mới. Xác nhận với người dùng nếu đổi schema DB hoặc đụng hơn khoảng 10 file.
 
-## 1. shared (hợp đồng)
+## 1. api (hợp đồng)
 
-- Schema Zod dữ liệu vào: `shared/src/schemas/<tài-nguyên>.ts`, export kèm kiểu `z.infer`.
-- Kiểu phản hồi: `shared/src/types/`.
+- Schema Zod dữ liệu vào: `api/src/schemas/<tài-nguyên>.ts`, export kèm kiểu `z.infer`.
+- Kiểu phản hồi: `api/src/types/`.
 - Giới hạn vào `constants/limits.ts`; câu chữ dùng chung vào `constants/messages.ts`.
 - Cập nhật `docs/api.md` (endpoint, quyền, body, kiểu trả về).
 - Test schema.
@@ -31,7 +31,7 @@ Skill `tao-module-backend`: policy → repository → service → controller (v�
 
 ## 4. api-client
 
-Thêm hàm vào `shared/src/api-client/<tài-nguyên>.ts` (hoặc `api-client/admin/`). Chạy `pnpm typecheck` ở gốc.
+Thêm hàm vào `api/src/api-client/<tài-nguyên>.ts` (hoặc `api-client/admin/`). Chạy `pnpm typecheck` ở gốc.
 
 ## 5. Frontend (theo phạm vi trong `docs/tinh-nang.md`)
 
