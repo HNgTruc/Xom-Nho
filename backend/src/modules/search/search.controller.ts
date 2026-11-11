@@ -1,6 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { type PostListItem, type SearchQuery, searchQuerySchema } from "@xom-nho/api";
-import { Public } from "../../common/decorators/public.decorator.js";
 import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import type { Paginated } from "../../common/types/paginated.js";
 import { SearchService } from "./search.service.js";
@@ -9,7 +8,6 @@ import { SearchService } from "./search.service.js";
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
-  @Public()
   @Get()
   search(
     @Query(new ZodValidationPipe(searchQuerySchema)) query: SearchQuery,

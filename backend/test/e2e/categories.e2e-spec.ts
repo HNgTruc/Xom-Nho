@@ -4,10 +4,15 @@ import type { App } from "supertest/types.js";
 import type { PrismaClient } from "../../src/generated/prisma/client.js";
 import { createTestApp } from "../fixtures/app.js";
 import { createTestPrisma, resetDatabase } from "../fixtures/database.js";
+import { signUp } from "../fixtures/session.js";
 
 describe("GET /api/v1/categories", () => {
   let app: INestApplication<App>;
   let prisma: PrismaClient;
+  let memberCookie: string;
+
+  const get = () =>
+    request(app.getHttpServer()).get("/api/v1/categories").set("Cookie", memberCookie);
 
   beforeAll(async () => {
     app = await createTestApp();
@@ -16,6 +21,7 @@ describe("GET /api/v1/categories", () => {
 
   beforeEach(async () => {
     await resetDatabase(prisma);
+    memberCookie = (await signUp(app, prisma, "hangxom@test.local")).cookie;
   });
 
   afterAll(async () => {
@@ -23,8 +29,8 @@ describe("GET /api/v1/categories", () => {
     await app.close();
   });
 
-  it("khách gọi được, trả mảng rỗng khi chưa có danh mục", async () => {
-    const res = await request(app.getHttpServer()).get("/api/v1/categories").expect(200);
+  it("hàng xóm gọi được, trả mảng rỗng khi chưa có danh mục", async () => {
+    const res = await get().expect(200);
 
     expect(res.body).toEqual({ data: [] });
   });
@@ -52,7 +58,7 @@ describe("GET /api/v1/categories", () => {
       ],
     });
 
-    const res = await request(app.getHttpServer()).get("/api/v1/categories").expect(200);
+    const res = await get().expect(200);
 
     expect(res.body.data).toEqual([
       {

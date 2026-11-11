@@ -8,7 +8,6 @@ import {
 } from "@xom-nho/api";
 import type { Response } from "express";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
-import { Public } from "../../common/decorators/public.decorator.js";
 import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import type { Paginated } from "../../common/types/paginated.js";
 import type { SessionUser } from "../../common/types/session-user.js";
@@ -18,7 +17,6 @@ import { PostsService } from "./posts.service.js";
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Public()
   @Get()
   list(
     @Query(new ZodValidationPipe(listPostsQuerySchema)) query: ListPostsQuery,
@@ -26,11 +24,10 @@ export class PostsController {
     return this.postsService.list(query);
   }
 
-  /** Công khai, nhưng vẫn đọc phiên nếu có để tác giả và trưởng xóm xem được bài chưa đăng. */
-  @Public()
+  /** Bài đã đăng: mọi thành viên. Bài chưa đăng: chủ bài và trưởng xóm (PostsPolicy.canView). */
   @Get(":slug")
   async get(
-    @CurrentUser() user: SessionUser | undefined,
+    @CurrentUser() user: SessionUser,
     @Param("slug") slug: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<PostDetail> {
@@ -44,7 +41,6 @@ export class PostsController {
     return post;
   }
 
-  @Public()
   @Post(":id/view")
   @HttpCode(HttpStatus.NO_CONTENT)
   view(@Param("id") id: string): Promise<void> {

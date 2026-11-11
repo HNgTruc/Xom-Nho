@@ -5,16 +5,20 @@ import type { PostStatus, PrismaClient } from "../../src/generated/prisma/client
 import { buildPostSearchText } from "../../src/modules/posts/posts.search-text.js";
 import { createTestApp } from "../fixtures/app.js";
 import { createTestPrisma, resetDatabase } from "../fixtures/database.js";
+import { signUp } from "../fixtures/session.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 const base = new Date("2026-10-01T00:00:00.000Z").getTime();
 
-/** Các route đọc công khai ngoài `posts`: tag, hồ sơ, tìm kiếm. */
+/** Các route đọc ngoài `posts`: tag, hồ sơ, tìm kiếm. Hàng xóm đăng nhập gọi; khách nhận 401 (guest-access). */
 describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
   let app: NestExpressApplication;
   let prisma: PrismaClient;
 
-  const http = () => request(app.getHttpServer());
+  let memberCookie: string;
+
+  /** GET bằng phiên của một hàng xóm bình thường. */
+  const get = (url: string) => request(app.getHttpServer()).get(url).set("Cookie", memberCookie);
   const slugsOf = (body: { data: PostListItem[] }) => body.data.map((p) => p.slug);
 
   async function createPost(input: {
@@ -55,6 +59,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
 
   beforeEach(async () => {
     await resetDatabase(prisma);
+    memberCookie = (await signUp(app, prisma, "hangxom@test.local")).cookie;
 
     await prisma.user.create({
       data: {
@@ -123,7 +128,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
 
   describe("GET /tags", () => {
     it("q rỗng: mọi tag, tag gắn nhiều bài trước", async () => {
-      const res = await http().get("/api/v1/tags").expect(200);
+      const res = await get("/api/v1/tags").expect(200);
 
       expect(res.body.data.map((t: { slug: string }) => t.slug)).toEqual([
         "do-an",
@@ -140,14 +145,13 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
       ["Ăn", ["do-an", "an-vat"]],
       ["khong-co", []],
     ])("q=%s gợi ý đúng tag, có dấu hay không đều được", async (q, expected) => {
-      const res = await http().get("/api/v1/tags").query({ q }).expect(200);
+      const res = await get("/api/v1/tags").query({ q }).expect(200);
 
       expect(res.body.data.map((t: { slug: string }) => t.slug)).toEqual(expected);
     });
 
     it("q quá dài thì 400", async () => {
-      const res = await http()
-        .get("/api/v1/tags")
+      const res = await get("/api/v1/tags")
         .query({ q: "a".repeat(31) })
         .expect(400);
 
@@ -157,13 +161,13 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
 
   describe("GET /tags/:slug", () => {
     it("trả tag, kể cả tag chưa có bài", async () => {
-      const res = await http().get("/api/v1/tags/chua-dung").expect(200);
+      const res = await get("/api/v1/tags/chua-dung").expect(200);
 
       expect(res.body.data).toMatchObject({ name: "Chưa dùng", slug: "chua-dung" });
     });
 
     it.each(["khong-co", "An-Vat"])("%s thì 404", async (slug) => {
-      const res = await http().get(`/api/v1/tags/${slug}`).expect(404);
+      const res = await get(`/api/v1/tags/${slug}`).expect(404);
 
       expect(res.body.error.code).toBe("NOT_FOUND");
     });
@@ -171,7 +175,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
 
   describe("GET /users/:username", () => {
     it("hồ sơ công khai, số bài chỉ đếm bài đã đăng, không có email", async () => {
-      const res = await http().get("/api/v1/users/lan").expect(200);
+      const res = await get("/api/v1/users/lan").expect(200);
 
       expect(res.body.data).toEqual({
         id: "lan",
@@ -186,7 +190,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
     });
 
     it("người bị cấm vẫn có hồ sơ, nhưng không lộ thông tin cấm", async () => {
-      const res = await http().get("/api/v1/users/minh").expect(200);
+      const res = await get("/api/v1/users/minh").expect(200);
 
       expect(res.body.data).not.toHaveProperty("banned");
       expect(res.body.data).not.toHaveProperty("banReason");
@@ -194,7 +198,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
     });
 
     it.each(["khongco", "Lan"])("%s thì 404", async (username) => {
-      await http().get(`/api/v1/users/${username}`).expect(404);
+      await get(`/api/v1/users/${username}`).expect(404);
     });
   });
 
@@ -206,20 +210,20 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
       ["ha noi", ["do-an-duong-pho"]],
       ["an", ["quan-an-dem", "do-an-duong-pho", "ban-tron"]],
     ])("q=%s tìm đúng bài đã đăng, có dấu hay không", async (q, expected) => {
-      const res = await http().get("/api/v1/search").query({ q }).expect(200);
+      const res = await get("/api/v1/search").query({ q }).expect(200);
 
       expect([...slugsOf(res.body)].sort()).toEqual([...expected].sort());
       expect(res.body.meta.total).toBe(expected.length);
     });
 
     it("mọi từ đều phải có", async () => {
-      const res = await http().get("/api/v1/search").query({ q: "ban tron ha noi" }).expect(200);
+      const res = await get("/api/v1/search").query({ q: "ban tron ha noi" }).expect(200);
 
       expect(slugsOf(res.body)).toEqual([]);
     });
 
     it("kết quả đủ trường như danh sách bài", async () => {
-      const res = await http().get("/api/v1/search").query({ q: "ha noi" }).expect(200);
+      const res = await get("/api/v1/search").query({ q: "ha noi" }).expect(200);
 
       expect(res.body.data[0]).toMatchObject({
         slug: "do-an-duong-pho",
@@ -234,8 +238,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
     });
 
     it("lọc thêm theo danh mục", async () => {
-      const res = await http()
-        .get("/api/v1/search")
+      const res = await get("/api/v1/search")
         .query({ q: "do an", category: "doi-song" })
         .expect(200);
 
@@ -243,17 +246,14 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
     });
 
     it("phân trang", async () => {
-      const res = await http()
-        .get("/api/v1/search")
-        .query({ q: "an", pageSize: 2, page: 2 })
-        .expect(200);
+      const res = await get("/api/v1/search").query({ q: "an", pageSize: 2, page: 2 }).expect(200);
 
       expect(res.body.data).toHaveLength(1);
       expect(res.body.meta).toEqual({ page: 2, pageSize: 2, total: 3, totalPages: 2 });
     });
 
     it.each(["", "   ", '+-*"()@'])("q=%j trả trang rỗng, không lỗi", async (q) => {
-      const res = await http().get("/api/v1/search").query({ q }).expect(200);
+      const res = await get("/api/v1/search").query({ q }).expect(200);
 
       expect(res.body).toEqual({
         data: [],
@@ -262,14 +262,13 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
     });
 
     it("toán tử boolean trong từ khóa không có tác dụng", async () => {
-      const res = await http().get("/api/v1/search").query({ q: "ban -tron" }).expect(200);
+      const res = await get("/api/v1/search").query({ q: "ban -tron" }).expect(200);
 
       expect(slugsOf(res.body)).toEqual(["ban-tron"]);
     });
 
     it("q quá dài thì 400", async () => {
-      await http()
-        .get("/api/v1/search")
+      await get("/api/v1/search")
         .query({ q: "a".repeat(101) })
         .expect(400);
     });

@@ -5,8 +5,8 @@ import type { PostStatus, PrismaClient } from "../../src/generated/prisma/client
 import { buildPostSearchText } from "../../src/modules/posts/posts.search-text.js";
 import { createTestApp } from "../fixtures/app.js";
 import { createTestPrisma, resetDatabase } from "../fixtures/database.js";
+import { signUp as signUpWith } from "../fixtures/session.js";
 
-const WEB_ORIGIN = "http://localhost:3000";
 const DAY = 24 * 60 * 60 * 1000;
 const base = new Date("2026-10-01T00:00:00.000Z").getTime();
 
@@ -15,20 +15,16 @@ describe("Đọc bài (/api/v1/posts)", () => {
   let prisma: PrismaClient;
   let ids: Record<string, string>;
 
-  const http = () => request(app.getHttpServer());
-  const slugsOf = (body: { data: PostListItem[] }) => body.data.map((p) => p.slug);
+  let memberCookie: string;
 
-  /** Đăng ký qua Better Auth, đặt vai trò trong database, trả cookie phiên và id. */
-  async function signUp(email: string, role = "user"): Promise<{ cookie: string; id: string }> {
-    const res = await http()
-      .post("/api/auth/sign-up/email")
-      .set("Origin", WEB_ORIGIN)
-      .send({ name: email.split("@")[0], email, password: "matkhau123" })
-      .expect(200);
-    const user = await prisma.user.update({ where: { email }, data: { role } });
-    const setCookie = res.headers["set-cookie"] as unknown as string[];
-    return { cookie: setCookie.map((c) => c.split(";")[0]).join("; "), id: user.id };
-  }
+  const http = () => request(app.getHttpServer());
+  const signUp = (email: string, role?: string) => signUpWith(app, prisma, email, role);
+  /** Một hàng xóm bình thường đang đăng nhập (không phải tác giả bài nào). */
+  const asMember = () => ({
+    get: (url: string) => http().get(url).set("Cookie", memberCookie),
+    post: (url: string) => http().post(url).set("Cookie", memberCookie),
+  });
+  const slugsOf = (body: { data: PostListItem[] }) => body.data.map((p) => p.slug);
 
   async function createPost(input: {
     slug: string;
@@ -66,6 +62,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
 
   beforeEach(async () => {
     await resetDatabase(prisma);
+    memberCookie = (await signUp("hangxom@test.local")).cookie;
 
     const lan = await prisma.user.create({
       data: { id: "lan", name: "Lan", email: "lan@test.local", username: "lan" },
@@ -132,15 +129,15 @@ describe("Đọc bài (/api/v1/posts)", () => {
   });
 
   describe("GET /posts", () => {
-    it("khách gọi được, chỉ có bài đã đăng, mới nhất trước, đúng định dạng phân trang", async () => {
-      const res = await http().get("/api/v1/posts").expect(200);
+    it("hàng xóm gọi được, chỉ có bài đã đăng, mới nhất trước, đúng định dạng phân trang", async () => {
+      const res = await asMember().get("/api/v1/posts").expect(200);
 
       expect(slugsOf(res.body)).toEqual(["moi-nhat", "o-giua", "cu-hon"]);
       expect(res.body.meta).toEqual({ page: 1, pageSize: 10, total: 3, totalPages: 1 });
     });
 
     it("bài trong danh sách đủ trường, không có content, chỉ đếm bình luận đang hiện", async () => {
-      const res = await http().get("/api/v1/posts").expect(200);
+      const res = await asMember().get("/api/v1/posts").expect(200);
       const post = res.body.data[0];
 
       expect(post).toMatchObject({
@@ -155,13 +152,13 @@ describe("Đọc bài (/api/v1/posts)", () => {
     });
 
     it("sort=top xếp theo lượt xem", async () => {
-      const res = await http().get("/api/v1/posts?sort=top").expect(200);
+      const res = await asMember().get("/api/v1/posts?sort=top").expect(200);
 
       expect(slugsOf(res.body)).toEqual(["cu-hon", "o-giua", "moi-nhat"]);
     });
 
     it("phân trang: trang 2 với 2 bài/trang", async () => {
-      const res = await http().get("/api/v1/posts?page=2&pageSize=2").expect(200);
+      const res = await asMember().get("/api/v1/posts?page=2&pageSize=2").expect(200);
 
       expect(slugsOf(res.body)).toEqual(["cu-hon"]);
       expect(res.body.meta).toEqual({ page: 2, pageSize: 2, total: 3, totalPages: 2 });
@@ -175,13 +172,13 @@ describe("Đọc bài (/api/v1/posts)", () => {
       ["category=", ["moi-nhat", "o-giua", "cu-hon"]],
       ["category=khong-co", []],
     ])("lọc %s", async (query, expected) => {
-      const res = await http().get(`/api/v1/posts?${query}`).expect(200);
+      const res = await asMember().get(`/api/v1/posts?${query}`).expect(200);
 
       expect(slugsOf(res.body)).toEqual(expected);
     });
 
     it("query sai thì 400 kèm lỗi từng trường", async () => {
-      const res = await http().get("/api/v1/posts?sort=random&pageSize=500").expect(400);
+      const res = await asMember().get("/api/v1/posts?sort=random&pageSize=500").expect(400);
 
       expect(res.body.error.code).toBe("VALIDATION_ERROR");
       expect(Object.keys(res.body.error.fields)).toEqual(
@@ -191,8 +188,8 @@ describe("Đọc bài (/api/v1/posts)", () => {
   });
 
   describe("GET /posts/:slug", () => {
-    it("khách xem được bài đã đăng, có content và trạng thái", async () => {
-      const res = await http().get("/api/v1/posts/moi-nhat").expect(200);
+    it("hàng xóm xem được bài đã đăng, có content và trạng thái", async () => {
+      const res = await asMember().get("/api/v1/posts/moi-nhat").expect(200);
 
       expect(res.body.data).toMatchObject({
         slug: "moi-nhat",
@@ -202,26 +199,26 @@ describe("Đọc bài (/api/v1/posts)", () => {
       });
     });
 
-    it("khách xem bản nháp thì 404, giống hệt bài không tồn tại", async () => {
-      const draft = await http().get("/api/v1/posts/ban-nhap").expect(404);
-      const missing = await http().get("/api/v1/posts/khong-ton-tai").expect(404);
+    it("bản nháp của người khác thì 404, giống hệt bài không tồn tại", async () => {
+      const draft = await asMember().get("/api/v1/posts/ban-nhap").expect(404);
+      const missing = await asMember().get("/api/v1/posts/khong-ton-tai").expect(404);
 
       expect(draft.body).toEqual(missing.body);
       expect(draft.body.error.code).toBe("NOT_FOUND");
     });
 
     it("slug sai định dạng thì 404, không phải 400", async () => {
-      await http()
+      await asMember()
         .get(`/api/v1/posts/${encodeURIComponent("bàn tròn")}`)
         .expect(404);
     });
 
     it("slug viết hoa thì 404: mỗi bài chỉ có một URL", async () => {
-      await http().get("/api/v1/posts/Moi-Nhat").expect(404);
+      await asMember().get("/api/v1/posts/Moi-Nhat").expect(404);
     });
 
     it("không trả email của tác giả", async () => {
-      const res = await http().get("/api/v1/posts/moi-nhat").expect(200);
+      const res = await asMember().get("/api/v1/posts/moi-nhat").expect(200);
 
       expect(res.body.data.author).toEqual({
         id: "lan",
@@ -232,7 +229,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
     });
 
     it("bài đã đăng: Vary theo cookie, không cấm cache", async () => {
-      const res = await http().get("/api/v1/posts/moi-nhat").expect(200);
+      const res = await asMember().get("/api/v1/posts/moi-nhat").expect(200);
 
       expect(res.headers.vary).toMatch(/Cookie/i);
       expect(res.headers["cache-control"] ?? "").not.toMatch(/no-store/);
@@ -249,7 +246,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
     });
 
     it("404 cũng có Vary: Cookie", async () => {
-      const res = await http().get("/api/v1/posts/ban-nhap").expect(404);
+      const res = await asMember().get("/api/v1/posts/ban-nhap").expect(404);
 
       expect(res.headers.vary).toMatch(/Cookie/i);
     });
@@ -272,21 +269,14 @@ describe("Đọc bài (/api/v1/posts)", () => {
       expect(res.body.data.status).toBe("PENDING");
     });
 
-    it("tác giả bị cấm xem bản nháp của mình thì 404, như khách", async () => {
+    it("tác giả bị cấm xem bản nháp của mình thì 403", async () => {
       const { cookie, id } = await signUp("bicam@test.local");
       await prisma.post.update({ where: { id: ids.nhap }, data: { authorId: id } });
       await prisma.user.update({ where: { id }, data: { banned: true, banReason: "spam" } });
 
-      const res = await http().get("/api/v1/posts/ban-nhap").set("Cookie", cookie).expect(404);
+      const res = await http().get("/api/v1/posts/ban-nhap").set("Cookie", cookie).expect(403);
 
-      expect(res.body.error.code).toBe("NOT_FOUND");
-    });
-
-    it("người bị cấm vẫn đọc được bài đã đăng", async () => {
-      const { cookie, id } = await signUp("bicam2@test.local");
-      await prisma.user.update({ where: { id }, data: { banned: true } });
-
-      await http().get("/api/v1/posts/moi-nhat").set("Cookie", cookie).expect(200);
+      expect(res.body.error.code).toBe("FORBIDDEN");
     });
 
     it("hàng xóm khác đăng nhập xem bài chờ duyệt thì 404", async () => {
@@ -306,7 +296,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
 
   describe("POST /posts/:id/view", () => {
     it("tăng lượt xem, trả 204, không đổi updatedAt", async () => {
-      await http().post(`/api/v1/posts/${ids.moi}/view`).expect(204);
+      await asMember().post(`/api/v1/posts/${ids.moi}/view`).expect(204);
 
       const post = await prisma.post.findUniqueOrThrow({ where: { id: ids.moi } });
       expect(post.viewCount).toBe(6);
@@ -314,18 +304,18 @@ describe("Đọc bài (/api/v1/posts)", () => {
     });
 
     it("bài chưa đăng thì 404 và không tăng lượt xem", async () => {
-      await http().post(`/api/v1/posts/${ids.nhap}/view`).expect(404);
+      await asMember().post(`/api/v1/posts/${ids.nhap}/view`).expect(404);
 
       const post = await prisma.post.findUniqueOrThrow({ where: { id: ids.nhap } });
       expect(post.viewCount).toBe(0);
     });
 
     it("id không tồn tại thì 404", async () => {
-      await http().post("/api/v1/posts/khong-co/view").expect(404);
+      await asMember().post("/api/v1/posts/khong-co/view").expect(404);
     });
 
     it("id sai dạng thì 404", async () => {
-      await http()
+      await asMember()
         .post(`/api/v1/posts/${"x".repeat(65)}/view`)
         .expect(404);
     });

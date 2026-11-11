@@ -25,7 +25,7 @@ Mỗi tầng chỉ gọi tầng ngay dưới. Module khác muốn dùng dữ li�
 
 - Công khai / người dùng: `/api/v1/<tài-nguyên>` trong `*.controller.ts`
 - Quản trị: `/api/v1/admin/<tài-nguyên>` trong `*.admin.controller.ts`, gắn `@Roles("admin")` ở cấp class
-- Mặc định mọi route **cần đăng nhập** (AuthGuard toàn cục); route công khai đánh dấu `@Public()`
+- Mặc định mọi route **cần đăng nhập** (AuthGuard toàn cục), kể cả route đọc: khách chỉ được đăng ký, đăng nhập (ADR 0007). `@Public()` chỉ dành cho `/health` và `/auth/providers`; thêm route công khai mới phải có ADR
 - Định dạng phản hồi và mã lỗi theo `docs/api.md`; interceptor và exception filter trong `common/` lo phần bọc, controller chỉ trả dữ liệu hoặc ném `AppException(code, message)`
 
 ## Kiểm tra dữ liệu
