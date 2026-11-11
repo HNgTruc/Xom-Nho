@@ -35,7 +35,8 @@ export function HeaderPanel({
   const unreadText = unread > 99 ? "99+" : numberFormat.format(unread);
 
   return (
-    <DropdownMenu>
+    // Không khóa cuộn trang khi mở (modal=false): khóa cuộn làm thanh cuộn biến mất, cả trang giật một cái
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         aria-label={unread > 0 ? `${label}, ${unreadText} chưa đọc` : label}
         className="glass-button relative inline-flex size-10 items-center justify-center rounded-full transition-colors duration-200 hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-[state=open]:bg-glass-button-hover [&_svg]:size-5"

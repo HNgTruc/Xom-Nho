@@ -96,7 +96,8 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
   }
 
   return (
-    <DropdownMenu onOpenChange={(open) => !open && setView("main")}>
+    // Không khóa cuộn trang khi mở (modal=false): khóa cuộn làm thanh cuộn biến mất, cả trang giật một cái
+    <DropdownMenu modal={false} onOpenChange={(open) => !open && setView("main")}>
       <DropdownMenuTrigger
         aria-label={`Tài khoản của ${user.name}`}
         className="glass-button flex h-10 items-center gap-2 rounded-full py-1 pr-1 pl-3 text-sm font-medium transition-colors duration-200 hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-[state=open]:bg-glass-button-hover"

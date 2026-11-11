@@ -8,10 +8,12 @@ import backdrop from "@/assets/backdrop/bien-may.jpg";
  * Ảnh được làm mờ sẵn một lần (`blur-glass-shell`, MASTER 2.4) thay cho làm mờ phía sau khung kính: lớp cố định
  * không đổi nên trình duyệt chỉ tính phép làm mờ một lần, cuộn trang không phải tính lại. Phóng to 4% để mép ảnh
  * bị làm mờ (mép mờ dần ra trong suốt) nằm ngoài màn hình.
+ * `right-scroll-bar-position`: khi hộp thoại khóa cuộn (thanh cuộn biến mất), thư viện khóa cuộn của Radix đặt
+ * `right` bằng bề rộng thanh cuộn cho lớp này, nên ảnh không giãn ra và nhảy (Windows, thanh cuộn 15px).
  */
 export function SiteBackdrop() {
   return (
-    <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden">
+    <div aria-hidden="true" className="right-scroll-bar-position fixed inset-0 -z-10 overflow-hidden">
       <Image
         src={backdrop}
         alt=""
