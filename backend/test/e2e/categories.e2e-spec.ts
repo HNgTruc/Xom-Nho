@@ -67,6 +67,7 @@ describe("GET /api/v1/categories", () => {
         slug: "doi-song",
         description: null,
         color: "amber",
+        icon: null,
         postCount: 0,
       },
       {
@@ -75,6 +76,7 @@ describe("GET /api/v1/categories", () => {
         slug: "hoi-dap",
         description: null,
         color: "amber",
+        icon: null,
         postCount: 2,
       },
     ]);
