@@ -1,6 +1,7 @@
 export * from "./constants/api.js";
 export * from "./constants/auth-messages.js";
 export * from "./constants/category-colors.js";
+export * from "./constants/category-icons.js";
 export * from "./constants/error-codes.js";
 export * from "./constants/limits.js";
 export * from "./constants/media.js";

@@ -135,6 +135,9 @@ model Category {
   description String?  @db.VarChar(300)
   // Khóa màu badge: amber | blue | green | purple | rose (api/src/constants/category-colors.ts)
   color       String   @default("amber") @db.VarChar(20)
+  // Khóa biểu tượng: tea | chip | notebook | moon | question (api/src/constants/category-icons.ts).
+  // null: chưa có biểu tượng, giao diện hiện chấm màu.
+  icon        String?  @db.VarChar(20)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

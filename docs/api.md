@@ -139,9 +139,10 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 | PUT    | `/me/avatar`       | 🔒  | Đổi ảnh đại diện, multipart trường `file`: ảnh JPG/PNG/WebP đến 5 MB (video, file khác: 400). Lưu ở `media/avatars`, xóa ảnh cũ. Trả `Me`. Đếm chung giới hạn 30 file / 10 phút với `POST /files` |
 | GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)                                                                                              |
 
-`Category`: `id, name, slug, description, color, postCount`. `postCount` chỉ đếm bài đã đăng.
+`Category`: `id, name, slug, description, color, icon, postCount`. `postCount` chỉ đếm bài đã đăng.
 `Tag`: `id, name, slug`.
 `color` (trong `Category` và `category` của bài) là khóa màu badge: `amber | blue | green | purple | rose` (`CATEGORY_COLORS` trong `api`, MASTER mục 2.2). Sau này có thể thêm màu, nên client gặp giá trị lạ thì dùng `toCategoryColor` để về màu mặc định, không báo lỗi.
+`icon` (chỉ trong `Category`, thêm 2026-11-12) là khóa biểu tượng danh mục: `tea | chip | notebook | moon | question` hoặc `null` (chưa có, frontend hiện chấm màu). `CATEGORY_ICONS` trong `api`, MASTER mục 6. Gặp khóa lạ thì dùng `toCategoryIcon` (trả `null`), không báo lỗi.
 `UserSummary` (tác giả bài): `id, name, username, image, avatarId`. `image` là link ảnh bên ngoài (Google, GitHub), `avatarId` là ảnh tự tải lên (thêm 2026-11-12); frontend hiện ảnh bằng `avatarUrl(baseUrl, user)`: `avatarId` trước, rồi `image`, không có thì chữ cái đầu.
 `PublicProfile`: `id, name, username, image, avatarId, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
 
@@ -202,15 +203,15 @@ Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với 
 
 ### Danh mục, tag
 
-| Method | Đường dẫn                 | Mô tả                                  |
-| ------ | ------------------------- | -------------------------------------- |
-| POST   | `/admin/categories`       | Thêm                                   |
-| PATCH  | `/admin/categories/:id`   | Sửa                                    |
-| PUT    | `/admin/categories/order` | Sắp xếp lại. Body: `{ ids: string[] }` |
-| DELETE | `/admin/categories/:id`   | Xóa (chỉ khi không còn bài)            |
-| GET    | `/admin/tags?q=&page=`    | Danh sách kèm số bài                   |
-| POST   | `/admin/tags/:id/merge`   | Gộp vào tag khác. Body: `{ targetId }` |
-| DELETE | `/admin/tags/:id`         | Xóa                                    |
+| Method | Đường dẫn                 | Mô tả                                                                                                |
+| ------ | ------------------------- | ---------------------------------------------------------------------------------------------------- |
+| POST   | `/admin/categories`       | Thêm. Body có `color` và `icon` (khóa trong `CATEGORY_COLORS`, `CATEGORY_ICONS`; `icon` được `null`) |
+| PATCH  | `/admin/categories/:id`   | Sửa (cùng các trường như khi thêm)                                                                   |
+| PUT    | `/admin/categories/order` | Sắp xếp lại. Body: `{ ids: string[] }`                                                               |
+| DELETE | `/admin/categories/:id`   | Xóa (chỉ khi không còn bài)                                                                          |
+| GET    | `/admin/tags?q=&page=`    | Danh sách kèm số bài                                                                                 |
+| POST   | `/admin/tags/:id/merge`   | Gộp vào tag khác. Body: `{ targetId }`                                                               |
+| DELETE | `/admin/tags/:id`         | Xóa                                                                                                  |
 
 ### Thành viên
 

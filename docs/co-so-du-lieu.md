@@ -69,6 +69,7 @@ erDiagram
     string slug UK
     string description
     string color "amber | blue | green | purple | rose"
+    string icon "tea | chip | notebook | moon | question, null = chấm màu"
     int sortOrder
   }
   Tag {
