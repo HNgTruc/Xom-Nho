@@ -65,7 +65,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] Web: tấm tạo bài ở trang chủ, hộp soạn tải ảnh/video, lưới ảnh trên thẻ bài, ảnh/video ở trang bài
 - [x] Backend: `comments` (bình luận, trả lời một cấp, sửa, xóa của mình, giới hạn 1 bình luận / 10 giây), cột `comment.editedAt`
 - [x] Backend: sửa/xóa bài (xóa cả file trên đĩa), chặn gắn ảnh đại diện vào bài
-- [ ] Web: sửa, xóa bài của mình (menu trên thẻ bài và trang bài, hộp soạn ở chế độ sửa)
+- [x] Web: sửa, xóa bài của mình (menu trên thẻ bài và trang bài, hộp soạn ở chế độ sửa)
 - [ ] Dọn file tải lên mà không gắn bài quá 1 ngày (bỏ qua ảnh đại diện: `purpose = AVATAR`)
 - [ ] Backend: `PostLike` (thích / bỏ thích), feed trả số thích và 2 bình luận công khai mới nhất
 - [x] Web: bình luận + trả lời ở trang bài (gửi, trả lời có "@tên", sửa, xóa có hỏi lại, "đã sửa", bình luận ẩn hiện mờ cho admin)

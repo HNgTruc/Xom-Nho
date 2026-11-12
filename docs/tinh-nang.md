@@ -127,7 +127,7 @@ Tiêu chí:
 - [x] Không dùng được ảnh của người khác hay ảnh đã gắn bài khác
 - [x] Thoát giữa chừng có hỏi lại, không mất bài
 - [x] Thẻ bài hiện lưới ảnh/video (tối đa 4 ô, ô cuối "+N"); trang bài hiện đủ ảnh và video có điều khiển, tua được
-- [ ] Sửa, xóa bài của mình (backend xong 2026-11-12: `PATCH`, `DELETE /posts/:id`, xóa cả file trên đĩa; chờ giao diện web)
+- [x] Sửa, xóa bài của mình (2026-11-12): backend `PATCH`, `DELETE /posts/:id`, xóa cả file trên đĩa; web có menu "…" trên thẻ bài và trang bài, hộp soạn ở chế độ sửa chỉ gửi trường đã đổi (`features/posts/lib/post-changes.test.ts`), xóa có hỏi lại
 - [ ] App: màn tạo bài, chọn ảnh/video từ máy
 - [ ] Dọn file đã tải lên mà không gắn bài
 

@@ -232,6 +232,7 @@ Biểu trưng **xn chữ ký** (chọn 2026-11-12): "xn" viết một mạch, ch
 
 - Tấm `glass` đầu feed (thay đầu trang "Bài viết trong xóm", `h1` chỉ còn cho trình đọc màn hình): ảnh đại diện 40px, viên viền `input` 60% cao 44px ghi "Chào {tên}, hôm nay có chuyện gì?" (`muted-foreground` trên `glass`), dưới đường kẻ là nút ghost **Ảnh/Video** và chỗ báo "Bài của bạn đã lên xóm." (`role=status`).
 - Hộp soạn là `Dialog` của `ui`: tấm `glass-bar` bo `radius-2xl`, rộng tối đa 576px, dưới 640px rộng gần hết màn hình; lớp phủ đen 40% không làm mờ. Thứ tự: tiêu đề hộp + tên người đăng, ô tiêu đề (không bắt buộc), ô nội dung chữ 18px, lưới xem trước 3 cột (4 cột từ 640px) ô vuông bo `radius-md`, nút gỡ tròn 32px nền đen 60%; ô đang tải phủ đen 45% có vòng quay; ô lỗi viền `destructive` và dải lỗi chữ trắng trên `destructive`. Rồi nút viền Ảnh/Video + dòng giới hạn file, chọn danh mục (select gốc, cao 44px trên điện thoại), nút chính **Đăng bài** (rộng hết trên điện thoại).
+- Chế độ sửa (cùng hộp): tiêu đề hộp "Sửa bài viết", điền sẵn bài, ảnh/video đã có hiện như ô đã tải xong (gỡ được), nút chính **Lưu thay đổi**. Mở từ thẻ trong feed thì hộp hiện vòng quay "Đang mở bài" (cao 192px) trong lúc tải bài. Lưu khi chưa đổi gì: báo "Bạn chưa thay đổi gì" ở đầu hộp. Đóng khi đang dở thì hỏi "Bỏ các thay đổi chưa lưu?".
 
 ### Thẻ bài trong feed
 
@@ -242,10 +243,12 @@ Biểu trưng **xn chữ ký** (chọn 2026-11-12): "xn" viết một mạch, ch
 - Tấm `glass`, bo `radius-xl`. Cả thẻ bấm được (một liên kết bao ngoài), vùng bấm đủ lớn; hover theo mục 5.
 - Số bình luận trong viên `accent` (xanh nhạt, chữ đen), như viên màu nhấn của mẫu.
 - Bài chưa đăng (chỉ tác giả thấy): badge trạng thái ở góc phải.
+- Bài của chính mình: nút ghost tròn "…" (Lucide `Ellipsis` 20px, 40px, dưới 640px 44px, nhãn "Tùy chọn bài viết") ở góc phải hàng badge danh mục, lề âm để hàng không cao thêm; nằm trên lớp liên kết của thẻ. Mở menu thả xuống `modal={false}` canh phải: **Sửa bài** (`Pencil`), **Xóa bài** (`Trash2`, màu `destructive`). Lưu xong thì chữ "Đã lưu thay đổi." (`text-sm`, 500, `role=status`) hiện cạnh nút 5 giây. Đóng hộp thì focus về nút "…".
 
 ### Trang chi tiết bài (thread view)
 
 - Cả bài trên một tấm `glass-strong`: tiêu đề, metadata, nội dung Markdown font Lora, danh sách tag, rồi khối bình luận.
+- Tác giả có nút "…" như trên thẻ bài, cạnh badge danh mục. Xóa bài hỏi lại bằng hộp thoại "Xóa bài viết?" (nói rõ mất cả bình luận, ảnh, video; nút `destructive` "Xóa bài", nút viền "Giữ lại"; lỗi hiện trong hộp, hộp không tự đóng). Xóa xong ở trang bài thì về trang chủ; ở feed thì thẻ biến mất.
 - Bình luận: avatar 32, tên, thời gian ("· đã sửa" nếu có), nội dung `text-base` chữ thường giữ xuống dòng. Trả lời thụt vào 1 cấp (40px trên web, 24px trên mobile; web dưới 640px thụt 28px cho đủ chỗ) với đường dọc `border` 2px bên trái; không lồng sâu hơn.
 - Dưới mỗi bình luận: nút ghost "Trả lời" (và "Sửa", "Xóa" cho người viết), cao 40px; dưới 640px bỏ biểu tượng, chỉ giữ chữ để ba nút nằm một hàng. Xóa hỏi lại bằng hộp thoại (nút `destructive` "Xóa bình luận", nút viền "Giữ lại"). Ô viết bình luận có nhãn hiện rõ ("Bình luận của bạn", "Trả lời {tên}"); trả lời một trả lời thì ô nằm cuối nhánh, điền sẵn "@tên ".
 - Bình luận bị ẩn: admin thấy mờ (opacity 60%) kèm nhãn "Đã ẩn"; người thường không thấy.
