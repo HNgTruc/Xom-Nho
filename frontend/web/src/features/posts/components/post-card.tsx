@@ -1,10 +1,11 @@
-import { formatDate, formatRelativeTime, type PostListItem } from "@xom-nho/api";
+import { type Category, formatDate, formatRelativeTime, type PostListItem } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 import { CategoryBadge } from "./category-badge";
+import { PostActions } from "./post-actions";
 import { PostMediaGrid } from "./post-media";
 
 /**
@@ -15,13 +16,39 @@ import { PostMediaGrid } from "./post-media";
  * Tấm `glass` (MASTER 2.4). Hover: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (MASTER 5). Bóng đổi ngay,
  * không chuyển mượt: bóng lớn chuyển mượt phải vẽ lại mỗi khung hình.
  * Số bình luận nằm trong viên `accent` (xanh nhạt), điểm nhấn như viên màu trong mẫu thiết kế.
+ * Bài của chính người xem (`viewerId`) có menu "…" (Sửa bài, Xóa bài) ở góc phải, nằm trên lớp liên kết.
  */
 const cardLinkClass = "after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none";
 
-export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
+export function PostCard({
+  post,
+  now,
+  viewerId,
+  categories = [],
+}: {
+  post: PostListItem;
+  now: Date;
+  /** Người đang xem: trùng tác giả thì hiện menu sửa, xóa */
+  viewerId?: string;
+  /** Danh mục cho hộp sửa bài */
+  categories?: Category[];
+}) {
+  const own = viewerId !== undefined && viewerId === post.author.id;
+
   return (
     <article className="glass relative flex flex-col gap-3 rounded-xl p-4 transition-[translate,background-color,border-color] duration-200 ease-standard hover:-translate-y-0.5 hover:border-glass-border-hover hover:bg-glass-strong hover:shadow-glass-hover has-[[data-card-link]:focus-visible]:ring-2 has-[[data-card-link]:focus-visible]:ring-ring has-[[data-card-link]:focus-visible]:ring-offset-2 has-[[data-card-link]:focus-visible]:ring-offset-background sm:p-5">
-      <CategoryBadge category={post.category} className="relative z-10" />
+      <div className="flex items-center justify-between gap-2">
+        <CategoryBadge category={post.category} className="relative z-10" />
+        {own && (
+          // Nút 40px nằm gọn trong hàng badge 24px, không đẩy thẻ cao thêm
+          <PostActions
+            post={{ id: post.id, slug: post.slug }}
+            author={{ name: post.author.name, image: userAvatarSrc(post.author) }}
+            categories={categories}
+            className="relative z-10 -my-2 -mr-2"
+          />
+        )}
+      </div>
 
       {post.title ? (
         <>

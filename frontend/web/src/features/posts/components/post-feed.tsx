@@ -3,9 +3,11 @@ import type { CSSProperties } from "react";
 import { Button } from "@xom-nho/ui/components/button";
 import Link from "next/link";
 import { EmptyState } from "@/components/common/empty-state";
+import { getCurrentUser } from "@/features/auth";
 import { Pagination } from "@/components/common/pagination";
 import { requestTime } from "@/lib/request-time";
 import { parseSearchParams, type RawSearchParams } from "@/lib/search-params";
+import { getCategories } from "../api/get-category";
 import { getPosts } from "../api/get-posts";
 import { feedHref } from "../lib/feed-href";
 import { PostCard } from "./post-card";
@@ -32,8 +34,9 @@ export async function PostFeed({
 }) {
   const query = parseSearchParams(listPostsQuerySchema, await searchParams);
   const { sort } = query;
-  // Một mốc thời gian cho cả trang để "2 giờ trước" của các thẻ tính cùng lúc
-  const [{ data: posts, meta }, now] = await Promise.all([
+  // Một mốc thời gian cho cả trang để "2 giờ trước" của các thẻ tính cùng lúc. Người xem và danh mục để hiện
+  // menu sửa, xóa trên bài của mình (cả hai đã `cache`, header gọi rồi nên không tốn thêm lần gọi nào)
+  const [{ data: posts, meta }, now, viewer, categories] = await Promise.all([
     getPosts({
       ...query,
       category: filter.category,
@@ -41,6 +44,8 @@ export async function PostFeed({
       author: filter.author,
     }),
     requestTime(),
+    getCurrentUser(),
+    getCategories().catch(() => []),
   ]);
 
   return (
@@ -69,7 +74,7 @@ export async function PostFeed({
               className="animate-rise-in"
               style={{ "--stagger": index + 2 } as CSSProperties}
             >
-              <PostCard post={post} now={now} />
+              <PostCard post={post} now={now} viewerId={viewer?.id} categories={categories} />
             </li>
           ))}
         </ol>

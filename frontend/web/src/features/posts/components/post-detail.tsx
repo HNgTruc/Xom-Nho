@@ -7,11 +7,13 @@ import { Suspense } from "react";
 import { requireUser } from "@/features/auth";
 import { CommentSection, CommentSectionSkeleton } from "@/features/comments";
 import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
+import { getCategories } from "../api/get-category";
 import { getPost } from "../api/get-post";
 import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 import { CategoryBadge } from "./category-badge";
 import { PlainContent } from "./plain-content";
+import { PostActions } from "./post-actions";
 import { PostMediaGallery } from "./post-media";
 import { PostStatusNote } from "./post-status-note";
 import { TableOfContents } from "./table-of-contents";
@@ -24,13 +26,17 @@ const numberFormat = new Intl.NumberFormat("vi-VN");
  * nội dung Markdown font Lora, danh sách thẻ, rồi khối bình luận (tải sau, không giữ chân bài). Cả bài nằm trên
  * kính đặc (MASTER 2.4) để đọc lâu không mỏi.
  * Chỉ cho thành viên (ADR 0007). Đọc `params` và cookie nên phải nằm trong `<Suspense>`.
- * Không có hoặc không được xem thì 404.
+ * Không có hoặc không được xem thì 404. Tác giả có menu "…" (Sửa bài, Xóa bài) cạnh badge danh mục; xóa xong về
+ * trang chủ.
  */
 export async function PostDetailView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  await requireUser(`/bai-viet/${slug}`);
+  const viewer = await requireUser(`/bai-viet/${slug}`);
   const post = await getPost(slug);
   if (!post) notFound();
+  const own = post.author.id === viewer.id;
+  // Danh mục chỉ cần cho hộp sửa bài (đã `cache`: header gọi rồi)
+  const categories = own ? await getCategories().catch(() => []) : [];
 
   // Bài soạn kiểu mạng xã hội là chữ thường: không qua Markdown, không có mục lục
   const plain = post.contentFormat === CONTENT_FORMATS.PLAIN;
@@ -41,7 +47,19 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
     <article className="glass-strong flex animate-rise-in flex-col gap-8 rounded-xl p-5 sm:p-8">
       <header className="flex flex-col gap-4">
         <PostStatusNote post={post} />
-        <CategoryBadge category={post.category} />
+        <div className="flex items-center justify-between gap-2">
+          <CategoryBadge category={post.category} />
+          {own && (
+            <PostActions
+              post={{ id: post.id, slug: post.slug }}
+              author={{ name: post.author.name, image: userAvatarSrc(post.author) }}
+              categories={categories}
+              detail={post}
+              afterDelete="/"
+              className="-my-2 -mr-2"
+            />
+          )}
+        </div>
         {post.title ? (
           <h1 className="text-3xl font-bold md:text-4xl">{post.title}</h1>
         ) : (

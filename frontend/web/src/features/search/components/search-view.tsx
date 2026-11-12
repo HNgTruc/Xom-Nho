@@ -71,7 +71,7 @@ function CategoryFilter({
 export async function SearchView({ searchParams }: { searchParams: Promise<RawSearchParams> }) {
   const query = parseSearchParams(searchQuerySchema, await searchParams);
   const { q, category, page } = query;
-  await requireUser(searchHref({ q, category, page }));
+  const viewer = await requireUser(searchHref({ q, category, page }));
 
   if (!q) {
     return (
@@ -118,7 +118,7 @@ export async function SearchView({ searchParams }: { searchParams: Promise<RawSe
               className="animate-rise-in"
               style={{ "--stagger": index + 2 } as CSSProperties}
             >
-              <PostCard post={post} now={now} />
+              <PostCard post={post} now={now} viewerId={viewer.id} categories={categories} />
             </li>
           ))}
         </ol>

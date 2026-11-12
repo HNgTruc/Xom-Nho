@@ -87,6 +87,19 @@ export const COMPOSER_MESSAGES = {
 /** Sửa, xóa bài của mình (`PATCH`, `DELETE /posts/:id`), dùng chung backend, web, mobile. */
 export const POST_MESSAGES = {
   NOT_OWNER: "Bạn chỉ sửa, xóa được bài của mình.",
+  ACTIONS: "Tùy chọn bài viết",
+  EDIT: "Sửa bài",
+  DELETE: "Xóa bài",
+  EDIT_TITLE: "Sửa bài viết",
+  SAVE: "Lưu thay đổi",
+  SAVED: "Đã lưu thay đổi.",
+  DISCARD_EDIT_CONFIRM: "Bỏ các thay đổi chưa lưu?",
+  LOADING: "Đang mở bài",
+  LOAD_FAILED: "Chưa mở được bài để sửa. Bạn thử lại sau nhé.",
+  DELETE_TITLE: "Xóa bài viết?",
+  DELETE_DESCRIPTION: "Bài cùng bình luận, ảnh và video sẽ bị xóa hẳn, không lấy lại được.",
+  DELETE_CONFIRM: "Xóa bài",
+  DELETE_CANCEL: "Giữ lại",
 } as const;
 
 /** Tải ảnh, video lên (`POST /files`, ADR 0005): backend báo lỗi, frontend kiểm tra trước bằng cùng câu. */
