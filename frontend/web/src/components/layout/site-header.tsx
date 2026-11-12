@@ -1,4 +1,5 @@
 import { Button } from "@xom-nho/ui/components/button";
+import { LogoMark } from "@xom-nho/ui/components/logo-mark";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -77,8 +78,9 @@ export function SiteHeader({ guest = false }: { guest?: boolean }) {
         />
         <Link
           href="/"
-          className="inline-flex h-10 items-center rounded-full border border-input/50 px-4 text-base font-bold tracking-tight text-foreground transition-colors duration-200 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="inline-flex h-10 items-center gap-2 rounded-full border border-input/50 pr-4 pl-2.5 text-base font-bold tracking-tight text-foreground transition-colors duration-200 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
+          <LogoMark className="size-7" />
           Xóm Nhỏ
         </Link>
 

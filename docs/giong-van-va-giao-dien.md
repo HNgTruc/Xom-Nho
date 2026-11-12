@@ -60,4 +60,4 @@ Tóm tắt nhanh:
 
 ### Logo
 
-Mái nhà nhỏ với bong bóng trò chuyện, hoặc vài mái nhà sát nhau. Một màu (`primary`), dùng tốt ở cỡ 32px, có bản cho nền tối.
+Chữ ký **xn**: "xn" viết một mạch, chữ x là hai nét cong quay lưng chạm nhau (hai nhà sát vách, chạm mà không cắt), nét phải chạy tiếp thành chữ n. Không dùng hình ngôi nhà, không dùng dấu × thẳng (nghĩa "đóng, xoá"). Một màu, chỉ một logo dùng ở mọi chỗ, kể cả favicon. Quy cách: MASTER mục 7 "Logo".
