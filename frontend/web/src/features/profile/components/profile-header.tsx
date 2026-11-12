@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avat
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import type { ReactNode } from "react";
 import { initials } from "@/lib/initials";
+import { userAvatarSrc } from "@/lib/media-url";
 
 const numberFormat = new Intl.NumberFormat("vi-VN");
 
@@ -29,7 +30,7 @@ export function ProfileHeader({
       <div className="flex flex-col gap-4 px-5 pb-5 sm:px-6 sm:pb-6">
         <div className="-mt-12 flex flex-wrap items-end justify-between gap-3 sm:-mt-14">
           <Avatar className="size-24 border-4 border-card text-2xl font-semibold shadow-glass sm:size-28">
-            {profile.image && <AvatarImage src={profile.image} alt="" />}
+            <AvatarImage src={userAvatarSrc(profile) ?? undefined} alt="" />
             <AvatarFallback className="text-3xl">{initials(profile.name)}</AvatarFallback>
           </Avatar>
           {actions}

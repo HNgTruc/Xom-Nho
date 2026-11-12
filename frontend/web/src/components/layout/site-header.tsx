@@ -7,6 +7,7 @@ import { MessagesMenu } from "@/features/messages";
 import { NotificationsMenu } from "@/features/notifications";
 import { CategoryNav, CategoryNavSkeleton } from "@/features/posts";
 import { HeaderSearch } from "@/features/search";
+import { userAvatarSrc } from "@/lib/media-url";
 
 /** Nút cho khách: chỉ đăng nhập, đăng ký (ADR 0007). Nằm cột cuối của lưới header. */
 function GuestActions() {
@@ -42,7 +43,7 @@ async function MemberNav() {
         <HeaderSearch />
         <MessagesMenu />
         <NotificationsMenu />
-        <UserMenu user={{ name: user.name, username: user.username, image: user.image }} />
+        <UserMenu user={{ name: user.name, username: user.username, image: userAvatarSrc(user) }} />
       </div>
     </>
   );

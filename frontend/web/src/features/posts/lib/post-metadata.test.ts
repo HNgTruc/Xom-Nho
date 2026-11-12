@@ -10,7 +10,7 @@ const post: PostDetail = {
   publishedAt: "2026-11-01T08:00:00.000Z",
   viewCount: 3,
   commentCount: 0,
-  author: { id: "u1", name: "Lan Anh", username: "lananh", image: null },
+  author: { id: "u1", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
   category: { name: "Đời sống", slug: "doi-song", color: "amber" },
   tags: [{ name: "Ăn vặt", slug: "an-vat" }],
   media: [],

@@ -7,6 +7,7 @@ const profile: PublicProfile = {
   name: "Lan Anh",
   username: "lananh",
   image: null,
+  avatarId: null,
   bio: "Thích nấu ăn, mê Hà Nội mùa đông.",
   role: "author",
   createdAt: "2026-10-01T00:00:00.000Z",

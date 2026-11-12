@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avat
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { initials } from "@/lib/initials";
+import { userAvatarSrc } from "@/lib/media-url";
 import { CategoryBadge } from "./category-badge";
 import { PostMediaGrid } from "./post-media";
 
@@ -61,7 +62,7 @@ export function PostCard({ post, now }: { post: PostListItem; now: Date }) {
 
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
         <Avatar size="sm">
-          {post.author.image && <AvatarImage src={post.author.image} alt="" />}
+          <AvatarImage src={userAvatarSrc(post.author) ?? undefined} alt="" />
           <AvatarFallback>{initials(post.author.name)}</AvatarFallback>
         </Avatar>
         {post.author.username ? (

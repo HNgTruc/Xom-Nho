@@ -7,6 +7,7 @@ import { requireUser } from "@/features/auth";
 import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
 import { getPost } from "../api/get-post";
 import { initials } from "@/lib/initials";
+import { userAvatarSrc } from "@/lib/media-url";
 import { CategoryBadge } from "./category-badge";
 import { PlainContent } from "./plain-content";
 import { PostMediaGallery } from "./post-media";
@@ -47,7 +48,7 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
           <Avatar>
-            {post.author.image && <AvatarImage src={post.author.image} alt="" />}
+            <AvatarImage src={userAvatarSrc(post.author) ?? undefined} alt="" />
             <AvatarFallback>{initials(post.author.name)}</AvatarFallback>
           </Avatar>
           <span className="text-base font-medium text-foreground">{post.author.name}</span>

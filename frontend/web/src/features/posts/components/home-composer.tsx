@@ -1,5 +1,6 @@
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import { requireUser } from "@/features/auth";
+import { userAvatarSrc } from "@/lib/media-url";
 import { getCategories } from "../api/get-category";
 import { PostComposer } from "./post-composer";
 
@@ -9,7 +10,9 @@ import { PostComposer } from "./post-composer";
  */
 export async function HomeComposer() {
   const [user, categories] = await Promise.all([requireUser("/"), getCategories().catch(() => [])]);
-  return <PostComposer user={{ name: user.name, image: user.image }} categories={categories} />;
+  return (
+    <PostComposer user={{ name: user.name, image: userAvatarSrc(user) }} categories={categories} />
+  );
 }
 
 export function HomeComposerSkeleton() {
