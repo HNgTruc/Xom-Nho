@@ -144,3 +144,35 @@ describe("api.tags, api.users", () => {
     expect(users.calledUrl()).toBe("http://x/api/v1/users/lananh");
   });
 });
+
+describe("api.comments", () => {
+  it("list gọi đúng đường dẫn, mã hóa id bài", async () => {
+    const { api, calledUrl } = setup();
+
+    await api.comments.list("bai 1");
+
+    expect(calledUrl()).toBe("http://x/api/v1/posts/bai%201/comments");
+  });
+
+  it("create gửi POST kèm content, parentId", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+
+    await api.comments.create("p1", { content: "Hay quá", parentId: "c1" });
+
+    expect(calledUrl()).toBe("http://x/api/v1/posts/p1/comments");
+    expect(calledInit().method).toBe("POST");
+    expect(JSON.parse(calledInit().body as string)).toEqual({ content: "Hay quá", parentId: "c1" });
+  });
+
+  it("update gửi PATCH, remove gửi DELETE tới /comments/:id", async () => {
+    const patch = setup({ data: {} });
+    await patch.api.comments.update("c1", { content: "sửa" });
+    expect(patch.calledUrl()).toBe("http://x/api/v1/comments/c1");
+    expect(patch.calledInit().method).toBe("PATCH");
+
+    const del = setup(null, 204);
+    await del.api.comments.remove("c1");
+    expect(del.calledUrl()).toBe("http://x/api/v1/comments/c1");
+    expect(del.calledInit().method).toBe("DELETE");
+  });
+});

@@ -1,4 +1,5 @@
 import { categoriesApi } from "./categories.js";
+import { commentsApi } from "./comments.js";
 import { type ClientOptions, createRequest } from "./client.js";
 import { filesApi } from "./files.js";
 import { healthApi } from "./health.js";
@@ -21,6 +22,7 @@ export function createClient(options: ClientOptions) {
     health: healthApi(request),
     categories: categoriesApi(request),
     posts: postsApi(request),
+    comments: commentsApi(request),
     files: filesApi(request),
     tags: tagsApi(request),
     users: usersApi(request),

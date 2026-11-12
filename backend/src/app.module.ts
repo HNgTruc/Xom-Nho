@@ -9,6 +9,7 @@ import { RateLimitModule } from "./infrastructure/rate-limit/rate-limit.module.j
 import { StorageModule } from "./infrastructure/storage/storage.module.js";
 import { AuthModule } from "./modules/auth/auth.module.js";
 import { CategoriesModule } from "./modules/categories/categories.module.js";
+import { CommentsModule } from "./modules/comments/comments.module.js";
 import { FilesModule } from "./modules/files/files.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 import { PostsModule } from "./modules/posts/posts.module.js";
@@ -27,6 +28,7 @@ import { UsersModule } from "./modules/users/users.module.js";
     AuthModule,
     CategoriesModule,
     PostsModule,
+    CommentsModule,
     FilesModule,
     TagsModule,
     UsersModule,

@@ -29,6 +29,9 @@ export const LIMITS = {
   /** Video tải lên: 25 MB (ADR 0005) */
   VIDEO_MAX_BYTES: 25 * 1024 * 1024,
 
+  /** Độ dài một bình luận (chữ thường) */
+  COMMENT_MAX: 2000,
+
   CATEGORY_NAME_MAX: 50,
   TAG_NAME_MAX: 30,
   /** Số tag gợi ý tối đa khi gõ (`GET /tags?q=`) */

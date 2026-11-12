@@ -8,6 +8,7 @@ import {
   POST_STATUSES,
   type PostDetail,
   type PostListItem,
+  type PostStatus,
   pathIdSchema,
   pathSlugSchema,
   withSlugSuffix,
@@ -125,6 +126,20 @@ export class PostsService {
       throw new AppException("NOT_FOUND", POST_NOT_FOUND);
     }
     return toPostDetail(row);
+  }
+
+  /**
+   * Trạng thái của bài mà `user` xem được, cho module khác (bình luận) kiểm tra trước khi đọc, ghi.
+   * Không có, id sai dạng, hoặc không được xem: NOT_FOUND như `getBySlug`.
+   */
+  async getVisibleStatus(user: SessionUser, id: string): Promise<PostStatus> {
+    if (!pathIdSchema.safeParse(id).success) throw new AppException("NOT_FOUND", POST_NOT_FOUND);
+
+    const target = await this.postsRepository.findAccessTarget(id);
+    if (!target || !PostsPolicy.canView(user, target)) {
+      throw new AppException("NOT_FOUND", POST_NOT_FOUND);
+    }
+    return target.status;
   }
 
   /** Tăng lượt xem. Chỉ tính cho bài đã đăng; bài khác coi như không có. */

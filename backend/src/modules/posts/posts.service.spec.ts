@@ -48,6 +48,7 @@ function setup() {
     findByIds: vi.fn().mockResolvedValue([]),
     findBySlug: vi.fn().mockResolvedValue(null),
     incrementViewCount: vi.fn().mockResolvedValue(1),
+    findAccessTarget: vi.fn().mockResolvedValue(null),
     findSlugsStartingWith: vi.fn().mockResolvedValue([]),
     createWithMedia: vi.fn().mockResolvedValue({ ok: true, slug: "ban-tron-cuoi-tuan" }),
   };
@@ -359,5 +360,36 @@ describe("PostsService.create", () => {
       code: "RATE_LIMITED",
     });
     expect(repository.createWithMedia).toHaveBeenCalledTimes(10);
+  });
+});
+
+describe("PostsService.getVisibleStatus", () => {
+  it("bài đã đăng: mọi thành viên nhận trạng thái", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "PUBLISHED", authorId: "tac-gia" });
+
+    await expect(service.getVisibleStatus(userOf("user"), "p1")).resolves.toBe("PUBLISHED");
+  });
+
+  it("bài đã ẩn: chủ bài và trưởng xóm xem được, người khác NOT_FOUND", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "ARCHIVED", authorId: "tac-gia" });
+
+    await expect(service.getVisibleStatus(userOf("author", "tac-gia"), "p1")).resolves.toBe(
+      "ARCHIVED",
+    );
+    await expect(service.getVisibleStatus(userOf("admin"), "p1")).resolves.toBe("ARCHIVED");
+    await expect(service.getVisibleStatus(userOf("user"), "p1")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+  });
+
+  it("id sai dạng thì NOT_FOUND, không truy vấn database", async () => {
+    const { service, repository } = setup();
+
+    await expect(service.getVisibleStatus(userOf("user"), "../x")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+    expect(repository.findAccessTarget).not.toHaveBeenCalled();
   });
 });

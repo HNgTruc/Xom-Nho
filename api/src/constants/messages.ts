@@ -100,6 +100,20 @@ export const FILE_MESSAGES = {
   AVATAR_NOT_IMAGE: "Ảnh đại diện phải là ảnh JPG, PNG hoặc WebP.",
 } as const;
 
+/** Bình luận (docs/tinh-nang.md mục 3), dùng chung backend, web, mobile. */
+export const COMMENT_MESSAGES = {
+  EMPTY: "Viết vài chữ rồi hãy gửi nhé.",
+  TOO_LONG: "Bình luận dài quá, bạn rút gọn lại chút nhé.",
+  RATE_LIMITED: "Bạn bình luận nhanh quá, nghỉ tay một chút rồi gửi tiếp nhé.",
+  NOT_FOUND: "Không tìm thấy bình luận này. Có thể bình luận đã bị xóa.",
+  PARENT_GONE: "Bình luận bạn đang trả lời không còn nữa.",
+  NOT_OWNER: "Bạn chỉ sửa, xóa được bình luận của mình.",
+  /** Bài đã bị trưởng xóm ẩn (chủ bài vẫn mở được trang bài) */
+  POST_CLOSED: "Bài này đang ẩn nên không nhận bình luận nữa.",
+  /** Trang bài chưa có bình luận (docs/giong-van-va-giao-dien.md) */
+  NONE_YET: "Chưa ai lên tiếng. Bạn nói gì đi!",
+} as const;
+
 /** Lời mời viết bài trên trang chủ, theo tên người đang xem. */
 export function composerPrompt(name: string): string {
   return `Chào ${name}, hôm nay có chuyện gì?`;

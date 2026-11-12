@@ -243,6 +243,8 @@ model Comment {
   parentId  String?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+  // Lần cuối người viết sửa nội dung; null = chưa sửa. Không dùng updatedAt vì admin ẩn/hiện cũng đổi cột đó
+  editedAt  DateTime?
 
   post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   author  User      @relation(fields: [authorId], references: [id], onDelete: Restrict)

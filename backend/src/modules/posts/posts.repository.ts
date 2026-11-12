@@ -164,6 +164,11 @@ export class PostsRepository {
    * Tăng lượt xem nếu bài đang ở trạng thái `status`. Trả số bài được cập nhật (0 hoặc 1).
    * Dùng SQL thô: `update` của Prisma tự đổi `updatedAt` (@updatedAt), mà lượt xem không phải là sửa bài.
    */
+  /** Phần policy cần để quyết định ai xem được bài (module khác gọi qua PostsService). */
+  findAccessTarget(id: string): Promise<{ status: PostStatus; authorId: string } | null> {
+    return this.prisma.post.findUnique({ where: { id }, select: { status: true, authorId: true } });
+  }
+
   incrementViewCount(id: string, status: PostStatus): Promise<number> {
     return this.prisma.$executeRaw`
       UPDATE post SET viewCount = viewCount + 1 WHERE id = ${id} AND status = ${status}`;
