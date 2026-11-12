@@ -119,12 +119,18 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 
 ### Bình luận (`modules/comments`)
 
-| Method | Đường dẫn             |     | Mô tả                                            |
-| ------ | --------------------- | --- | ------------------------------------------------ |
-| GET    | `/posts/:id/comments` | 🔒  | Bình luận gốc đang hiện, mỗi cái kèm `replies[]` |
-| POST   | `/posts/:id/comments` | 🔒  | Body: `{ content, parentId? }`                   |
-| PATCH  | `/comments/:id`       | 🔒  | Sửa bình luận của mình                           |
-| DELETE | `/comments/:id`       | 🔒  | Xóa bình luận của mình                           |
+| Method | Đường dẫn             |     | Mô tả                                                                                                                                           |
+| ------ | --------------------- | --- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/posts/:id/comments` | 🔒  | `CommentThread[]`: bình luận gốc cũ trước, mỗi cái kèm `replies[]` (cũng cũ trước). Bài không xem được: 404. `Cache-Control: private, no-store` |
+| POST   | `/posts/:id/comments` | 🔒  | Body `createCommentSchema`: `{ content, parentId? }`. Trả 201 + `CommentItem`. Bài đã bị ẩn: 403 (chủ bài) hoặc 404 (người khác)                |
+| PATCH  | `/comments/:id`       | 🔒  | Body `updateCommentSchema`: `{ content }`. Sửa bình luận của mình, đặt `editedAt`. Của người khác: 403                                          |
+| DELETE | `/comments/:id`       | 🔒  | Xóa hẳn bình luận của mình, trả lời bên dưới bị xóa theo. 204. Của người khác: 403                                                              |
+
+`CommentItem`: `id, postId, parentId, content, author (UserSummary), status, createdAt, editedAt`. `CommentThread` thêm `replies: CommentItem[]`. `content` là chữ thường (tối đa `LIMITS.COMMENT_MAX` = 2000 ký tự, đã cắt khoảng trắng hai đầu): frontend hiện dạng text, giữ xuống dòng, không render Markdown hay HTML. `editedAt` khác `null` thì hiện "đã sửa"; trưởng xóm ẩn, hiện bình luận không đổi `editedAt`.
+
+- **Một cấp trả lời**: `parentId` là bình luận đang trả lời (gốc hay trả lời đều được); backend luôn gắn vào bình luận gốc của nhánh. Frontend tự điền `@tên ` vào đầu nội dung khi trả lời một trả lời. `parentId` không có, thuộc bài khác, hoặc (cùng bình luận gốc của nó) đã ẩn với người gửi: 400 với `fields.parentId`.
+- **Bình luận đã ẩn** (`status: HIDDEN`): người thường, kể cả người viết, không thấy, và không thấy cả các trả lời của nó; trưởng xóm thấy kèm `status` để hiện mờ. Người viết sửa, xóa bình luận đã ẩn: 404.
+- Người khác (kể cả trưởng xóm) sửa, xóa bình luận đang hiện: 403. Trưởng xóm ẩn, xóa bình luận của người khác bằng route admin.
 
 ### Danh mục, tag, người dùng
 
@@ -230,7 +236,7 @@ Phần đổi vai trò và cấm có thể dùng API của plugin admin trong Be
 - Đăng nhập/đăng ký: giới hạn sẵn của Better Auth.
 - Tạo bài: tối đa 10 bài / 10 phút mỗi người (`posts.service.ts`).
 - Tải file: tối đa 30 file / 10 phút mỗi người (`files.service.ts`).
-- Bình luận: tối đa 1 bình luận / 10 giây / người.
+- Bình luận: tối đa 1 bình luận / 10 giây / người (`comments.service.ts`). Bình luận bị từ chối vì dữ liệu sai không tính.
 - Lượt xem (`POST /posts/:id/view`): hiện chưa giới hạn, ai gọi lặp cũng tăng được. Khi làm `infrastructure/rate-limit` (giai đoạn 4), giới hạn theo IP + bài (ví dụ 1 lần / 30 phút).
 
 Bộ đếm lưu trong bộ nhớ (`infrastructure/rate-limit/rate-limiter.ts`, cửa sổ trượt theo khóa); khi chạy nhiều instance thì chuyển sang MySQL hoặc Redis.

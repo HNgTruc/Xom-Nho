@@ -168,9 +168,9 @@ Tiêu chí:
 
 Tiêu chí:
 
-- [ ] Trả lời một trả lời vẫn nằm trong cùng nhánh, có "@tên"
-- [ ] Bình luận bị ẩn không hiện với người thường, hiện mờ với admin
-- [ ] Gửi liên tục bị giới hạn tần suất
+- [ ] Trả lời một trả lời vẫn nằm trong cùng nhánh, có "@tên" (backend xong 2026-11-12: gắn vào bình luận gốc; "@tên" do web điền)
+- [ ] Bình luận bị ẩn không hiện với người thường, hiện mờ với admin (backend xong: admin nhận kèm `status`; chờ giao diện)
+- [x] Gửi liên tục bị giới hạn tần suất
 - [ ] Nội dung bình luận hiển thị dạng chữ thường (không render Markdown, không HTML)
 
 ## 5. Tin nhắn riêng 🌐📱

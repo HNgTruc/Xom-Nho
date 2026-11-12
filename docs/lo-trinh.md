@@ -54,7 +54,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] Backend: `posts` (danh sách, chi tiết), `categories`, `tags`, `users` (hồ sơ), `search`
 - [x] Test service + policy cho từng vai trò
 - [x] Web: trang chủ có phân trang, chi tiết bài (Markdown an toàn), danh mục, tag, hồ sơ, tìm kiếm (ô tìm ở header, trang `/tim-kiem`)
-- [ ] Web: metadata, Open Graph (không làm sitemap: khách không đọc được bài, ADR 0007)
+- [x] Web: metadata, Open Graph (không làm sitemap: khách không đọc được bài, ADR 0007)
 - [x] Chỉ thành viên đọc được: backend bỏ `@Public()` ở route đọc, web có `proxy.ts` và trang chào mừng cho khách (ADR 0007)
 - [x] Web: giao diện kính trên ảnh nền, header viên thuốc, chuyển động (MASTER 2.4, 5)
 - [x] Web: menu người dùng (Hồ sơ, Cài đặt, Hiển thị và trợ năng, Đăng xuất)
@@ -63,7 +63,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 - [x] Backend: tạo bài kèm ảnh/video, đăng thẳng (ADR 0008), giới hạn tần suất trong bộ nhớ (`infrastructure/rate-limit`)
 - [x] Web: tấm tạo bài ở trang chủ, hộp soạn tải ảnh/video, lưới ảnh trên thẻ bài, ảnh/video ở trang bài
-- [ ] Backend: sửa/xóa bài (xóa cả file trên đĩa), `comments`
+- [x] Backend: `comments` (bình luận, trả lời một cấp, sửa, xóa của mình, giới hạn 1 bình luận / 10 giây), cột `comment.editedAt`
+- [ ] Backend: sửa/xóa bài (xóa cả file trên đĩa)
 - [ ] Dọn file tải lên mà không gắn bài quá 1 ngày (bỏ qua ảnh đại diện: `purpose = AVATAR`)
 - [ ] Backend: `PostLike` (thích / bỏ thích), feed trả số thích và 2 bình luận công khai mới nhất
 - [ ] Web: trình soạn Markdown có xem trước, bài của tôi, bình luận + trả lời
