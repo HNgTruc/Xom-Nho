@@ -44,6 +44,8 @@ Khách không đọc được gì (ADR 0007): backend trả 401 cho mọi route 
 
 Từ ADR 0008 mọi thành viên đăng thẳng: bài soạn ở trang chủ vào thẳng `PUBLISHED`. Các trạng thái chờ duyệt bên dưới giữ cho bài cũ và trình soạn Markdown sau này (nếu bật lại duyệt bài).
 
+Bài viết, sửa và xóa (`posts.policy.ts`, `canModify`): qua route thường chỉ tác giả, ở mọi trạng thái (kể cả bài bị ẩn); bài đã đăng của người khác trả 403, bài ẩn của người khác trả 404. Trưởng xóm sửa, xóa bài bất kỳ bằng route admin (giai đoạn 5).
+
 Bình luận (`comments.policy.ts`): bình luận đã ẩn chỉ trưởng xóm thấy (người viết cũng không); sửa, xóa chỉ người viết và khi bình luận còn hiện; bài chứa bình luận phải xem được (bài đã ẩn chỉ chủ bài, trưởng xóm mở, và không nhận bình luận mới).
 
 Ảnh, video (`GET /files/:id`): ảnh đại diện và file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
