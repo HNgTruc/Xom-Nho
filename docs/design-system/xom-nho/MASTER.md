@@ -190,7 +190,43 @@ Thứ tự hiện ra trên trang danh sách: header (bậc 0) → đầu trang (
 - Biểu tượng đi kèm chữ: `aria-hidden="true"`. Nút chỉ có biểu tượng: bắt buộc có nhãn (`aria-label` / `accessibilityLabel`) tiếng Việt.
 - Biểu tượng mang ý nghĩa cần tương phản ≥ 3:1 với nền.
 
+### Biểu tượng danh mục và điều hướng
+
+Bộ vẽ riêng (2026-11-12) cho Trang chủ, Chủ đề và danh mục, trong `@xom-nho/ui/components/category-icon` (`CategoryIcon`, `HomeFeedIcon`, `TopicsIcon`). Cùng lưới 24, nét 2, đầu nét và góc tròn như Lucide để đứng cạnh nhau; mỗi danh mục là một đồ vật quen trong nhà, có một nét cong chữ S cùng họ với logo chữ ký.
+
+| Khóa       | Hình                       | Danh mục (seed) |
+| ---------- | -------------------------- | --------------- |
+| `tea`      | Chén trà bốc khói          | Đời sống        |
+| `chip`     | Con chip, mạch uốn chữ S   | Công nghệ       |
+| `notebook` | Quyển vở mở                | Học tập         |
+| `moon`     | Trăng khuyết và một vì sao | Góc kể chuyện   |
+| `question` | Bong bóng có dấu hỏi       | Hỏi đáp         |
+
+- Khóa đặt theo hình, không theo tên danh mục (như khóa màu); danh mục lưu khóa ở cột `icon` (`null`: hiện chấm màu).
+- Ô biểu tượng (`CategoryMark` của web): nền badge, biểu tượng màu chữ danh mục (cặp màu mục 2.2, đã đạt tương phản). Menu Chủ đề: ô 32px bo `radius-md`, biểu tượng 20px. Đầu trang danh mục: ô 56px bo `radius-lg`, biểu tượng 30px.
+- Viên Trang chủ, Chủ đề ở header: biểu tượng 18px màu chữ của viên, trước chữ.
+- Luôn là hình trang trí (`aria-hidden`): tên danh mục đi kèm bằng chữ.
+- Thêm biểu tượng: vẽ trong `category-icon.tsx` theo đúng lưới và nét, rồi thêm khóa vào `CATEGORY_ICONS` (`api`).
+
 ## 7. Thành phần chính
+
+### Logo
+
+Biểu trưng **xn chữ ký** (chọn 2026-11-12): "xn" viết một mạch, chữ x là hai nét cong quay lưng chạm nhau ở giữa, nét phải chạy tiếp thành chữ n. Component `LogoMark` (`@xom-nho/ui/components/logo-mark`), tô bằng `currentColor`.
+
+**Chỉ có một logo**, dùng ở mọi chỗ và mọi cỡ; không có bản thu gọn.
+
+| Chỗ                           | Cách dùng                                                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Viên logo ở header            | `LogoMark` 28px, cạnh chữ "Xóm Nhỏ"                                                                       |
+| Favicon                       | `frontend/web/src/app/icon.svg`: ô `#18181B` bo góc 7/32, logo trắng thu 92% vào giữa ô (đọc được ở 16px) |
+| Icon app, splash, ảnh chia sẻ | Logo trắng trên nền `#18181B` (hoặc đen trên xanh nhạt `#BAE6FD`)                                         |
+
+- Dựng trên lưới 32: x và n cao 16 ô (dòng 8 đến 24), vòm n bán kính 5, nét 3,75, đầu nét tròn.
+- Một màu: `foreground` của chế độ đang dùng (đen / trắng). Xanh nhạt chỉ làm nền icon app.
+- Khoảng trống quanh logo ít nhất một phần tư khung; trong viên logo ở header, viền viên thuốc đã là khoảng trống.
+- Không kéo giãn, không xoay (x nghiêng thành dấu ×), không thêm màu danh mục hay bóng, không đặt x trong khung vuông có viền (thành nút đóng).
+- Đặt cạnh chữ "Xóm Nhỏ" thì là hình trang trí (`aria-hidden`); đứng một mình thì truyền `label="Xóm Nhỏ"`.
 
 ### Tấm tạo bài và hộp soạn (trang chủ)
 
@@ -259,7 +295,7 @@ Mọi danh sách và trang dữ liệu đều có đủ: đang tải (skeleton c
 
 - Mobile-first. Điểm ngắt kiểm tra: 375, 768, 1024, 1440.
 - Ảnh nền cố định phủ màn hình; `SiteShell` là khung kính lớn bao header và nội dung, chừa viền ảnh quanh khung.
-- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền), điều hướng gồm hai viên **Trang chủ** và **Chủ đề** (mục đang xem là viên `glass-primary`; đang ở một danh mục thì "Chủ đề" là viên `glass-primary`; **chỉ khi đã đăng nhập**), bên phải là nút Đăng nhập / Đăng ký (khách: header chỉ có logo và hai nút này), hoặc (đã đăng nhập) **ô tìm kiếm**, nút tròn **Tin nhắn**, **Thông báo** rồi **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai.
+- Header dính trong khung: thanh `glass-bar` gồm logo (viên có viền: biểu trưng `xn` 28px và chữ "Xóm Nhỏ", mục 7 "Logo"), điều hướng gồm hai viên **Trang chủ** và **Chủ đề** (mục đang xem là viên `glass-primary`; đang ở một danh mục thì "Chủ đề" là viên `glass-primary`; **chỉ khi đã đăng nhập**), bên phải là nút Đăng nhập / Đăng ký (khách: header chỉ có logo và hai nút này), hoặc (đã đăng nhập) **ô tìm kiếm**, nút tròn **Tin nhắn**, **Thông báo** rồi **menu tài khoản** (viên `glass-button` có tên và ảnh đại diện; mở menu `glass-bar` gồm Hồ sơ, Cài đặt, Đăng xuất). Từ 1024px một hàng, bo `radius-full`; dưới 1024px điều hướng xuống hàng thứ hai.
 - **Chủ đề** (`NavigationMenu` của `@xom-nho/ui`): rê chuột vào thì sau 200ms thả xuống tấm `glass-bar` liệt kê danh mục (chấm màu danh mục + tên, mục đang xem in đậm); rời cả nút lẫn bảng thì đóng. Bấm (cảm ứng), Enter, Space cũng mở; mũi tên xuống vào danh sách, Esc đóng. Rê chuột đã mở rồi bấm thì giữ bảng mở. Kính của header là lớp nền riêng nằm sau thanh (không đặt `backdrop-filter` lên chính thanh), và `animate-rise-in` dùng `backwards`: phần tử cha có `backdrop-filter` hay còn giữ `opacity` của animation thì kính bên trong không làm mờ được trang.
 - Trang chào mừng của khách (`/`): cột 860px căn giữa theo chiều dọc; tấm `glass-strong` lớn (viên nhãn `accent`, tiêu đề `text-3xl` đến `text-5xl`, đoạn giới thiệu, nút chính **Tham gia xóm** và nút viền **Đăng nhập**, xếp dọc rộng hết trên điện thoại), dưới là ba tấm `glass` (biểu tượng Lucide trong vòng tròn `accent`, tiêu đề `text-lg`, một câu), ba cột từ 768px. Hiện ra lần lượt: tấm lớn bậc 0, ba tấm nhỏ bậc 1 đến 3.
 - Feed một cột ở giữa, rộng tối đa 860px, ở mọi bề rộng. Không có cột phải (bỏ ngày 2026-11-11 theo yêu cầu): danh mục nằm trong "Chủ đề" trên header.

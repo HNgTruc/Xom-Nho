@@ -8,6 +8,7 @@ const category: Category = {
   slug: "doi-song",
   description: "Chuyện thường ngày trong xóm.",
   color: "amber",
+  icon: "tea",
   postCount: 3,
 };
 

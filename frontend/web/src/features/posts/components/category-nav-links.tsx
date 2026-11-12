@@ -9,16 +9,18 @@ import {
   NavigationMenuTrigger,
   navigationMenuPillClass,
 } from "@xom-nho/ui/components/navigation-menu";
+import { HomeFeedIcon, TopicsIcon } from "@xom-nho/ui/components/category-icon";
 import { cn } from "@xom-nho/ui/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type PointerEvent, useRef, useState } from "react";
-import { categoryDotClass } from "../lib/category-color";
+import { CategoryMark } from "./category-mark";
 
 export interface CategoryNavItem {
   href: string;
   label: string;
   color: string;
+  icon: string | null;
 }
 
 const TOPICS_VALUE = "chu-de";
@@ -41,6 +43,7 @@ export function CategoryNavLinks({ categories }: { categories: CategoryNavItem[]
         <NavigationMenuItem>
           <NavigationMenuLink asChild active={homeActive}>
             <Link href="/" className={pillClass(homeActive)}>
+              <HomeFeedIcon className="size-4.5" />
               Trang chủ
             </Link>
           </NavigationMenuLink>
@@ -65,6 +68,7 @@ export function CategoryNavLinks({ categories }: { categories: CategoryNavItem[]
                 pointerTypeRef.current = "";
               }}
             >
+              <TopicsIcon className="size-4.5" />
               Chủ đề
             </NavigationMenuTrigger>
             <NavigationMenuContent>
@@ -77,17 +81,11 @@ export function CategoryNavLinks({ categories }: { categories: CategoryNavItem[]
                         <Link
                           href={category.href}
                           className={cn(
-                            "flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-base text-foreground transition-colors duration-200 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                            "flex min-h-11 items-center gap-3 rounded-md py-1.5 pr-3 pl-1.5 text-base text-foreground transition-colors duration-200 hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                             active && "font-semibold",
                           )}
                         >
-                          <span
-                            aria-hidden="true"
-                            className={cn(
-                              "size-2.5 shrink-0 rounded-full",
-                              categoryDotClass(category.color),
-                            )}
-                          />
+                          <CategoryMark color={category.color} icon={category.icon} />
                           {category.label}
                         </Link>
                       </NavigationMenuLink>

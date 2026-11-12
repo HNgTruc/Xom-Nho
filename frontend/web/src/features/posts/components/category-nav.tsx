@@ -12,6 +12,7 @@ export async function CategoryNav() {
         href: `/danh-muc/${category.slug}`,
         label: category.name,
         color: category.color,
+        icon: category.icon,
       }))}
     />
   );

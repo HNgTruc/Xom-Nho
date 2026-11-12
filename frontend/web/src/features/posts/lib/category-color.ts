@@ -18,6 +18,15 @@ const DOT_CLASS: Record<CategoryColor, string> = {
   rose: "bg-category-rose",
 };
 
+// Ô biểu tượng danh mục: nền badge, biểu tượng màu chữ danh mục (cặp màu đã tính tương phản, MASTER 2.2)
+const TILE_CLASS: Record<CategoryColor, string> = {
+  amber: "bg-category-amber-bg text-category-amber",
+  blue: "bg-category-blue-bg text-category-blue",
+  green: "bg-category-green-bg text-category-green",
+  purple: "bg-category-purple-bg text-category-purple",
+  rose: "bg-category-rose-bg text-category-rose",
+};
+
 /** Màu lạ (backend thêm màu mới mà web chưa biết) thì về màu mặc định, không vỡ giao diện. */
 export function categoryBadgeClass(color: string): string {
   return BADGE_CLASS[toCategoryColor(color)];
@@ -25,4 +34,8 @@ export function categoryBadgeClass(color: string): string {
 
 export function categoryDotClass(color: string): string {
   return DOT_CLASS[toCategoryColor(color)];
+}
+
+export function categoryTileClass(color: string): string {
+  return TILE_CLASS[toCategoryColor(color)];
 }

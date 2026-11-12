@@ -220,6 +220,7 @@ Tiêu chí:
 ### 4.4 Danh mục, tag
 
 - Thêm, sửa, sắp xếp danh mục. Gộp tag trùng nghĩa.
+- Khi thêm, sửa danh mục: chọn màu (5 màu) và biểu tượng (5 biểu tượng, hoặc không có thì hiện chấm màu), xem trước ô biểu tượng như trong menu Chủ đề (MASTER mục 6).
 
 ### 4.5 Thành viên
 

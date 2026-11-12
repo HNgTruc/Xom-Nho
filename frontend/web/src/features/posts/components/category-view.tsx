@@ -1,13 +1,12 @@
 import { FEED_MESSAGES } from "@xom-nho/api";
-import { cn } from "@xom-nho/ui/lib/utils";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/common/error-state";
 import { requireUser } from "@/features/auth";
 import type { RawSearchParams } from "@/lib/search-params";
 import { getCategory } from "../api/get-category";
-import { categoryDotClass } from "../lib/category-color";
 import { ArchiveHeader, ArchiveHeaderSkeleton } from "./archive-header";
+import { CategoryMark } from "./category-mark";
 import { PostFeed } from "./post-feed";
 import { PostListSkeleton } from "./post-list-skeleton";
 
@@ -34,12 +33,7 @@ export async function CategoryView({
         title={category.name}
         description={category.description}
         postCount={category.postCount}
-        marker={
-          <span
-            aria-hidden="true"
-            className={cn("size-2.5 shrink-0 rounded-full", categoryDotClass(category.color))}
-          />
-        }
+        icon={<CategoryMark color={category.color} icon={category.icon} size="lg" />}
       />
       <ErrorBoundary message={FEED_MESSAGES.LOAD_ERROR}>
         <Suspense fallback={<PostListSkeleton />}>
