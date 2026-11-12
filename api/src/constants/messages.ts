@@ -96,6 +96,8 @@ export const FILE_MESSAGES = {
   UPLOAD_FAILED: "Chưa tải lên được. Bạn thử lại nhé.",
   /** Ảnh, video gửi kèm bài không còn (đã gắn bài khác, của người khác, hoặc không có) */
   NOT_ATTACHABLE: "Có ảnh, video không dùng được nữa. Bạn gỡ ra rồi thêm lại nhé.",
+  /** Chọn video (hay file không phải ảnh) làm ảnh đại diện */
+  AVATAR_NOT_IMAGE: "Ảnh đại diện phải là ảnh JPG, PNG hoặc WebP.",
 } as const;
 
 /** Lời mời viết bài trên trang chủ, theo tên người đang xem. */
@@ -124,6 +126,12 @@ export function searchEmptyMessage(q: string): string {
 export const SETTINGS_MESSAGES = {
   SAVED: "Đã lưu hồ sơ của bạn.",
   NO_CHANGE: "Bạn chưa thay đổi gì.",
+  AVATAR_SAVED: "Đã đổi ảnh đại diện.",
+  AVATAR_REMOVED: "Đã xóa ảnh đại diện.",
+  AVATAR_HINT: "Ảnh JPG, PNG hoặc WebP, tối đa 5 MB. Hàng xóm sẽ thấy ảnh này cạnh tên bạn.",
+  AVATAR_REMOVE_TITLE: "Xóa ảnh đại diện?",
+  AVATAR_REMOVE_DESCRIPTION:
+    "Ảnh sẽ bị xóa hẳn, chỗ ảnh hiện chữ cái đầu tên bạn. Muốn có ảnh lại thì bạn tải ảnh khác lên.",
 } as const;
 
 /**

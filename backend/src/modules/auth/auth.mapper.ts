@@ -8,6 +8,7 @@ export function toMe(row: MeRow): Me {
     email: row.email,
     username: row.username,
     image: row.image,
+    avatarId: row.avatarId,
     bio: row.bio,
     role: ROLE_VALUES.includes(row.role as Role) ? (row.role as Role) : ROLES.USER,
     createdAt: row.createdAt.toISOString(),

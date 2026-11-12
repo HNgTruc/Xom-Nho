@@ -54,7 +54,29 @@ export class FilesService {
    * Nhận một ảnh hoặc video (ADR 0005): loại file theo chữ ký nhị phân, cỡ theo loại, rồi lưu đĩa và database.
    * File chưa gắn bài nào; `POST /posts` gắn sau qua `mediaIds`.
    */
-  async upload(user: SessionUser, file: UploadedFileData | undefined): Promise<MediaItem> {
+  upload(user: SessionUser, file: UploadedFileData | undefined): Promise<MediaItem> {
+    return this.store(user, file, "POST");
+  }
+
+  /**
+   * Nhận ảnh đại diện: chỉ ảnh (JPG, PNG, WebP đến 5 MB), lưu ở `media/avatars`. Chưa gán cho ai;
+   * `AuthService.updateAvatar` gán vào hồ sơ rồi xóa ảnh cũ.
+   */
+  uploadAvatar(user: SessionUser, file: UploadedFileData | undefined): Promise<MediaItem> {
+    return this.store(user, file, "AVATAR");
+  }
+
+  /** Xóa dòng media và file trên đĩa. Xóa file lỗi thì chỉ ghi log: dòng đã mất, file thành rác vô hại. */
+  async remove(id: string): Promise<void> {
+    const storageKey = await this.filesRepository.delete(id);
+    if (storageKey) await this.removeFile(storageKey);
+  }
+
+  private async store(
+    user: SessionUser,
+    file: UploadedFileData | undefined,
+    purpose: "POST" | "AVATAR",
+  ): Promise<MediaItem> {
     if (!file || file.size === 0) {
       throw new AppException("VALIDATION_ERROR", FILE_MESSAGES.MISSING, {
         file: FILE_MESSAGES.MISSING,
@@ -66,16 +88,23 @@ export class FilesService {
         file: FILE_MESSAGES.UNSUPPORTED,
       });
     }
+    if (purpose === "AVATAR" && type.kind !== "IMAGE") {
+      throw new AppException("VALIDATION_ERROR", FILE_MESSAGES.AVATAR_NOT_IMAGE, {
+        file: FILE_MESSAGES.AVATAR_NOT_IMAGE,
+      });
+    }
     if (file.size > MAX_BYTES[type.kind]) {
       const message = TOO_LARGE_MESSAGE[type.kind];
       throw new AppException("VALIDATION_ERROR", message, { file: message });
     }
     this.rateLimiter.consume(`upload:${user.id}`, UPLOAD_RATE);
 
-    const storageKey = await this.storage.save(file.buffer, type.extension, FOLDER[type.kind]);
+    const folder = purpose === "AVATAR" ? "avatars" : FOLDER[type.kind];
+    const storageKey = await this.storage.save(file.buffer, type.extension, folder);
     try {
       const row = await this.filesRepository.create({
         kind: type.kind,
+        purpose,
         mimeType: type.mimeType,
         sizeBytes: file.size,
         storageKey,
@@ -84,11 +113,15 @@ export class FilesService {
       return toMediaItem(row);
     } catch (error) {
       // Không để file mồ côi trên đĩa khi ghi database lỗi
-      await this.storage.remove(storageKey).catch((removeError: unknown) => {
-        this.logger.warn(`Không xóa được file ${storageKey}: ${String(removeError)}`);
-      });
+      await this.removeFile(storageKey);
       throw error;
     }
+  }
+
+  private async removeFile(storageKey: string): Promise<void> {
+    await this.storage.remove(storageKey).catch((error: unknown) => {
+      this.logger.warn(`Không xóa được file ${storageKey}: ${String(error)}`);
+    });
   }
 
   /**

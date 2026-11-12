@@ -34,4 +34,4 @@ export type ApiClient = ReturnType<typeof createClient>;
 
 export { ApiError, isApiError } from "./api-error.js";
 export type { ClientOptions, QueryValue, RequestFn, RequestOptions } from "./client.js";
-export { fileUrl } from "./files.js";
+export { avatarUrl, fileUrl } from "./files.js";

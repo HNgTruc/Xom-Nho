@@ -15,7 +15,7 @@ function listRow(overrides: Partial<PostListRow> = {}): PostListRow {
     excerpt: "Món ngon dễ nấu",
     publishedAt,
     viewCount: 12,
-    author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null },
+    author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
     category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
     tags: [
       { tag: { name: "Ăn vặt", slug: "an-vat" } },
@@ -93,7 +93,7 @@ describe("PostsService.list", () => {
         publishedAt: "2026-11-01T08:00:00.000Z",
         viewCount: 12,
         commentCount: 3,
-        author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null },
+        author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
         category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
         tags: [
           { name: "Ăn vặt", slug: "an-vat" },
@@ -217,6 +217,7 @@ describe("PostsService.getBySlug", () => {
       name: "Lan Anh",
       username: "lananh",
       image: null,
+      avatarId: null,
     });
     expect(post.category).toEqual({ name: "Ẩm thực", slug: "am-thuc", color: "rose" });
   });

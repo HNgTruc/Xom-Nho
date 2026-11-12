@@ -10,6 +10,7 @@ function profileSelect(postStatus: PostStatus) {
     name: true,
     username: true,
     image: true,
+    avatarId: true,
     bio: true,
     role: true,
     createdAt: true,

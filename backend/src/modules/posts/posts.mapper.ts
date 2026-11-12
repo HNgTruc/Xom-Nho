@@ -13,7 +13,13 @@ import type { PostDetailRow, PostListRow } from "./posts.repository.js";
 // Map từng trường thay vì trả nguyên object quan hệ: thêm cột vào `select` (ví dụ `email`) không tự lọt ra API
 
 function toUserSummary(author: PostListRow["author"]): UserSummary {
-  return { id: author.id, name: author.name, username: author.username, image: author.image };
+  return {
+    id: author.id,
+    name: author.name,
+    username: author.username,
+    image: author.image,
+    avatarId: author.avatarId,
+  };
 }
 
 function toCategoryRef(category: PostListRow["category"]): CategoryRef {

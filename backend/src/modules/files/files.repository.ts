@@ -15,6 +15,7 @@ const mediaAccessSelect = {
   mimeType: true,
   storageKey: true,
   ownerId: true,
+  purpose: true,
   post: { select: { status: true } },
 } satisfies Prisma.MediaSelect;
 export type MediaAccessRow = Prisma.MediaGetPayload<{ select: typeof mediaAccessSelect }>;
@@ -25,6 +26,7 @@ export class FilesRepository {
 
   create(data: {
     kind: MediaKind;
+    purpose?: "POST" | "AVATAR";
     mimeType: string;
     sizeBytes: number;
     storageKey: string;
@@ -35,5 +37,13 @@ export class FilesRepository {
 
   findForAccess(id: string): Promise<MediaAccessRow | null> {
     return this.prisma.media.findUnique({ where: { id }, select: mediaAccessSelect });
+  }
+
+  /** Xóa dòng, trả khóa file để xóa trên đĩa; không có thì `null`. */
+  async delete(id: string): Promise<string | null> {
+    const row = await this.prisma.media.findUnique({ where: { id }, select: { storageKey: true } });
+    if (!row) return null;
+    await this.prisma.media.deleteMany({ where: { id } });
+    return row.storageKey;
   }
 }

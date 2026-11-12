@@ -74,6 +74,29 @@ describe("api.posts.create và api.files", () => {
     const { fileUrl } = await import("./index.js");
     expect(fileUrl("http://x/", "a b")).toBe("http://x/api/v1/files/a%20b");
   });
+
+  it("avatarUrl ưu tiên ảnh tải lên, rồi tới link ngoài, không có thì null", async () => {
+    const { avatarUrl } = await import("./index.js");
+    const google = "https://lh3.googleusercontent.com/a/x";
+
+    expect(avatarUrl("http://x", { avatarId: "m1", image: google })).toBe(
+      "http://x/api/v1/files/m1",
+    );
+    expect(avatarUrl("http://x", { avatarId: null, image: google })).toBe(google);
+    expect(avatarUrl("http://x", { avatarId: null, image: null })).toBeNull();
+  });
+});
+
+describe("api.me", () => {
+  it("uploadAvatar gửi PUT multipart trường file tới /me/avatar", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+
+    await api.me.uploadAvatar(new Blob(["abc"], { type: "image/webp" }), "mat.webp");
+
+    expect(calledUrl()).toBe("http://x/api/v1/me/avatar");
+    expect(calledInit().method).toBe("PUT");
+    expect(((calledInit().body as FormData).get("file") as File).name).toBe("mat.webp");
+  });
 });
 
 describe("api.search", () => {

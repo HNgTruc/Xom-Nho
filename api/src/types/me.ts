@@ -6,7 +6,10 @@ export interface Me {
   name: string;
   email: string;
   username: string | null;
+  /** Link ảnh bên ngoài (Google, GitHub). Hiện ảnh bằng `avatarUrl(baseUrl, me)`, đừng dùng thẳng */
   image: string | null;
+  /** Ảnh đại diện tự tải lên (`PUT /me/avatar`), ưu tiên hơn `image` */
+  avatarId: string | null;
   bio: string | null;
   role: Role;
   createdAt: string;

@@ -11,6 +11,18 @@ export function fileUrl(baseUrl: string, id: string): string {
   return `${baseUrl.replace(/\/+$/, "")}${API_PREFIX}/files/${encodeURIComponent(id)}`;
 }
 
+/**
+ * Ảnh đại diện để hiện: ảnh tự tải lên (`avatarId`) trước, rồi link bên ngoài (`image`, từ Google, GitHub).
+ * Không có cả hai: `null`, frontend hiện chữ cái đầu.
+ */
+export function avatarUrl(
+  baseUrl: string,
+  user: { avatarId: string | null; image: string | null },
+): string | null {
+  if (user.avatarId) return fileUrl(baseUrl, user.avatarId);
+  return user.image;
+}
+
 export function filesApi(request: RequestFn) {
   return {
     /**

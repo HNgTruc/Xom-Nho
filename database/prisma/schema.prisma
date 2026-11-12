@@ -36,6 +36,12 @@ enum MediaKind {
   VIDEO
 }
 
+// File dùng vào việc gì: ảnh, video trong bài hay ảnh đại diện (sau này thêm ảnh bìa, file trong tin nhắn)
+enum MediaPurpose {
+  POST
+  AVATAR
+}
+
 // Cột lõi theo Better Auth (+ plugin admin: role, banned, banReason, banExpires).
 // Id do Better Auth sinh (32 ký tự), không dùng cuid().
 model User {
@@ -51,13 +57,16 @@ model User {
   // Cột riêng của Xóm Nhỏ
   username      String?   @unique @db.VarChar(50)
   bio           String?   @db.Text
+  // Ảnh đại diện tải lên (media purpose AVATAR). Có thì hiện ảnh này, không thì hiện `image` (link Google/GitHub)
+  avatarId      String?   @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  avatar        Media?    @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
   posts         Post[]    @relation("PostAuthor")
   reviewedPosts Post[]    @relation("PostReviewer")
   comments      Comment[]
-  media         Media[]
+  media         Media[]   @relation("MediaOwner")
   sessions      Session[]
   accounts      Account[]
 
@@ -185,20 +194,23 @@ model Post {
 // Ảnh, video người dùng tải lên (ADR 0005), lưu trên ổ đĩa backend. Tải lên trước (postId null),
 // gắn vào bài khi đăng. File trên đĩa tên theo storageKey (ngẫu nhiên), không dùng tên gốc.
 model Media {
-  id         String    @id @default(cuid())
+  id         String       @id @default(cuid())
   kind       MediaKind
-  mimeType   String    @db.VarChar(50)
+  purpose    MediaPurpose @default(POST)
+  mimeType   String       @db.VarChar(50)
   sizeBytes  Int
-  storageKey String    @unique @db.VarChar(100)
-  ownerId    String    @db.VarChar(36)
+  storageKey String       @unique @db.VarChar(100)
+  ownerId    String       @db.VarChar(36)
   postId     String?
   // Thứ tự hiển thị trong bài, từ 0
-  position   Int       @default(0)
-  createdAt  DateTime  @default(now())
+  position   Int          @default(0)
+  createdAt  DateTime     @default(now())
 
-  owner User  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner    User  @relation("MediaOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  // Người đang dùng file này làm ảnh đại diện
+  avatarOf User? @relation("UserAvatar")
   // Xóa bài thì xóa dòng media (file trên đĩa do service dọn)
-  post  Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post     Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId, position])
   // File chưa gắn bài của một người: kiểm tra khi đăng, dọn file bỏ dở

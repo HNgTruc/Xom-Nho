@@ -12,6 +12,7 @@ export function toPublicProfile(row: ProfileRow): PublicProfile {
     name: row.name,
     username: row.username,
     image: row.image,
+    avatarId: row.avatarId,
     bio: row.bio,
     role: toRole(row.role),
     createdAt: row.createdAt.toISOString(),

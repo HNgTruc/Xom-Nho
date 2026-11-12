@@ -7,6 +7,7 @@ export const meSelect = {
   email: true,
   username: true,
   image: true,
+  avatarId: true,
   bio: true,
   role: true,
   createdAt: true,
@@ -18,12 +19,18 @@ export type MeRow = {
   email: string;
   username: string | null;
   image: string | null;
+  avatarId: string | null;
   bio: string | null;
   role: string;
   createdAt: Date;
 };
 
-export type MeUpdateData = { name?: string; bio?: string | null; image?: string | null };
+export type MeUpdateData = {
+  name?: string;
+  bio?: string | null;
+  image?: string | null;
+  avatarId?: string | null;
+};
 
 @Injectable()
 export class AuthRepository {
@@ -31,6 +38,15 @@ export class AuthRepository {
 
   findMe(userId: string): Promise<MeRow | null> {
     return this.prisma.user.findUnique({ where: { id: userId }, select: meSelect });
+  }
+
+  /** Ảnh đại diện đang dùng, để xóa sau khi đổi. */
+  async findAvatarId(userId: string): Promise<string | null> {
+    const row = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { avatarId: true },
+    });
+    return row?.avatarId ?? null;
   }
 
   updateMe(userId: string, data: MeUpdateData): Promise<MeRow> {

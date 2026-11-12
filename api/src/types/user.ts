@@ -8,7 +8,10 @@ export interface UserSummary {
   id: string;
   name: string;
   username: string | null;
+  /** Link ảnh bên ngoài (Google, GitHub). Hiện ảnh bằng `avatarUrl(baseUrl, user)`, đừng dùng thẳng */
   image: string | null;
+  /** Ảnh đại diện tự tải lên (`PUT /me/avatar`), ưu tiên hơn `image` */
+  avatarId: string | null;
 }
 
 /**

@@ -143,7 +143,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
       expect(post).toMatchObject({
         slug: "moi-nhat",
         commentCount: 1,
-        author: { id: "lan", name: "Lan", username: "lan", image: null },
+        author: { id: "lan", name: "Lan", username: "lan", image: null, avatarId: null },
         category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
         tags: [{ name: "Ăn vặt", slug: "an-vat" }],
       });
@@ -225,6 +225,7 @@ describe("Đọc bài (/api/v1/posts)", () => {
         name: "Lan",
         username: "lan",
         image: null,
+        avatarId: null,
       });
     });
 

@@ -11,7 +11,7 @@ export const postListSelect = {
   excerpt: true,
   publishedAt: true,
   viewCount: true,
-  author: { select: { id: true, name: true, username: true, image: true } },
+  author: { select: { id: true, name: true, username: true, image: true, avatarId: true } },
   category: { select: { name: true, slug: true, color: true } },
   tags: {
     select: { tag: { select: { name: true, slug: true } } },

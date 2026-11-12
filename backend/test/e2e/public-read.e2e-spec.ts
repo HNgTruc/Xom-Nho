@@ -182,6 +182,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
         name: "Lan",
         username: "lan",
         image: null,
+        avatarId: null,
         bio: "Thích nấu ăn",
         role: "author",
         createdAt: new Date(base).toISOString(),
@@ -227,7 +228,7 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
 
       expect(res.body.data[0]).toMatchObject({
         slug: "do-an-duong-pho",
-        author: { id: "lan", name: "Lan", username: "lan", image: null },
+        author: { id: "lan", name: "Lan", username: "lan", image: null, avatarId: null },
         category: { name: "Ẩm thực", slug: "am-thuc", color: "amber" },
         tags: [
           { name: "Ăn vặt", slug: "an-vat" },

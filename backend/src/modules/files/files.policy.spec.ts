@@ -5,9 +5,18 @@ const user = (id: string, role = "user"): SessionUser =>
   ({ id, role, banned: false, name: id, email: `${id}@test.local` }) as SessionUser;
 
 describe("FilesPolicy.canView", () => {
-  const published = { ownerId: "lan", post: { status: "PUBLISHED" as const } };
-  const unattached = { ownerId: "lan", post: null };
-  const archived = { ownerId: "lan", post: { status: "ARCHIVED" as const } };
+  const published = {
+    ownerId: "lan",
+    purpose: "POST" as const,
+    post: { status: "PUBLISHED" as const },
+  };
+  const unattached = { ownerId: "lan", purpose: "POST" as const, post: null };
+  const archived = {
+    ownerId: "lan",
+    purpose: "POST" as const,
+    post: { status: "ARCHIVED" as const },
+  };
+  const avatar = { ownerId: "lan", purpose: "AVATAR" as const, post: null };
 
   it.each(["user", "author", "admin"])("file trong bài đã đăng: %s nào cũng xem được", (role) => {
     expect(FilesPolicy.canView(user("minh", role), published)).toBe(true);
@@ -28,4 +37,11 @@ describe("FilesPolicy.canView", () => {
     expect(FilesPolicy.canView(user("minh"), archived)).toBe(false);
     expect(FilesPolicy.canView(user("lan"), archived)).toBe(true);
   });
+
+  it.each(["user", "author", "admin"])(
+    "ảnh đại diện của người khác: %s nào cũng xem được",
+    (role) => {
+      expect(FilesPolicy.canView(user("minh", role), avatar)).toBe(true);
+    },
+  );
 });
