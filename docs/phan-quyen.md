@@ -24,6 +24,8 @@ Vai trò lưu ở cột `role` của bảng `user` (plugin admin của Better Au
 | Viết bài, kèm ảnh/video (đăng thẳng)    |       |    ✅    |   ✅    |     ✅     |
 | Tải ảnh, video lên                      |       |    ✅    |   ✅    |     ✅     |
 | Xem ảnh, video của bài đã đăng          |       |    ✅    |   ✅    |     ✅     |
+| Đổi, xóa ảnh đại diện của mình          |       |    ✅    |   ✅    |     ✅     |
+| Xem ảnh đại diện của người khác         |       |    ✅    |   ✅    |     ✅     |
 | Sửa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
 | Xóa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
 | Tạo tag mới khi viết bài                |       |          |   ✅    |     ✅     |
@@ -42,7 +44,7 @@ Khách không đọc được gì (ADR 0007): backend trả 401 cho mọi route 
 
 Từ ADR 0008 mọi thành viên đăng thẳng: bài soạn ở trang chủ vào thẳng `PUBLISHED`. Các trạng thái chờ duyệt bên dưới giữ cho bài cũ và trình soạn Markdown sau này (nếu bật lại duyệt bài).
 
-Ảnh, video (`GET /files/:id`): file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
+Ảnh, video (`GET /files/:id`): ảnh đại diện và file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
 
 ```mermaid
 stateDiagram-v2

@@ -103,9 +103,9 @@ Lỗi khi đăng: `VALIDATION_ERROR` kèm `fields` (`content` khi không có ch�
 | Method | Đường dẫn    |     | Mô tả                                                                                                                                                                                                                              |
 | ------ | ------------ | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | POST   | `/files`     | 🔒  | Tải một file, multipart trường `file`. Ảnh JPG/PNG/WebP đến 5 MB, video MP4/WebM đến 25 MB, nhận loại bằng chữ ký nhị phân. Trả 201 + `MediaItem { id, kind, mimeType }`, chưa gắn bài. Quá 25 MB: 413. Giới hạn 30 file / 10 phút |
-| GET    | `/files/:id` | 🔒  | Nội dung file. Bài đã đăng: mọi thành viên; còn lại chỉ người tải lên và admin, người khác 404. Có `Range` (tua video), `Cache-Control: private`, `X-Content-Type-Options: nosniff`                                                |
+| GET    | `/files/:id` | 🔒  | Nội dung file. Ảnh đại diện và file trong bài đã đăng: mọi thành viên; còn lại chỉ người tải lên và admin, người khác 404. Có `Range` (tua video), `Cache-Control: private`, `X-Content-Type-Options: nosniff`                     |
 
-Frontend lấy đường dẫn bằng `fileUrl(baseUrl, id)` trong api-client; web dùng thẳng trong `<img>`, `<video>` (trình duyệt tự gửi cookie, web và backend cùng site).
+Frontend lấy đường dẫn bằng `fileUrl(baseUrl, id)` trong api-client (ảnh đại diện: `avatarUrl(baseUrl, user)`, xem `UserSummary`); web dùng thẳng trong `<img>`, `<video>` (trình duyệt tự gửi cookie, web và backend cùng site).
 
 Kiểu khai báo ở `api/src/types/post.ts`, `media.ts`, `user.ts`, `tag.ts`; schema query ở `api/src/schemas/post.ts`, `search.ts`, `tag.ts`.
 
@@ -128,23 +128,25 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 
 ### Danh mục, tag, người dùng
 
-| Method | Đường dẫn          |     | Mô tả                                                                                                                 |
-| ------ | ------------------ | --- | --------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/categories`      | 🔒  | Tất cả danh mục, kèm số bài                                                                                           |
-| GET    | `/tags?q=`         | 🔒  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất                 |
-| GET    | `/tags/:slug`      | 🔒  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404                             |
-| GET    | `/users/:username` | 🔒  | Hồ sơ (`PublicProfile`: phần mọi thành viên thấy). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404 |
-| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                                        |
-| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`                                                             |
-| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)                  |
+| Method | Đường dẫn          |     | Mô tả                                                                                                                                                                                             |
+| ------ | ------------------ | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/categories`      | 🔒  | Tất cả danh mục, kèm số bài                                                                                                                                                                       |
+| GET    | `/tags?q=`         | 🔒  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất                                                                                             |
+| GET    | `/tags/:slug`      | 🔒  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404                                                                                                         |
+| GET    | `/users/:username` | 🔒  | Hồ sơ (`PublicProfile`: phần mọi thành viên thấy). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404                                                                             |
+| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                                                                                                                    |
+| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`. Gửi `image` (link hoặc `null`) thì bỏ luôn ảnh đã tải lên, xóa file                                                                    |
+| PUT    | `/me/avatar`       | 🔒  | Đổi ảnh đại diện, multipart trường `file`: ảnh JPG/PNG/WebP đến 5 MB (video, file khác: 400). Lưu ở `media/avatars`, xóa ảnh cũ. Trả `Me`. Đếm chung giới hạn 30 file / 10 phút với `POST /files` |
+| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)                                                                                              |
 
 `Category`: `id, name, slug, description, color, postCount`. `postCount` chỉ đếm bài đã đăng.
 `Tag`: `id, name, slug`.
 `color` (trong `Category` và `category` của bài) là khóa màu badge: `amber | blue | green | purple | rose` (`CATEGORY_COLORS` trong `api`, MASTER mục 2.2). Sau này có thể thêm màu, nên client gặp giá trị lạ thì dùng `toCategoryColor` để về màu mặc định, không báo lỗi.
-`PublicProfile`: `id, name, username, image, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
+`UserSummary` (tác giả bài): `id, name, username, image, avatarId`. `image` là link ảnh bên ngoài (Google, GitHub), `avatarId` là ảnh tự tải lên (thêm 2026-11-12); frontend hiện ảnh bằng `avatarUrl(baseUrl, user)`: `avatarId` trước, rồi `image`, không có thì chữ cái đầu.
+`PublicProfile`: `id, name, username, image, avatarId, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
 
 Ràng buộc `username` trong `api` (chỉ a-z, 0-9, tối đa 20 ký tự) hẹp hơn cột `user.username` (50 ký tự). Sau này cho người dùng tự đặt username theo quy tắc rộng hơn thì phải nới schema cùng lúc, nếu không `?author=` và `/users/:username` sẽ từ chối username hợp lệ. Nới ra là được phép trong v1, siết lại thì không.
-`Me`: `id, name, email, username, image, bio, role, createdAt`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
+`Me`: `id, name, email, username, image, avatarId, bio, role, createdAt`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
 
 ### Đăng nhập (`/api/auth/*`, Better Auth)
 

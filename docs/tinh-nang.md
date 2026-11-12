@@ -45,9 +45,9 @@ Tiêu chí:
 
 Tiêu chí:
 
-- [ ] File sai loại (đổi đuôi .exe thành .jpg) bị từ chối, có lời báo tiếng Việt
-- [ ] File quá 5 MB bị chặn ngay ở trình duyệt, backend cũng chặn
-- [ ] Đổi ảnh thì file cũ bị xóa khỏi ổ đĩa
+- [ ] File sai loại (đổi đuôi .exe thành .jpg) bị từ chối, có lời báo tiếng Việt (ảnh đại diện: xong 2026-11-12; ảnh bìa: chưa)
+- [ ] File quá 5 MB bị chặn ngay ở trình duyệt, backend cũng chặn (ảnh đại diện: xong 2026-11-12; ảnh bìa: chưa)
+- [ ] Đổi ảnh thì file cũ bị xóa khỏi ổ đĩa (ảnh đại diện: xong 2026-11-12; ảnh bìa: chưa)
 
 ### 1.5 Kết bạn 🌐📱
 

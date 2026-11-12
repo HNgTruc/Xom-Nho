@@ -16,6 +16,7 @@ erDiagram
   Post ||--o{ Comment : "có"
   Comment ||--o{ Comment : "trả lời"
   User ||--o{ Media : "tải lên"
+  User |o--o| Media : "ảnh đại diện (avatarId)"
   Post ||--o{ Media : "gắn"
   User ||--o{ Post : "duyệt (reviewer)"
 
@@ -29,6 +30,7 @@ erDiagram
     boolean banned
     string bio
     string username UK
+    string avatarId FK,UK "ảnh tự tải lên, null = dùng image"
     datetime createdAt
   }
   Post {
@@ -52,6 +54,7 @@ erDiagram
   Media {
     string id PK
     enum kind "IMAGE VIDEO"
+    enum purpose "POST AVATAR"
     string mimeType
     int sizeBytes
     string storageKey UK "tên file trên đĩa, ngẫu nhiên"
@@ -99,7 +102,8 @@ Ghi chú cài đặt:
 
 - Tên bảng viết thường, số ít, gạch dưới (`user`, `post`, `post_tag`) qua `@@map`; tên cột giữ camelCase như Better Auth.
 - `Post.contentFormat`: `MARKDOWN` (bài kiểu diễn đàn, có trước) hoặc `PLAIN` (soạn ở trang chủ, ADR 0008). Bài soạn ở trang chủ có thể có `title` rỗng.
-- `Media`: ảnh, video tải lên (ADR 0005). File nằm trên đĩa backend (`UPLOAD_DIR`, mặc định `media/` ở gốc repo), đường dẫn là `storageKey` dạng `<thư mục>/<uuid>.<đuôi>`: thư mục `images` hoặc `videos` theo `kind` (sau này thêm `avatars`), đuôi do backend chọn theo chữ ký nhị phân. Tải lên trước với `postId = null`, gắn khi đăng bài. Xóa bài thì xóa dòng media (cascade); file trên đĩa phải dọn riêng.
+- `Media`: ảnh, video tải lên (ADR 0005). File nằm trên đĩa backend (`UPLOAD_DIR`, mặc định `media/` ở gốc repo), đường dẫn là `storageKey` dạng `<thư mục>/<uuid>.<đuôi>`: thư mục `images` hoặc `videos` theo `kind`, `avatars` cho ảnh đại diện; đuôi do backend chọn theo chữ ký nhị phân. `purpose` cho biết file dùng vào đâu: `POST` (ảnh, video trong bài: tải lên trước với `postId = null`, gắn khi đăng bài) hay `AVATAR` (ảnh đại diện: `postId` luôn `null`, `user.avatarId` trỏ tới). Xóa bài thì xóa dòng media (cascade); file trên đĩa phải dọn riêng. Việc dọn file không gắn bài **phải bỏ qua `AVATAR`**.
+- `User.avatarId`: ảnh đại diện tự tải lên (`PUT /me/avatar`). Có thì hiện ảnh này, không thì hiện `image` (link từ Google, GitHub). Đổi ảnh hay xóa ảnh thì backend xóa dòng media cũ và file trên đĩa; xóa dòng media thì `avatarId` tự về `null` (`ON DELETE SET NULL`).
 - `Post.content` là `MEDIUMTEXT` (16 MB): `TEXT` chỉ 64 KB, bài tiếng Việt dài (mỗi chữ có dấu 2-3 byte) dễ vượt.
 - Server MySQL mặc định `utf8mb4_0900_ai_ci`, nhưng Prisma tạo từng bảng với `utf8mb4_unicode_ci` và không theo dõi collation. Giữ nguyên `unicode_ci` cho mọi bảng (không sửa tay migration) để các bảng luôn đồng nhất. Cả hai collation đều không phân biệt dấu khi so sánh, nên cột `UNIQUE` coi "bàn" và "ban" là trùng (hai tag này không cùng tồn tại được). Đây là hành vi mong muốn cho tên tag, danh mục. Tìm kiếm không phụ thuộc collation vì `searchText` đã bỏ dấu sẵn.
 - Kết nối qua driver adapter `@prisma/adapter-mariadb` (Prisma 7 bắt buộc dùng adapter). `DATABASE_URL` khai báo trong `backend/prisma.config.ts` (file này trỏ tới `database/prisma/`), không còn trong `schema.prisma`.
