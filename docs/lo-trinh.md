@@ -67,7 +67,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Backend: sửa/xóa bài (xóa cả file trên đĩa)
 - [ ] Dọn file tải lên mà không gắn bài quá 1 ngày (bỏ qua ảnh đại diện: `purpose = AVATAR`)
 - [ ] Backend: `PostLike` (thích / bỏ thích), feed trả số thích và 2 bình luận công khai mới nhất
-- [ ] Web: trình soạn Markdown có xem trước, bài của tôi, bình luận + trả lời
+- [x] Web: bình luận + trả lời ở trang bài (gửi, trả lời có "@tên", sửa, xóa có hỏi lại, "đã sửa", bình luận ẩn hiện mờ cho admin)
+- [ ] Web: trình soạn Markdown có xem trước, bài của tôi
 - [ ] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất
 - [ ] Test Playwright: đăng ký → viết bài → bình luận
 

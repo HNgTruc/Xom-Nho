@@ -168,10 +168,10 @@ Tiêu chí:
 
 Tiêu chí:
 
-- [ ] Trả lời một trả lời vẫn nằm trong cùng nhánh, có "@tên" (backend xong 2026-11-12: gắn vào bình luận gốc; "@tên" do web điền)
-- [ ] Bình luận bị ẩn không hiện với người thường, hiện mờ với admin (backend xong: admin nhận kèm `status`; chờ giao diện)
+- [x] Trả lời một trả lời vẫn nằm trong cùng nhánh, có "@tên" (web; app chưa)
+- [x] Bình luận bị ẩn không hiện với người thường, hiện mờ với admin (web; app chưa)
 - [x] Gửi liên tục bị giới hạn tần suất
-- [ ] Nội dung bình luận hiển thị dạng chữ thường (không render Markdown, không HTML)
+- [x] Nội dung bình luận hiển thị dạng chữ thường (không render Markdown, không HTML) (web; app chưa)
 
 ## 5. Tin nhắn riêng 🌐📱
 
