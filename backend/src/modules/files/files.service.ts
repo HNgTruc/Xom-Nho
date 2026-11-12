@@ -36,6 +36,12 @@ const FOLDER: Record<MediaKind, StorageFolder> = {
 /** 30 file mỗi 10 phút mỗi người: đủ cho vài bài 10 ảnh, chặn ai đó đổ đầy ổ đĩa. */
 const UPLOAD_RATE = { limit: 30, windowMs: 10 * 60 * 1000, message: FILE_MESSAGES.RATE_LIMITED };
 
+/** File tải lên mà quá 1 ngày chưa gắn bài thì là rác: không ai viết dở một bài lâu đến thế. */
+export const ORPHAN_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+/** Mỗi lần dọn xóa tối đa 10 lô x 100 file, còn thừa thì để lần sau: không giữ database lâu. */
+const CLEANUP_BATCH_SIZE = 100;
+const CLEANUP_MAX_BATCHES = 10;
+
 export function toMediaItem(row: MediaItemRow): MediaItem {
   return { id: row.id, kind: row.kind, mimeType: row.mimeType };
 }
@@ -70,6 +76,35 @@ export class FilesService {
   async remove(id: string): Promise<void> {
     const storageKey = await this.filesRepository.delete(id);
     if (storageKey) await this.removeFile(storageKey);
+  }
+
+  /**
+   * Dọn file rác (docs/co-so-du-lieu.md, ADR 0005): ảnh, video tải lên cho bài mà quá `ORPHAN_MAX_AGE_MS` chưa gắn
+   * bài nào (bỏ dở hộp soạn, gỡ khỏi hộp trước khi đăng). Không đụng ảnh đại diện. `FilesScheduler` gọi mỗi giờ.
+   * Xóa dòng trước, rồi chỉ xóa trên đĩa file đã xóa dòng thật: file vừa được gắn bài giữa chừng thì giữ nguyên.
+   * Trả số file đã dọn.
+   */
+  async cleanupOrphans(now: Date = new Date()): Promise<number> {
+    const before = new Date(now.getTime() - ORPHAN_MAX_AGE_MS);
+    let removed = 0;
+    for (let batch = 0; batch < CLEANUP_MAX_BATCHES; batch++) {
+      const candidates = await this.filesRepository.findOrphans(before, CLEANUP_BATCH_SIZE);
+      if (candidates.length === 0) break;
+
+      const deleted = new Set(
+        await this.filesRepository.deleteOrphans(
+          candidates.map((row) => row.id),
+          before,
+        ),
+      );
+      for (const row of candidates) {
+        if (deleted.has(row.id)) await this.removeFile(row.storageKey);
+      }
+      removed += deleted.size;
+      if (candidates.length < CLEANUP_BATCH_SIZE) break;
+    }
+    if (removed > 0) this.logger.log(`Đã dọn ${removed} file tải lên mà không gắn bài`);
+    return removed;
   }
 
   private async store(

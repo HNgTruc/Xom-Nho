@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
+import { ScheduleModule } from "@nestjs/schedule";
 import { AuthGuard } from "./common/guards/auth.guard.js";
 import { RolesGuard } from "./common/guards/roles.guard.js";
 import { ConfigModule } from "./config/config.module.js";
@@ -20,6 +21,8 @@ import { UsersModule } from "./modules/users/users.module.js";
 @Module({
   imports: [
     ConfigModule,
+    // Việc chạy định kỳ (`@Cron`): dọn file không gắn bài (`FilesScheduler`)
+    ScheduleModule.forRoot(),
     DatabaseModule,
     AuthInfraModule,
     StorageModule,
