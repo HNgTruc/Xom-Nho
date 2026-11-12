@@ -129,7 +129,7 @@ Tiêu chí:
 - [x] Thẻ bài hiện lưới ảnh/video (tối đa 4 ô, ô cuối "+N"); trang bài hiện đủ ảnh và video có điều khiển, tua được
 - [x] Sửa, xóa bài của mình (2026-11-12): backend `PATCH`, `DELETE /posts/:id`, xóa cả file trên đĩa; web có menu "…" trên thẻ bài và trang bài, hộp soạn ở chế độ sửa chỉ gửi trường đã đổi (`features/posts/lib/post-changes.test.ts`), xóa có hỏi lại
 - [ ] App: màn tạo bài, chọn ảnh/video từ máy
-- [ ] Dọn file đã tải lên mà không gắn bài
+- [x] Dọn file đã tải lên mà không gắn bài (2026-11-12): mỗi giờ xóa file quá 1 ngày chưa gắn bài, giữ ảnh đại diện (`files-cleanup.e2e-spec.ts`)
 
 ### 2.4 Danh mục và tag 🌐📱
 

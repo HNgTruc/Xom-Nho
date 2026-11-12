@@ -181,6 +181,8 @@ backend/src/modules/posts/
 
 Controller công khai và controller admin dùng **chung service**, nên quy tắc không bị viết hai lần. Mỗi tầng chỉ gọi tầng ngay dưới: controller → service → repository → Prisma.
 
+Việc chạy định kỳ đặt trong `<tài-nguyên>.scheduler.ts` (`@Cron` của `@nestjs/schedule`, `ScheduleModule.forRoot()` ở `app.module.ts`). Scheduler giống controller, chỉ gọi service, không chứa quy tắc. Ví dụ: `files.scheduler.ts` dọn file không gắn bài mỗi giờ.
+
 ## Cấu trúc bên trong một feature frontend
 
 ```
