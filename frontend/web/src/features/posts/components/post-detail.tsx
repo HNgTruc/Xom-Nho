@@ -3,7 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avat
 import { Badge } from "@xom-nho/ui/components/badge";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 import { requireUser } from "@/features/auth";
+import { CommentSection, CommentSectionSkeleton } from "@/features/comments";
 import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
 import { getPost } from "../api/get-post";
 import { initials } from "@/lib/initials";
@@ -19,8 +21,8 @@ const numberFormat = new Intl.NumberFormat("vi-VN");
 
 /**
  * Trang bài viết (MASTER mục 7, thread view): danh mục, tiêu đề, tác giả và ngày, mục lục nếu bài dài,
- * nội dung Markdown font Lora, danh sách thẻ. Cả bài nằm trên kính đặc (MASTER 2.4) để đọc lâu không mỏi.
- * Khối bình luận thêm ở giai đoạn 4.
+ * nội dung Markdown font Lora, danh sách thẻ, rồi khối bình luận (tải sau, không giữ chân bài). Cả bài nằm trên
+ * kính đặc (MASTER 2.4) để đọc lâu không mỏi.
  * Chỉ cho thành viên (ADR 0007). Đọc `params` và cookie nên phải nằm trong `<Suspense>`.
  * Không có hoặc không được xem thì 404.
  */
@@ -92,6 +94,10 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
           </ul>
         </footer>
       )}
+
+      <Suspense fallback={<CommentSectionSkeleton />}>
+        <CommentSection postId={post.id} canComment={published} />
+      </Suspense>
 
       {/* Chỉ bài đã đăng mới tính lượt xem (backend cũng chặn) */}
       {published && <ViewTracker postId={post.id} />}

@@ -112,7 +112,21 @@ export const COMMENT_MESSAGES = {
   POST_CLOSED: "Bài này đang ẩn nên không nhận bình luận nữa.",
   /** Trang bài chưa có bình luận (docs/giong-van-va-giao-dien.md) */
   NONE_YET: "Chưa ai lên tiếng. Bạn nói gì đi!",
+  HEADING: "Bình luận",
+  FORM_LABEL: "Bình luận của bạn",
+  SUBMIT: "Gửi bình luận",
+  REPLY_SUBMIT: "Gửi trả lời",
+  EDITED: "đã sửa",
+  DELETE_TITLE: "Xóa bình luận?",
+  DELETE_DESCRIPTION: "Bình luận sẽ bị xóa hẳn, không lấy lại được.",
+  DELETE_WITH_REPLIES: "Bình luận và các trả lời bên dưới sẽ bị xóa hẳn, không lấy lại được.",
+  LOAD_FAILED: "Chưa tải được bình luận. Bạn thử lại nhé.",
 } as const;
+
+/** Nhãn ô trả lời: "Trả lời Lan Anh". */
+export function commentReplyLabel(name: string): string {
+  return `Trả lời ${name}`;
+}
 
 /** Lời mời viết bài trên trang chủ, theo tên người đang xem. */
 export function composerPrompt(name: string): string {
