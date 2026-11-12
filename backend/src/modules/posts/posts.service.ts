@@ -1,26 +1,30 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import {
   COMPOSER_MESSAGES,
   CONTENT_FORMATS,
+  EMPTY_POST_MESSAGE,
   type CreatePostInput,
   FILE_MESSAGES,
   type ListPostsQuery,
+  POST_MESSAGES,
   POST_STATUSES,
   type PostDetail,
   type PostListItem,
   type PostStatus,
   pathIdSchema,
   pathSlugSchema,
+  type UpdatePostInput,
   withSlugSuffix,
 } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import { paginate, type Paginated } from "../../common/types/paginated.js";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
+import { StorageService } from "../../infrastructure/storage/storage.service.js";
 import { baseSlug, excerptFromContent } from "./posts.compose.js";
 import { toPostDetail, toPostListItem } from "./posts.mapper.js";
 import { PostsPolicy } from "./posts.policy.js";
-import { PostsRepository } from "./posts.repository.js";
+import { type CreatePostFailure, type PostEditRow, PostsRepository } from "./posts.repository.js";
 import { buildPostSearchText } from "./posts.search-text.js";
 
 const POST_NOT_FOUND = "Không tìm thấy bài viết này. Có thể bài đã được gỡ hoặc đường dẫn bị sai.";
@@ -33,11 +37,23 @@ const CREATE_RATE = {
   message: COMPOSER_MESSAGES.RATE_LIMITED,
 };
 
+/** Lưu bài (đăng hoặc sửa) không được: báo đúng ô có vấn đề. */
+function saveFailure(reason: CreatePostFailure): AppException {
+  const categoryGone = reason === "CATEGORY_NOT_FOUND";
+  const message = categoryGone ? CATEGORY_GONE : FILE_MESSAGES.NOT_ATTACHABLE;
+  return new AppException("VALIDATION_ERROR", message, {
+    [categoryGone ? "category" : "mediaIds"]: message,
+  });
+}
+
 @Injectable()
 export class PostsService {
+  private readonly logger = new Logger(PostsService.name);
+
   constructor(
     private readonly postsRepository: PostsRepository,
     private readonly rateLimiter: RateLimiter,
+    private readonly storage: StorageService,
   ) {}
 
   /**
@@ -64,14 +80,89 @@ export class PostsService {
       input.mediaIds,
     );
 
-    if (!result.ok) {
-      const categoryGone = result.reason === "CATEGORY_NOT_FOUND";
-      const message = categoryGone ? CATEGORY_GONE : FILE_MESSAGES.NOT_ATTACHABLE;
-      throw new AppException("VALIDATION_ERROR", message, {
-        [categoryGone ? "category" : "mediaIds"]: message,
+    if (!result.ok) throw saveFailure(result.reason);
+    return this.getBySlug(user, result.slug);
+  }
+
+  /**
+   * Sửa bài của mình (docs/tinh-nang.md mục 2.3). Slug giữ nguyên để liên kết đã chia sẻ không hỏng; tóm tắt,
+   * searchText tính lại khi đổi chữ. Ảnh, video bỏ ra bị xóa khỏi ổ đĩa sau khi lưu xong. Trạng thái không đổi
+   * (bài đang bị ẩn vẫn ẩn tới khi trưởng xóm khôi phục).
+   */
+  async update(user: SessionUser, id: string, input: UpdatePostInput): Promise<PostDetail> {
+    const post = await this.findModifiable(user, id);
+
+    const title = input.title ?? post.title;
+    const content = input.content ?? post.content;
+    const mediaCount = input.mediaIds?.length ?? post.media.length;
+    if (content === "" && mediaCount === 0) {
+      throw new AppException("VALIDATION_ERROR", EMPTY_POST_MESSAGE, {
+        content: EMPTY_POST_MESSAGE,
       });
     }
-    return this.getBySlug(user, result.slug);
+
+    const textChanged = input.title !== undefined || input.content !== undefined;
+    const excerpt = excerptFromContent(content);
+    const result = await this.postsRepository.updateWithMedia(
+      id,
+      user.id,
+      {
+        title: input.title,
+        content: input.content,
+        ...(textChanged && {
+          excerpt,
+          searchText: buildPostSearchText({
+            title,
+            excerpt,
+            tagNames: post.tags.map(({ tag }) => tag.name),
+          }),
+        }),
+        categorySlug: input.category,
+      },
+      input.mediaIds,
+    );
+    if (!result.ok) throw saveFailure(result.reason);
+
+    await this.removeFiles(result.removedStorageKeys);
+    return this.getBySlug(user, post.slug);
+  }
+
+  /** Xóa hẳn bài của mình: bình luận, tag, ảnh, video đi theo; file xóa khỏi ổ đĩa sau khi xóa dòng. */
+  async remove(user: SessionUser, id: string): Promise<void> {
+    await this.findModifiable(user, id);
+    const storageKeys = await this.postsRepository.deleteWithMedia(id);
+    await this.removeFiles(storageKeys);
+  }
+
+  /**
+   * Bài mà `user` được sửa, xóa. Không có, id sai dạng, hoặc không được xem: NOT_FOUND (không lộ là có).
+   * Xem được mà không phải bài của mình: FORBIDDEN.
+   */
+  private async findModifiable(user: SessionUser, id: string): Promise<PostEditRow> {
+    if (!pathIdSchema.safeParse(id).success) throw new AppException("NOT_FOUND", POST_NOT_FOUND);
+
+    const post = await this.postsRepository.findForEdit(id);
+    if (!post || !PostsPolicy.canView(user, post)) {
+      throw new AppException("NOT_FOUND", POST_NOT_FOUND);
+    }
+    if (!PostsPolicy.canModify(user, post)) {
+      throw new AppException("FORBIDDEN", POST_MESSAGES.NOT_OWNER);
+    }
+    return post;
+  }
+
+  /**
+   * Xóa file trên đĩa sau khi database đã xong. Lỗi thì chỉ ghi log: dòng đã mất, file còn lại là rác vô hại,
+   * không làm hỏng việc sửa, xóa bài của người dùng.
+   */
+  private async removeFiles(storageKeys: readonly string[]): Promise<void> {
+    await Promise.all(
+      storageKeys.map((key) =>
+        this.storage.remove(key).catch((error: unknown) => {
+          this.logger.warn(`Không xóa được file ${key}: ${String(error)}`);
+        }),
+      ),
+    );
   }
 
   /** `base` nếu chưa ai dùng, không thì `base-2`, `base-3`... (số nhỏ nhất còn trống). */

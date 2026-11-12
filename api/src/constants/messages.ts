@@ -84,6 +84,11 @@ export const COMPOSER_MESSAGES = {
   RATE_LIMITED: "Bạn đăng nhiều bài quá, nghỉ tay vài phút rồi đăng tiếp nhé.",
 } as const;
 
+/** Sửa, xóa bài của mình (`PATCH`, `DELETE /posts/:id`), dùng chung backend, web, mobile. */
+export const POST_MESSAGES = {
+  NOT_OWNER: "Bạn chỉ sửa, xóa được bài của mình.",
+} as const;
+
 /** Tải ảnh, video lên (`POST /files`, ADR 0005): backend báo lỗi, frontend kiểm tra trước bằng cùng câu. */
 export const FILE_MESSAGES = {
   MISSING: "Chọn một ảnh hoặc video để tải lên.",

@@ -18,4 +18,13 @@ export const PostsPolicy = {
     if (!user || user.banned) return false;
     return user.id === post.authorId || user.role === ROLES.ADMIN;
   },
+
+  /**
+   * Sửa, xóa qua route thường (`PATCH`, `DELETE /posts/:id`): chỉ tác giả, ở mọi trạng thái (kể cả bài bị ẩn,
+   * để tác giả sửa lại hay gỡ đi). Trưởng xóm xử lý bài của người khác bằng route admin, không qua đây.
+   */
+  canModify(user: SessionUser, post: PostAccessTarget): boolean {
+    if (user.banned) return false;
+    return user.id === post.authorId;
+  },
 };

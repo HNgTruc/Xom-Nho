@@ -249,6 +249,27 @@ describe("Tải file và đăng bài (/api/v1/files, /api/v1/posts)", () => {
       expect(await prisma.post.count()).toBe(1);
     });
 
+    it("dùng ảnh đại diện của chính mình làm ảnh bài thì 400, ảnh đại diện giữ nguyên", async () => {
+      const me = await http()
+        .put("/api/v1/me/avatar")
+        .set("Cookie", lan.cookie)
+        .attach("file", PNG, { filename: "mat.png", contentType: "image/png" })
+        .expect(200);
+      const avatarId = me.body.data.avatarId as string;
+
+      const res = await createPost(lan.cookie, {
+        content: "Lấy avatar",
+        mediaIds: [avatarId],
+      }).expect(400);
+
+      expect(res.body.error.fields).toHaveProperty("mediaIds");
+      expect(await prisma.post.count()).toBe(0);
+      expect(await prisma.media.findUniqueOrThrow({ where: { id: avatarId } })).toMatchObject({
+        purpose: "AVATAR",
+        postId: null,
+      });
+    });
+
     it.each([
       [{ content: "   " }, "content"],
       [{ content: "Chào", category: "" }, "category"],

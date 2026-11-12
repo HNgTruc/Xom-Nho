@@ -1,7 +1,13 @@
 import type { PostStatus, Role } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
-import type { PostDetailRow, PostListRow, PostsRepository } from "./posts.repository.js";
+import type { StorageService } from "../../infrastructure/storage/storage.service.js";
+import type {
+  PostDetailRow,
+  PostEditRow,
+  PostListRow,
+  PostsRepository,
+} from "./posts.repository.js";
 import { PostsService } from "./posts.service.js";
 
 const publishedAt = new Date("2026-11-01T08:00:00.000Z");
@@ -49,14 +55,19 @@ function setup() {
     findBySlug: vi.fn().mockResolvedValue(null),
     incrementViewCount: vi.fn().mockResolvedValue(1),
     findAccessTarget: vi.fn().mockResolvedValue(null),
+    findForEdit: vi.fn().mockResolvedValue(null),
+    updateWithMedia: vi.fn().mockResolvedValue({ ok: true, removedStorageKeys: [] }),
+    deleteWithMedia: vi.fn().mockResolvedValue([]),
     findSlugsStartingWith: vi.fn().mockResolvedValue([]),
     createWithMedia: vi.fn().mockResolvedValue({ ok: true, slug: "ban-tron-cuoi-tuan" }),
   };
+  const storage = { remove: vi.fn().mockResolvedValue(undefined) };
   const service = new PostsService(
     repository as unknown as PostsRepository,
     new RateLimiter(() => 0),
+    storage as unknown as StorageService,
   );
-  return { service, repository };
+  return { service, repository, storage };
 }
 
 describe("PostsService.list", () => {
@@ -391,5 +402,147 @@ describe("PostsService.getVisibleStatus", () => {
       code: "NOT_FOUND",
     });
     expect(repository.findAccessTarget).not.toHaveBeenCalled();
+  });
+});
+
+describe("PostsService.update, remove", () => {
+  function editRow(overrides: Partial<PostEditRow> = {}): PostEditRow {
+    return {
+      id: "p1",
+      slug: "cho-phien",
+      title: "Chợ phiên",
+      content: "Sáng mai đi chợ",
+      status: "PUBLISHED",
+      authorId: "tac-gia",
+      tags: [{ tag: { name: "ăn vặt" } }],
+      media: [{ id: "m1" }],
+      ...overrides,
+    };
+  }
+  const author = userOf("user", "tac-gia");
+
+  function ready(row: PostEditRow | null = editRow()) {
+    const ctx = setup();
+    ctx.repository.findForEdit.mockResolvedValue(row);
+    ctx.repository.findBySlug.mockResolvedValue(detailRow());
+    return ctx;
+  }
+
+  it("đổi chữ thì tính lại tóm tắt, searchText (kèm tag), giữ slug", async () => {
+    const { service, repository } = ready();
+
+    await service.update(author, "p1", { title: "Chợ phiên Tết" });
+
+    expect(repository.updateWithMedia).toHaveBeenCalledWith(
+      "p1",
+      "tac-gia",
+      expect.objectContaining({
+        title: "Chợ phiên Tết",
+        excerpt: "Sáng mai đi chợ",
+        searchText: expect.stringContaining("an vat"),
+      }),
+      undefined,
+    );
+    expect(repository.findBySlug).toHaveBeenCalledWith("cho-phien");
+  });
+
+  it("chỉ đổi danh mục thì không tính lại tóm tắt", async () => {
+    const { service, repository } = ready();
+
+    await service.update(author, "p1", { category: "hoi-dap" });
+
+    const changes = repository.updateWithMedia.mock.calls[0]?.[2];
+    expect(changes).toEqual({ title: undefined, content: undefined, categorySlug: "hoi-dap" });
+  });
+
+  it("file bỏ ra bị xóa khỏi ổ đĩa sau khi lưu", async () => {
+    const { service, repository, storage } = ready();
+    repository.updateWithMedia.mockResolvedValue({
+      ok: true,
+      removedStorageKeys: ["images/a.png", "videos/b.mp4"],
+    });
+
+    await service.update(author, "p1", { mediaIds: [] });
+
+    expect(storage.remove).toHaveBeenCalledWith("images/a.png");
+    expect(storage.remove).toHaveBeenCalledWith("videos/b.mp4");
+  });
+
+  it("xóa file trên đĩa lỗi vẫn sửa bài thành công", async () => {
+    const { service, repository, storage } = ready();
+    repository.updateWithMedia.mockResolvedValue({
+      ok: true,
+      removedStorageKeys: ["images/a.png"],
+    });
+    storage.remove.mockRejectedValue(new Error("đĩa bận"));
+
+    await expect(service.update(author, "p1", { mediaIds: [] })).resolves.toBeDefined();
+  });
+
+  it("sửa xong mà không còn chữ lẫn ảnh thì 400 ở ô content, không ghi", async () => {
+    const { service, repository } = ready(editRow({ media: [] }));
+
+    await expect(service.update(author, "p1", { content: "" })).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      fields: { content: expect.any(String) },
+    });
+    expect(repository.updateWithMedia).not.toHaveBeenCalled();
+  });
+
+  it("xóa hết chữ nhưng bài còn ảnh thì được", async () => {
+    const { service, repository } = ready();
+
+    await service.update(author, "p1", { content: "" });
+
+    expect(repository.updateWithMedia).toHaveBeenCalled();
+  });
+
+  it.each([
+    ["CATEGORY_NOT_FOUND", "category"],
+    ["MEDIA_NOT_ATTACHABLE", "mediaIds"],
+  ] as const)("repository báo %s thì 400 ở ô %s", async (reason, field) => {
+    const { service, repository } = ready();
+    repository.updateWithMedia.mockResolvedValue({ ok: false, reason });
+
+    await expect(service.update(author, "p1", { title: "x" })).rejects.toMatchObject({
+      code: "VALIDATION_ERROR",
+      fields: { [field]: expect.any(String) },
+    });
+  });
+
+  it.each([
+    ["hàng xóm khác", userOf("user")],
+    ["trưởng xóm (dùng route admin)", userOf("admin")],
+  ])("%s sửa, xóa bài đã đăng của người khác thì FORBIDDEN", async (_, who) => {
+    const { service, repository } = ready();
+
+    await expect(service.update(who, "p1", { title: "x" })).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    await expect(service.remove(who, "p1")).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(repository.updateWithMedia).not.toHaveBeenCalled();
+    expect(repository.deleteWithMedia).not.toHaveBeenCalled();
+  });
+
+  it("bài bị ẩn của người khác thì NOT_FOUND (không lộ là có)", async () => {
+    const { service } = ready(editRow({ status: "ARCHIVED" }));
+
+    await expect(service.remove(userOf("user"), "p1")).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it.each(["khong-co", "../p1"])("id %j không có hoặc sai dạng thì NOT_FOUND", async (id) => {
+    const { service } = ready(null);
+
+    await expect(service.remove(author, id)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it("tác giả xóa bài: xóa dòng rồi xóa file trên đĩa", async () => {
+    const { service, repository, storage } = ready();
+    repository.deleteWithMedia.mockResolvedValue(["images/a.png"]);
+
+    await service.remove(author, "p1");
+
+    expect(repository.deleteWithMedia).toHaveBeenCalledWith("p1");
+    expect(storage.remove).toHaveBeenCalledWith("images/a.png");
   });
 });

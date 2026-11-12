@@ -59,12 +59,39 @@ export type CreatePostFailure = "CATEGORY_NOT_FOUND" | "MEDIA_NOT_ATTACHABLE";
 export type CreatePostResult =
   { ok: true; slug: string } | { ok: false; reason: CreatePostFailure };
 
-/** Dừng transaction tạo bài (rollback) mà không phải lỗi hệ thống. */
+/** Dừng transaction tạo, sửa bài (rollback) mà không phải lỗi hệ thống. */
 class CreatePostAbort extends Error {
   constructor(readonly reason: CreatePostFailure) {
     super(reason);
   }
 }
+
+/** Phần bài cần để sửa, xóa: quyền, giá trị đang có (để tính tóm tắt, searchText), file đang gắn. */
+const postEditSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  content: true,
+  status: true,
+  authorId: true,
+  tags: { select: { tag: { select: { name: true } } } },
+  media: { select: { id: true }, orderBy: { position: "asc" } },
+} satisfies Prisma.PostSelect;
+
+export type PostEditRow = Prisma.PostGetPayload<{ select: typeof postEditSelect }>;
+
+/** Thay đổi service đã tính sẵn; trường `undefined` thì giữ nguyên. */
+export interface PostChanges {
+  title?: string;
+  content?: string;
+  excerpt?: string;
+  searchText?: string;
+  categorySlug?: string;
+}
+
+/** Sửa xong: khóa file đã gỡ khỏi bài (service xóa trên đĩa sau khi transaction xong). */
+export type UpdatePostResult =
+  { ok: true; removedStorageKeys: string[] } | { ok: false; reason: CreatePostFailure };
 
 export interface PostListPage {
   sort: PostSort;
@@ -146,8 +173,9 @@ export class PostsRepository {
           select: { id: true, slug: true },
         });
         for (const [position, id] of mediaIds.entries()) {
+          // `purpose: POST`: ảnh đại diện cũng chưa gắn bài, nhưng không được thành ảnh của bài
           const { count } = await tx.media.updateMany({
-            where: { id, ownerId: data.authorId, postId: null },
+            where: { id, ownerId: data.authorId, postId: null, purpose: "POST" },
             data: { postId: created.id, position },
           });
           if (count !== 1) throw new CreatePostAbort("MEDIA_NOT_ATTACHABLE");
@@ -160,15 +188,92 @@ export class PostsRepository {
     }
   }
 
+  findForEdit(id: string): Promise<PostEditRow | null> {
+    return this.prisma.post.findUnique({ where: { id }, select: postEditSelect });
+  }
+
   /**
-   * Tăng lượt xem nếu bài đang ở trạng thái `status`. Trả số bài được cập nhật (0 hoặc 1).
-   * Dùng SQL thô: `update` của Prisma tự đổi `updatedAt` (@updatedAt), mà lượt xem không phải là sửa bài.
+   * Sửa bài trong một transaction. `mediaIds` (nếu có) là danh sách đầy đủ sau khi sửa: file bỏ ra bị xóa dòng,
+   * file giữ lại và file mới được xếp lại thứ tự. File mới phải của tác giả, chưa gắn bài nào, không phải ảnh
+   * đại diện (`updateMany` có điều kiện, như lúc đăng). Không đạt thì rollback, không đổi gì.
    */
+  async updateWithMedia(
+    id: string,
+    authorId: string,
+    changes: PostChanges,
+    mediaIds: readonly string[] | undefined,
+  ): Promise<UpdatePostResult> {
+    const { categorySlug, ...fields } = changes;
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        let categoryId: string | undefined;
+        if (categorySlug !== undefined) {
+          const category = await tx.category.findUnique({
+            where: { slug: categorySlug },
+            select: { id: true },
+          });
+          if (!category) throw new CreatePostAbort("CATEGORY_NOT_FOUND");
+          categoryId = category.id;
+        }
+
+        let removedStorageKeys: string[] = [];
+        if (mediaIds !== undefined) {
+          const keep = new Set(mediaIds);
+          const current = await tx.media.findMany({
+            where: { postId: id },
+            select: { id: true, storageKey: true },
+          });
+          const removed = current.filter((media) => !keep.has(media.id));
+          await tx.media.deleteMany({ where: { id: { in: removed.map((media) => media.id) } } });
+          removedStorageKeys = removed.map((media) => media.storageKey);
+
+          for (const [position, mediaId] of mediaIds.entries()) {
+            const { count } = await tx.media.updateMany({
+              where: {
+                id: mediaId,
+                ownerId: authorId,
+                purpose: "POST",
+                OR: [{ postId: id }, { postId: null }],
+              },
+              data: { postId: id, position },
+            });
+            if (count !== 1) throw new CreatePostAbort("MEDIA_NOT_ATTACHABLE");
+          }
+        }
+
+        await tx.post.update({ where: { id }, data: { ...fields, categoryId } });
+        return { ok: true as const, removedStorageKeys };
+      });
+    } catch (error) {
+      if (error instanceof CreatePostAbort) return { ok: false, reason: error.reason };
+      throw error;
+    }
+  }
+
+  /**
+   * Xóa bài; bình luận, tag, dòng media xóa theo (`onDelete: Cascade`). Trả khóa file để service xóa trên đĩa
+   * sau khi transaction xong.
+   */
+  async deleteWithMedia(id: string): Promise<string[]> {
+    return this.prisma.$transaction(async (tx) => {
+      const media = await tx.media.findMany({
+        where: { postId: id },
+        select: { storageKey: true },
+      });
+      await tx.post.deleteMany({ where: { id } });
+      return media.map((item) => item.storageKey);
+    });
+  }
+
   /** Phần policy cần để quyết định ai xem được bài (module khác gọi qua PostsService). */
   findAccessTarget(id: string): Promise<{ status: PostStatus; authorId: string } | null> {
     return this.prisma.post.findUnique({ where: { id }, select: { status: true, authorId: true } });
   }
 
+  /**
+   * Tăng lượt xem nếu bài đang ở trạng thái `status`. Trả số bài được cập nhật (0 hoặc 1).
+   * Dùng SQL thô: `update` của Prisma tự đổi `updatedAt` (@updatedAt), mà lượt xem không phải là sửa bài.
+   */
   incrementViewCount(id: string, status: PostStatus): Promise<number> {
     return this.prisma.$executeRaw`
       UPDATE post SET viewCount = viewCount + 1 WHERE id = ${id} AND status = ${status}`;

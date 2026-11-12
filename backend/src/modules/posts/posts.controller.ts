@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   Res,
@@ -17,6 +19,8 @@ import {
   POST_STATUSES,
   type PostDetail,
   type PostListItem,
+  type UpdatePostInput,
+  updatePostSchema,
 } from "@xom-nho/api";
 import type { Response } from "express";
 import { CurrentUser } from "../../common/decorators/current-user.decorator.js";
@@ -60,6 +64,23 @@ export class PostsController {
     if (post.status !== POST_STATUSES.PUBLISHED)
       res.setHeader("Cache-Control", "private, no-store");
     return post;
+  }
+
+  /** Sửa bài của mình. Trả bài sau khi sửa (slug giữ nguyên). */
+  @Patch(":id")
+  update(
+    @CurrentUser() user: SessionUser,
+    @Param("id") id: string,
+    @Body(new ZodValidationPipe(updatePostSchema)) input: UpdatePostInput,
+  ): Promise<PostDetail> {
+    return this.postsService.update(user, id, input);
+  }
+
+  /** Xóa hẳn bài của mình, cả bình luận, ảnh, video. Trả 204. */
+  @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@CurrentUser() user: SessionUser, @Param("id") id: string): Promise<void> {
+    return this.postsService.remove(user, id);
   }
 
   @Post(":id/view")

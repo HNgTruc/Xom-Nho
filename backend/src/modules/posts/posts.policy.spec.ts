@@ -52,3 +52,35 @@ describe("PostsPolicy.canView", () => {
     });
   });
 });
+
+describe("PostsPolicy.canModify", () => {
+  it.each(["user", "author", "admin"] as const)("%s sửa, xóa được bài của mình", (role) => {
+    expect(
+      PostsPolicy.canModify(userOf(role, AUTHOR_ID), { status: "PUBLISHED", authorId: AUTHOR_ID }),
+    ).toBe(true);
+  });
+
+  it.each(["user", "author", "admin"] as const)(
+    "%s không sửa, xóa bài của người khác qua route thường",
+    (role) => {
+      expect(
+        PostsPolicy.canModify(userOf(role), { status: "PUBLISHED", authorId: AUTHOR_ID }),
+      ).toBe(false);
+    },
+  );
+
+  it("tác giả vẫn sửa, xóa được bài đang bị ẩn của mình", () => {
+    expect(
+      PostsPolicy.canModify(userOf("user", AUTHOR_ID), { status: "ARCHIVED", authorId: AUTHOR_ID }),
+    ).toBe(true);
+  });
+
+  it("người bị cấm không sửa, xóa được, kể cả bài của mình", () => {
+    expect(
+      PostsPolicy.canModify(userOf("user", AUTHOR_ID, true), {
+        status: "PUBLISHED",
+        authorId: AUTHOR_ID,
+      }),
+    ).toBe(false);
+  });
+});

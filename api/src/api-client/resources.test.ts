@@ -176,3 +176,21 @@ describe("api.comments", () => {
     expect(del.calledInit().method).toBe("DELETE");
   });
 });
+
+describe("api.posts sửa, xóa", () => {
+  it("update gửi PATCH chỉ các trường đổi, remove gửi DELETE", async () => {
+    const patch = setup({ data: {} });
+    await patch.api.posts.update("p 1", { title: "Mới", mediaIds: ["m2", "m1"] });
+    expect(patch.calledUrl()).toBe("http://x/api/v1/posts/p%201");
+    expect(patch.calledInit().method).toBe("PATCH");
+    expect(JSON.parse(patch.calledInit().body as string)).toEqual({
+      title: "Mới",
+      mediaIds: ["m2", "m1"],
+    });
+
+    const del = setup(null, 204);
+    await del.api.posts.remove("p1");
+    expect(del.calledUrl()).toBe("http://x/api/v1/posts/p1");
+    expect(del.calledInit().method).toBe("DELETE");
+  });
+});

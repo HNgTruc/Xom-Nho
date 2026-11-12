@@ -7,7 +7,12 @@ import {
   slugSchema,
   usernameSchema,
 } from "./common.js";
-import { createPostSchema, listPostsQuerySchema } from "./post.js";
+import {
+  createPostSchema,
+  EMPTY_POST_MESSAGE,
+  listPostsQuerySchema,
+  updatePostSchema,
+} from "./post.js";
 import { searchQuerySchema } from "./search.js";
 import { tagSuggestQuerySchema } from "./tag.js";
 
@@ -161,5 +166,48 @@ describe("createPostSchema", () => {
     expect(createPostSchema.safeParse({ ...base, content: "a".repeat(10_001) }).success).toBe(
       false,
     );
+  });
+});
+
+describe("updatePostSchema", () => {
+  it("chỉ giữ trường được gửi, cắt khoảng trắng như lúc đăng", () => {
+    expect(updatePostSchema.parse({ title: "  Chợ phiên  " })).toEqual({ title: "Chợ phiên" });
+  });
+
+  it("không gửi trường nào thì báo chưa thay đổi gì", () => {
+    const result = updatePostSchema.safeParse({});
+
+    expect(result.error?.issues[0]?.message).toBe("Bạn chưa thay đổi gì");
+  });
+
+  it("xóa hết chữ và hết ảnh cùng lúc thì báo ở ô content", () => {
+    const result = updatePostSchema.safeParse({ content: "  ", mediaIds: [] });
+
+    expect(result.error?.issues[0]).toMatchObject({
+      path: ["content"],
+      message: EMPTY_POST_MESSAGE,
+    });
+  });
+
+  it("xóa hết chữ mà không gửi mediaIds thì để backend xét (bài có thể còn ảnh)", () => {
+    expect(updatePostSchema.safeParse({ content: "" }).success).toBe(true);
+  });
+
+  it.each<[Record<string, unknown>, string]>([
+    [{ mediaIds: ["a", "a"] }, "ảnh trùng"],
+    [{ mediaIds: ["../etc"] }, "id lạ"],
+    [{ mediaIds: Array.from({ length: 11 }, (_, i) => `m${i}`) }, "quá 10 file"],
+    [{ category: "" }, "danh mục rỗng"],
+    [{ title: "a".repeat(201) }, "tiêu đề quá dài"],
+  ])("chặn %j (%s)", (body) => {
+    expect(updatePostSchema.safeParse(body).success).toBe(false);
+  });
+
+  it("bỏ trường client không được đổi (slug, status, authorId)", () => {
+    expect(
+      updatePostSchema.parse({ content: "Mới", slug: "x", status: "PUBLISHED", authorId: "y" }),
+    ).toEqual({
+      content: "Mới",
+    });
   });
 });
