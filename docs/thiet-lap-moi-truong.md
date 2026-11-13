@@ -91,6 +91,24 @@ Tài khoản mẫu sau khi chạy seed (chỉ ở máy dev), mật khẩu đều
 | `baongoc@xomnho.local`   | Hàng xóm (`user`)    |
 | http://localhost:8080    | Adminer              |
 
+### Test Playwright của web
+
+Lần đầu tải trình duyệt cho Playwright (lưu ở `%LOCALAPPDATA%\ms-playwright`):
+
+```bash
+pnpm --filter web exec playwright install chromium
+```
+
+Chạy test (MySQL phải đang chạy, `pnpm db:up`):
+
+```bash
+pnpm --filter web test:e2e
+```
+
+Playwright tự dựng một bộ riêng, chạy được cả khi `pnpm dev` đang mở: backend ở cổng **4100** trên database `xom_nho_test` (tự áp migration, chạy seed để có danh mục), web bản production ở cổng **3100** (build vào `frontend/web/.next-e2e/`, backend compile vào `backend/dist-e2e/`). Mỗi lần chạy mất khoảng một phút vì phải build. Test tạo tài khoản và bài mới có hậu tố ngẫu nhiên, nên không cần dọn database. Không chạy cùng lúc với `pnpm --filter backend test:e2e`: test backend xóa sạch database test trước mỗi test. Test lỗi thì xem ảnh chụp và trace trong `frontend/web/test-results/` (`pnpm --filter web exec playwright show-trace <file trace.zip>`).
+
+CI trên GitHub chưa chạy test này vì chưa có MySQL trong CI.
+
 ## 5. Chạy app trên điện thoại thật bằng Expo Go
 
 Điện thoại không hiểu `localhost` là máy tính của bạn, nên app phải gọi API qua IP mạng Wi-Fi.

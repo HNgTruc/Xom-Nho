@@ -70,7 +70,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] Backend: `PostLike` (thích / bỏ thích, `PUT`/`DELETE /posts/:id/like`), feed trả số thích, `likedByMe` và 2 bình luận gốc đang hiện mới nhất
 - [x] Web: bình luận + trả lời ở trang bài (gửi, trả lời có "@tên", sửa, xóa có hỏi lại, "đã sửa", bình luận ẩn hiện mờ cho admin)
 - [x] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất; trang bài có Thích, Chia sẻ
-- [ ] Test Playwright: đăng ký → viết bài → bình luận
+- [x] Test Playwright: đăng ký → viết bài → bình luận (`frontend/web/e2e/`, chạy riêng ở cổng 3100/4100 trên database test; chưa có trong CI)
 
 ## Giai đoạn 4b: Hồ sơ, cài đặt, kết bạn
 

@@ -60,5 +60,7 @@ src/
 ```bash
 pnpm --filter web dev            # http://localhost:3000 (backend phải chạy ở :4000)
 pnpm --filter web test
-pnpm --filter web test:e2e
+pnpm --filter web test:e2e       # Playwright: tự dựng backend :4100 (database _test) + web :3100, cần MySQL
 ```
+
+Test Playwright đặt ở `e2e/*.e2e.ts` (đuôi `.e2e.ts` để Vitest không chạy nhầm). Cách chạy và lưu ý: `docs/thiet-lap-moi-truong.md` mục 4, "Test Playwright của web".
