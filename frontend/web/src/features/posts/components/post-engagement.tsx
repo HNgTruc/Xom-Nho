@@ -3,6 +3,8 @@
 import {
   COMMENT_MESSAGES,
   commentCountLabel,
+  DISLIKE_MESSAGES,
+  dislikeCountLabel,
   LIKE_MESSAGES,
   likeCountLabel,
   type PostLikeState,
@@ -10,11 +12,11 @@ import {
 } from "@xom-nho/api";
 import { Button } from "@xom-nho/ui/components/button";
 import { cn } from "@xom-nho/ui/lib/utils";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, ThumbsDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { browserApi } from "@/lib/browser-api";
-import { likeErrorText, toggledLike } from "../lib/like-state";
+import { likeErrorText, sameLikeState, toggledDislike, toggledLike } from "../lib/like-state";
 
 const numberFormat = new Intl.NumberFormat("vi-VN");
 
@@ -26,11 +28,19 @@ const aboveCardLink = "relative z-10";
 /** Nút trong hàng hành động: chia đều ba cột; điện thoại cao 44px cho đủ vùng bấm (MASTER mục 10). */
 const actionButton = "w-full px-2 max-sm:h-11";
 
+/** Biểu tượng trong nút bấm: thu 90% khi nhấn (tắt khi giảm chuyển động), tô đặc khi đã bấm. */
+const pressIcon = (pressed: boolean) =>
+  cn(
+    "size-5 transition-transform ease-standard group-active/button:scale-90 motion-reduce:transition-none",
+    pressed && "fill-current",
+  );
+
 /**
- * Số thích, số bình luận và hàng nút Thích, Bình luận, Chia sẻ (docs/tinh-nang.md mục 2.1, 2.6; MASTER mục 7).
- * Dùng ở thẻ bài trong feed và trang bài.
- * - Thích: đổi ngay khi bấm (cập nhật lạc quan), gửi `PUT`/`DELETE` theo trạng thái muốn có. Bấm liên tục thì chỉ
- *   kết quả của lần bấm cuối được hiện; lỗi thì trả về trạng thái backend xác nhận gần nhất và báo lỗi.
+ * Số thích, số không thích, số bình luận và hàng nút Thích + Không thích, Bình luận, Chia sẻ (docs/tinh-nang.md
+ * mục 2.1, 2.6; MASTER mục 7; ADR 0009). Dùng ở thẻ bài trong feed và trang bài.
+ * - Thích, Không thích: loại trừ nhau, đổi ngay khi bấm (cập nhật lạc quan), gửi `PUT`/`DELETE` theo trạng thái
+ *   muốn có. Bấm liên tục (kể cả qua lại giữa hai nút) thì chỉ kết quả của lần bấm cuối được hiện; lỗi thì trả
+ *   về trạng thái backend xác nhận gần nhất và báo lỗi.
  * - Chia sẻ: màn hình cảm ứng có `navigator.share` thì mở bảng chia sẻ của hệ điều hành; còn lại sao chép liên kết.
  * - Bình luận: liên kết tới khối bình luận của trang bài (`#binh-luan`).
  */
@@ -58,12 +68,15 @@ export function PostEngagement({
   const [state, setState] = useState(like);
   // Trang tải lại dữ liệu (`router.refresh()`) thì lấy số mới của server
   const [serverLike, setServerLike] = useState(like);
-  if (serverLike.liked !== like.liked || serverLike.likeCount !== like.likeCount) {
+  if (!sameLikeState(serverLike, like)) {
     setServerLike(like);
     setState(like);
   }
   const confirmed = useRef(like);
   const latestRequest = useRef(0);
+  // Các lượt bấm gửi lần lượt, đúng thứ tự bấm: gửi song song thì server có thể xử lý lượt sau trước lượt trước
+  // (bấm Không thích rồi Thích thật nhanh mà kết quả lưu lại là Không thích)
+  const queue = useRef<Promise<unknown>>(Promise.resolve());
   const [notice, setNotice] = useState<Notice | null>(null);
 
   useEffect(() => {
@@ -77,21 +90,30 @@ export function PostEngagement({
     return () => clearTimeout(timer);
   }, [notice]);
 
-  async function toggleLike() {
-    const next = toggledLike(state);
+  async function toggle(kind: "like" | "dislike") {
+    const next = kind === "like" ? toggledLike(state) : toggledDislike(state);
     setState(next);
     setNotice(null);
     const request = ++latestRequest.current;
+    const { posts } = browserApi;
+    const send = () =>
+      kind === "like"
+        ? next.liked
+          ? posts.like(postId)
+          : posts.unlike(postId)
+        : next.disliked
+          ? posts.dislike(postId)
+          : posts.undislike(postId);
+    const sent = queue.current.then(send);
+    queue.current = sent.catch(() => undefined);
     try {
-      const { data } = next.liked
-        ? await browserApi.posts.like(postId)
-        : await browserApi.posts.unlike(postId);
+      const { data } = await sent;
       confirmed.current = data;
       if (request === latestRequest.current) setState(data);
     } catch (error) {
       if (request !== latestRequest.current) return;
       setState(confirmed.current);
-      setNotice({ tone: "error", text: likeErrorText(error) });
+      setNotice({ tone: "error", text: likeErrorText(error, kind) });
     }
   }
 
@@ -116,17 +138,33 @@ export function PostEngagement({
   }
 
   const showLikes = state.likeCount > 0;
+  const showDislikes = state.dislikeCount > 0;
   const showComments = showCommentCount && commentCount > 0;
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      {(showLikes || showComments) && (
+      {(showLikes || showDislikes || showComments) && (
         <div className="flex min-h-6 items-center justify-between gap-2 text-sm text-muted-foreground">
-          {showLikes ? (
-            <span className="inline-flex items-center gap-1">
-              <Heart aria-hidden="true" className="size-4 fill-current" strokeWidth={1.75} />
-              <span aria-hidden="true">{numberFormat.format(state.likeCount)}</span>
-              <span className="sr-only">{likeCountLabel(state.likeCount)}</span>
+          {showLikes || showDislikes ? (
+            <span className="inline-flex items-center gap-3">
+              {showLikes && (
+                <span className="inline-flex items-center gap-1">
+                  <Heart aria-hidden="true" className="size-4 fill-current" strokeWidth={1.75} />
+                  <span aria-hidden="true">{numberFormat.format(state.likeCount)}</span>
+                  <span className="sr-only">{likeCountLabel(state.likeCount)}</span>
+                </span>
+              )}
+              {showDislikes && (
+                <span className="inline-flex items-center gap-1">
+                  <ThumbsDown
+                    aria-hidden="true"
+                    className="size-4 fill-current"
+                    strokeWidth={1.75}
+                  />
+                  <span aria-hidden="true">{numberFormat.format(state.dislikeCount)}</span>
+                  <span className="sr-only">{dislikeCountLabel(state.dislikeCount)}</span>
+                </span>
+              )}
             </span>
           ) : (
             <span />
@@ -146,22 +184,44 @@ export function PostEngagement({
       )}
 
       <div className="grid grid-cols-3 gap-1 border-t border-border pt-2">
-        <Button
-          type="button"
-          variant="ghost"
-          aria-pressed={state.liked}
-          onClick={() => void toggleLike()}
-          className={cn(aboveCardLink, actionButton, state.liked && "font-semibold")}
-        >
-          <Heart
-            aria-hidden="true"
+        {/*
+          Cột đầu là cặp Thích + Không thích (chỉ biểu tượng), ADR 0009, MASTER mục 7. Cặp ôm sát nhau, nằm giữa
+          cột (giãn nút Thích ra thì trên máy tính hai nút rời nhau). Dưới 640px không đủ chỗ cho bốn nút ba nhãn
+          (thẻ còn khoảng 314px ở bề rộng 390px): chữ "Thích" chỉ còn cho trình đọc màn hình, nút vuông 44px.
+          Hai biểu tượng dồn vào phía nhau (vùng chạm vẫn 44px): không thì ngón cái gần biểu tượng Bình luận hơn
+          tim, mắt ghép nhầm nhóm.
+        */}
+        <div className="flex min-w-0 justify-center gap-1 max-sm:gap-0">
+          <Button
+            type="button"
+            variant="ghost"
+            aria-pressed={state.liked}
+            onClick={() => void toggle("like")}
             className={cn(
-              "size-5 transition-transform ease-standard group-active/button:scale-90 motion-reduce:transition-none",
-              state.liked && "fill-current",
+              aboveCardLink,
+              "min-w-0 px-2 max-sm:size-11 max-sm:justify-end max-sm:pr-1 max-sm:pl-0",
+              state.liked && "font-semibold",
             )}
-          />
-          {LIKE_MESSAGES.LIKE}
-        </Button>
+          >
+            <Heart aria-hidden="true" className={pressIcon(state.liked)} />
+            <span className="max-sm:sr-only">{LIKE_MESSAGES.LIKE}</span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-pressed={state.disliked}
+            aria-label={DISLIKE_MESSAGES.DISLIKE}
+            title={DISLIKE_MESSAGES.DISLIKE}
+            onClick={() => void toggle("dislike")}
+            className={cn(
+              aboveCardLink,
+              "shrink-0 max-sm:size-11 max-sm:justify-start max-sm:pl-1",
+            )}
+          >
+            <ThumbsDown aria-hidden="true" className={pressIcon(state.disliked)} />
+          </Button>
+        </div>
         <Button asChild variant="ghost" className={cn(aboveCardLink, actionButton)}>
           <Link href={commentsHref}>
             <MessageCircle aria-hidden="true" className="size-5" />

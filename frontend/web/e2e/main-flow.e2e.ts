@@ -1,8 +1,16 @@
 import { expect, test } from "@playwright/test";
-import { COMMENT_MESSAGES, COMPOSER_MESSAGES, composerPrompt } from "@xom-nho/api";
+import {
+  COMMENT_MESSAGES,
+  COMPOSER_MESSAGES,
+  composerPrompt,
+  DISLIKE_MESSAGES,
+  dislikeCountLabel,
+  LIKE_MESSAGES,
+  likeCountLabel,
+} from "@xom-nho/api";
 
 /**
- * Luồng chính của web (docs/lo-trinh.md giai đoạn 4): đăng ký → viết bài → bình luận.
+ * Luồng chính của web (docs/lo-trinh.md giai đoạn 4): đăng ký → viết bài → bình luận → Thích, Không thích.
  * Mỗi lần chạy dùng tài khoản và bài mới (tên có hậu tố ngẫu nhiên) nên không cần dọn database test.
  */
 test("hàng xóm mới đăng ký, đăng bài rồi bình luận vào bài của mình", async ({ page }) => {
@@ -19,7 +27,8 @@ test("hàng xóm mới đăng ký, đăng bài rồi bình luận vào bài củ
     await page.getByLabel("Mật khẩu", { exact: true }).fill("matkhau-e2e-123");
     await page.getByRole("button", { name: "Đăng ký", exact: true }).click();
 
-    await expect(page).toHaveURL("/");
+    // Better Auth băm mật khẩu bằng scrypt (tốn CPU): chạy song song nhiều lượt trên máy yếu có thể quá 5 giây
+    await expect(page).toHaveURL("/", { timeout: 15_000 });
     await expect(page.getByRole("button", { name: composerPrompt(name) })).toBeVisible();
   });
 
@@ -59,5 +68,29 @@ test("hàng xóm mới đăng ký, đăng bài rồi bình luận vào bài củ
 
     await page.reload();
     await expect(page.getByText(comment)).toBeVisible();
+  });
+
+  await test.step("Thích và Không thích loại trừ nhau, tải lại vẫn giữ lựa chọn (ADR 0009)", async () => {
+    const like = page.getByRole("button", { name: LIKE_MESSAGES.LIKE, exact: true });
+    const dislike = page.getByRole("button", { name: DISLIKE_MESSAGES.DISLIKE });
+    // Nút đổi ngay khi bấm (lạc quan); chờ server lưu xong rồi mới tải lại, không thì đọc trúng lúc đang ghi
+    const saved = (kind: "like" | "dislike") =>
+      page.waitForResponse((r) => r.url().endsWith(`/${kind}`) && r.request().method() === "PUT");
+
+    // Bấm liền hai nút, không chờ: các lượt bấm phải được lưu đúng thứ tự bấm
+    const bothSaved = Promise.all([saved("dislike"), saved("like")]);
+    await dislike.click();
+    await expect(dislike).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText(dislikeCountLabel(1))).toBeAttached();
+
+    await like.click();
+    await expect(like).toHaveAttribute("aria-pressed", "true");
+    await expect(dislike).toHaveAttribute("aria-pressed", "false");
+    await bothSaved;
+
+    await page.reload();
+    await expect(like).toHaveAttribute("aria-pressed", "true");
+    await expect(dislike).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByText(likeCountLabel(1))).toBeAttached();
   });
 });

@@ -12,6 +12,8 @@ const post: PostDetail = {
   commentCount: 0,
   likeCount: 0,
   likedByMe: false,
+  dislikeCount: 0,
+  dislikedByMe: false,
   author: { id: "u1", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
   category: { name: "Đời sống", slug: "doi-song", color: "amber" },
   tags: [{ name: "Ăn vặt", slug: "an-vat" }],

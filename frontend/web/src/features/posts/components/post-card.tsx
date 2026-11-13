@@ -116,7 +116,12 @@ export function PostCard({
         postId={post.id}
         slug={post.slug}
         shareTitle={post.title || `Bài của ${post.author.name}`}
-        like={{ liked: post.likedByMe, likeCount: post.likeCount }}
+        like={{
+          liked: post.likedByMe,
+          likeCount: post.likeCount,
+          disliked: post.dislikedByMe,
+          dislikeCount: post.dislikeCount,
+        }}
         commentCount={post.commentCount}
         commentsHref={`/bai-viet/${post.slug}#binh-luan`}
       />
