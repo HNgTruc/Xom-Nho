@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Res,
 } from "@nestjs/common";
@@ -18,6 +19,7 @@ import {
   listPostsQuerySchema,
   POST_STATUSES,
   type PostDetail,
+  type PostLikeState,
   type PostListItem,
   type UpdatePostInput,
   updatePostSchema,
@@ -35,9 +37,10 @@ export class PostsController {
 
   @Get()
   list(
+    @CurrentUser() user: SessionUser,
     @Query(new ZodValidationPipe(listPostsQuerySchema)) query: ListPostsQuery,
   ): Promise<Paginated<PostListItem>> {
-    return this.postsService.list(query);
+    return this.postsService.list(user, query);
   }
 
   /** Đăng bài (ADR 0008: mọi thành viên đăng thẳng). Trả 201 kèm bài vừa đăng. */
@@ -87,5 +90,17 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   view(@Param("id") id: string): Promise<void> {
     return this.postsService.recordView(id);
+  }
+
+  /** Thích bài. Gọi lặp lại vẫn chỉ tính một lần. Trả số thích mới. */
+  @Put(":id/like")
+  like(@CurrentUser() user: SessionUser, @Param("id") id: string): Promise<PostLikeState> {
+    return this.postsService.like(user, id);
+  }
+
+  /** Bỏ thích. Chưa thích cũng không lỗi. Trả 200 kèm số thích mới (không phải 204) để frontend cập nhật số. */
+  @Delete(":id/like")
+  unlike(@CurrentUser() user: SessionUser, @Param("id") id: string): Promise<PostLikeState> {
+    return this.postsService.unlike(user, id);
   }
 }

@@ -62,11 +62,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  avatar        Media?    @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
-  posts         Post[]    @relation("PostAuthor")
-  reviewedPosts Post[]    @relation("PostReviewer")
+  avatar        Media?     @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
+  posts         Post[]     @relation("PostAuthor")
+  reviewedPosts Post[]     @relation("PostReviewer")
   comments      Comment[]
-  media         Media[]   @relation("MediaOwner")
+  media         Media[]    @relation("MediaOwner")
+  postLikes     PostLike[]
   sessions      Session[]
   accounts      Account[]
 
@@ -180,12 +181,13 @@ model Post {
   updatedAt     DateTime      @updatedAt
 
   // Không xóa người dùng hay danh mục khi còn bài
-  author   User      @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Restrict)
-  category Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  reviewer User?     @relation("PostReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  author   User       @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  category Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  reviewer User?      @relation("PostReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
   tags     PostTag[]
   comments Comment[]
   media    Media[]
+  likes    PostLike[]
 
   @@index([status, publishedAt(sort: Desc)])
   @@index([categoryId, status, publishedAt])
@@ -231,6 +233,22 @@ model PostTag {
   @@id([postId, tagId])
   @@index([tagId])
   @@map("post_tag")
+}
+
+// Một hàng xóm thích một bài. Khóa chính ghép: mỗi người thích mỗi bài một lần, ghi lặp lại không tăng số.
+// Xóa bài hay người dùng thì lượt thích đi theo.
+model PostLike {
+  postId    String
+  userId    String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  // Bài một người đã thích, mới trước (danh sách "đã thích" sau này) và khóa ngoại userId
+  @@index([userId, createdAt])
+  @@map("post_like")
 }
 
 model Comment {

@@ -27,7 +27,7 @@ function listRow(overrides: Partial<PostListRow> = {}): PostListRow {
       { tag: { name: "Ăn vặt", slug: "an-vat" } },
       { tag: { name: "Hà Nội", slug: "ha-noi" } },
     ],
-    _count: { comments: 3 },
+    _count: { comments: 3, likes: 5 },
     media: [{ id: "m1", kind: "IMAGE", mimeType: "image/png" }],
     ...overrides,
   };
@@ -60,6 +60,11 @@ function setup() {
     deleteWithMedia: vi.fn().mockResolvedValue([]),
     findSlugsStartingWith: vi.fn().mockResolvedValue([]),
     createWithMedia: vi.fn().mockResolvedValue({ ok: true, slug: "ban-tron-cuoi-tuan" }),
+    findLikedPostIds: vi.fn().mockResolvedValue(new Set<string>()),
+    findLatestComments: vi.fn().mockResolvedValue([]),
+    addLike: vi.fn().mockResolvedValue(undefined),
+    removeLike: vi.fn().mockResolvedValue(undefined),
+    findLikeState: vi.fn().mockResolvedValue({ liked: false, count: 0 }),
   };
   const storage = { remove: vi.fn().mockResolvedValue(undefined) };
   const service = new PostsService(
@@ -74,7 +79,7 @@ describe("PostsService.list", () => {
   it("chỉ lấy bài đã đăng, đổi trang thành skip/take, truyền bộ lọc xuống repository", async () => {
     const { service, repository } = setup();
 
-    await service.list({
+    await service.list(userOf("user"), {
       page: 3,
       pageSize: 10,
       sort: "top",
@@ -93,7 +98,7 @@ describe("PostsService.list", () => {
     const { service, repository } = setup();
     repository.findList.mockResolvedValue([[listRow()], 21]);
 
-    const result = await service.list({ page: 1, pageSize: 10, sort: "new" });
+    const result = await service.list(userOf("user"), { page: 1, pageSize: 10, sort: "new" });
 
     expect(result.meta).toEqual({ page: 1, pageSize: 10, total: 21, totalPages: 3 });
     expect(result.items).toEqual([
@@ -105,6 +110,9 @@ describe("PostsService.list", () => {
         publishedAt: "2026-11-01T08:00:00.000Z",
         viewCount: 12,
         commentCount: 3,
+        likeCount: 5,
+        likedByMe: false,
+        latestComments: [],
         author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
         category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
         tags: [
@@ -119,9 +127,146 @@ describe("PostsService.list", () => {
   it("không có bài nào thì trả trang rỗng, 0 trang", async () => {
     const { service } = setup();
 
-    const result = await service.list({ page: 1, pageSize: 10, sort: "new" });
+    const result = await service.list(userOf("user"), { page: 1, pageSize: 10, sort: "new" });
 
     expect(result).toEqual({ items: [], meta: { page: 1, pageSize: 10, total: 0, totalPages: 0 } });
+  });
+});
+
+describe("PostsService.list: thích và bình luận xem trước", () => {
+  function comment(id: string, postId: string) {
+    return {
+      id,
+      postId,
+      content: `Bình luận ${id}`,
+      createdAt: new Date("2026-11-03T10:00:00.000Z"),
+      author: { id: "u9", name: "Minh", username: "minh", image: null, avatarId: null },
+    };
+  }
+
+  it("tra lượt thích của người xem và 2 bình luận mới nhất cho cả trang, mỗi thứ một truy vấn", async () => {
+    const { service, repository } = setup();
+    const viewer = userOf("user");
+    repository.findList.mockResolvedValue([[listRow({ id: "a" }), listRow({ id: "b" })], 2]);
+    repository.findLikedPostIds.mockResolvedValue(new Set(["b"]));
+    repository.findLatestComments.mockResolvedValue([comment("c2", "a"), comment("c1", "a")]);
+
+    const { items } = await service.list(viewer, { page: 1, pageSize: 10, sort: "new" });
+
+    expect(repository.findLikedPostIds).toHaveBeenCalledTimes(1);
+    expect(repository.findLikedPostIds).toHaveBeenCalledWith(viewer.id, ["a", "b"]);
+    expect(repository.findLatestComments).toHaveBeenCalledWith(["a", "b"], 2);
+    expect(items.map((p) => p.likedByMe)).toEqual([false, true]);
+    expect(items[0]?.latestComments.map((c) => c.id)).toEqual(["c2", "c1"]);
+    expect(items[1]?.latestComments).toEqual([]);
+  });
+
+  it("bình luận xem trước chỉ có phần UserSummary của tác giả, thời gian ISO", async () => {
+    const { service, repository } = setup();
+    repository.findList.mockResolvedValue([[listRow()], 1]);
+    repository.findLatestComments.mockResolvedValue([comment("c1", "p1")]);
+
+    const { items } = await service.list(userOf("user"), { page: 1, pageSize: 10, sort: "new" });
+
+    expect(items[0]?.latestComments).toEqual([
+      {
+        id: "c1",
+        content: "Bình luận c1",
+        createdAt: "2026-11-03T10:00:00.000Z",
+        author: { id: "u9", name: "Minh", username: "minh", image: null, avatarId: null },
+      },
+    ]);
+  });
+});
+
+describe("PostsService.like, unlike", () => {
+  const published = { status: "PUBLISHED", authorId: "tac-gia" } as const;
+
+  it.each([
+    ["hàng xóm", userOf("user")],
+    ["cây bút", userOf("author")],
+    ["trưởng xóm", userOf("admin")],
+    ["chính tác giả", userOf("user", "tac-gia")],
+  ])("%s thích được bài đã đăng, nhận số thích mới", async (_label, user) => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue(published);
+    repository.findLikeState.mockResolvedValue({ liked: true, count: 4 });
+
+    await expect(service.like(user, "p1")).resolves.toEqual({ liked: true, likeCount: 4 });
+    expect(repository.addLike).toHaveBeenCalledWith("p1", user.id);
+  });
+
+  it("bài đã ẩn: chủ bài nhận FORBIDDEN, không ghi lượt thích", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "ARCHIVED", authorId: "tac-gia" });
+
+    await expect(service.like(userOf("user", "tac-gia"), "p1")).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    expect(repository.addLike).not.toHaveBeenCalled();
+  });
+
+  it("bài đã ẩn của người khác: NOT_FOUND (không lộ là có)", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "ARCHIVED", authorId: "tac-gia" });
+
+    await expect(service.like(userOf("user"), "p1")).rejects.toMatchObject({ code: "NOT_FOUND" });
+    expect(repository.addLike).not.toHaveBeenCalled();
+  });
+
+  it("bài không có hoặc id sai dạng: NOT_FOUND", async () => {
+    const { service, repository } = setup();
+
+    await expect(service.like(userOf("user"), "p1")).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(service.unlike(userOf("user"), "../x")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+    expect(repository.removeLike).not.toHaveBeenCalled();
+  });
+
+  it("bỏ thích được cả bài đã ẩn mà mình xem được", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "ARCHIVED", authorId: "tac-gia" });
+
+    await expect(service.unlike(userOf("admin"), "p1")).resolves.toEqual({
+      liked: false,
+      likeCount: 0,
+    });
+    expect(repository.removeLike).toHaveBeenCalledWith("p1", "id-admin");
+  });
+
+  it("bấm quá 60 lần một phút thì RATE_LIMITED", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue(published);
+    const user = userOf("user");
+
+    for (let i = 0; i < 60; i++) await service.like(user, "p1");
+
+    await expect(service.unlike(user, "p1")).rejects.toMatchObject({ code: "RATE_LIMITED" });
+    expect(repository.removeLike).not.toHaveBeenCalled();
+  });
+});
+
+describe("PostsService.getBySlug: thích", () => {
+  it("trả số thích và người xem đã thích chưa", async () => {
+    const { service, repository } = setup();
+    repository.findBySlug.mockResolvedValue(detailRow());
+    repository.findLikedPostIds.mockResolvedValue(new Set(["p1"]));
+
+    const post = await service.getBySlug(userOf("user"), "ban-tron-cuoi-tuan");
+
+    expect(post).toMatchObject({ likeCount: 5, likedByMe: true });
+    expect(post).not.toHaveProperty("latestComments");
+  });
+
+  it("không có người xem thì likedByMe false, không tra lượt thích", async () => {
+    const { service, repository } = setup();
+    repository.findBySlug.mockResolvedValue(detailRow());
+
+    await expect(service.getBySlug(undefined, "ban-tron-cuoi-tuan")).resolves.toMatchObject({
+      likedByMe: false,
+    });
+    expect(repository.findLikedPostIds).not.toHaveBeenCalled();
   });
 });
 
@@ -264,7 +409,7 @@ describe("PostsService.listPublishedByIds", () => {
     const { service, repository } = setup();
     repository.findByIds.mockResolvedValue([listRow({ id: "a" }), listRow({ id: "b" })]);
 
-    const items = await service.listPublishedByIds(["b", "mat", "a"]);
+    const items = await service.listPublishedByIds(userOf("user"), ["b", "mat", "a"]);
 
     expect(repository.findByIds).toHaveBeenCalledWith(["b", "mat", "a"], "PUBLISHED");
     expect(items.map((p) => p.id)).toEqual(["b", "a"]);
@@ -273,7 +418,7 @@ describe("PostsService.listPublishedByIds", () => {
   it("danh sách rỗng thì không truy vấn", async () => {
     const { service, repository } = setup();
 
-    await expect(service.listPublishedByIds([])).resolves.toEqual([]);
+    await expect(service.listPublishedByIds(userOf("user"), [])).resolves.toEqual([]);
     expect(repository.findByIds).not.toHaveBeenCalled();
   });
 });

@@ -84,3 +84,26 @@ describe("PostsPolicy.canModify", () => {
     ).toBe(false);
   });
 });
+
+describe("PostsPolicy.canLike", () => {
+  const published = { status: "PUBLISHED", authorId: AUTHOR_ID } as const;
+
+  it.each([
+    ["hàng xóm", userOf("user")],
+    ["cây bút", userOf("author")],
+    ["trưởng xóm", userOf("admin")],
+    ["chính tác giả", userOf("user", AUTHOR_ID)],
+  ])("%s thích được bài đã đăng", (_label, user) => {
+    expect(PostsPolicy.canLike(user, published)).toBe(true);
+  });
+
+  it("người bị cấm không thích được", () => {
+    expect(PostsPolicy.canLike(userOf("user", "x", true), published)).toBe(false);
+  });
+
+  it.each(NOT_PUBLISHED)("bài %s: kể cả tác giả, trưởng xóm cũng không thích được", (status) => {
+    const post = { status, authorId: AUTHOR_ID };
+    expect(PostsPolicy.canLike(userOf("user", AUTHOR_ID), post)).toBe(false);
+    expect(PostsPolicy.canLike(userOf("admin"), post)).toBe(false);
+  });
+});

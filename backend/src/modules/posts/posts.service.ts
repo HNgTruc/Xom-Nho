@@ -5,10 +5,13 @@ import {
   EMPTY_POST_MESSAGE,
   type CreatePostInput,
   FILE_MESSAGES,
+  LIKE_MESSAGES,
+  LIMITS,
   type ListPostsQuery,
   POST_MESSAGES,
   POST_STATUSES,
   type PostDetail,
+  type PostLikeState,
   type PostListItem,
   type PostStatus,
   pathIdSchema,
@@ -23,8 +26,14 @@ import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import { StorageService } from "../../infrastructure/storage/storage.service.js";
 import { baseSlug, excerptFromContent } from "./posts.compose.js";
 import { toPostDetail, toPostListItem } from "./posts.mapper.js";
-import { PostsPolicy } from "./posts.policy.js";
-import { type CreatePostFailure, type PostEditRow, PostsRepository } from "./posts.repository.js";
+import { type PostAccessTarget, PostsPolicy } from "./posts.policy.js";
+import {
+  type CommentPreviewRow,
+  type CreatePostFailure,
+  type PostEditRow,
+  type PostListRow,
+  PostsRepository,
+} from "./posts.repository.js";
 import { buildPostSearchText } from "./posts.search-text.js";
 
 const POST_NOT_FOUND = "Không tìm thấy bài viết này. Có thể bài đã được gỡ hoặc đường dẫn bị sai.";
@@ -35,6 +44,16 @@ const CREATE_RATE = {
   limit: 10,
   windowMs: 10 * 60 * 1000,
   message: COMPOSER_MESSAGES.RATE_LIMITED,
+};
+
+/**
+ * 60 lần thích / bỏ thích mỗi phút mỗi người. Ghi lặp không làm sai số (khóa chính), giới hạn này chỉ để chặn
+ * script bấm liên tục (sau này mỗi lượt thích còn tạo thông báo).
+ */
+const LIKE_RATE = {
+  limit: 60,
+  windowMs: 60 * 1000,
+  message: LIKE_MESSAGES.RATE_LIMITED,
 };
 
 /** Lưu bài (đăng hoặc sửa) không được: báo đúng ô có vấn đề. */
@@ -174,8 +193,8 @@ export class PostsService {
     return withSlugSuffix(base, n);
   }
 
-  /** Danh sách công khai: chỉ bài đã đăng, ai cũng xem được. */
-  async list(query: ListPostsQuery): Promise<Paginated<PostListItem>> {
+  /** Danh sách công khai: chỉ bài đã đăng, mọi thành viên xem được. */
+  async list(user: SessionUser, query: ListPostsQuery): Promise<Paginated<PostListItem>> {
     const { page, pageSize, sort, category, tag, author } = query;
     const [rows, total] = await this.postsRepository.findList(
       {
@@ -186,21 +205,49 @@ export class PostsService {
       },
       { sort, skip: (page - 1) * pageSize, take: pageSize },
     );
-    return paginate(rows.map(toPostListItem), total, page, pageSize);
+    return paginate(await this.toListItems(user, rows), total, page, pageSize);
   }
 
   /**
    * Bài đã đăng theo danh sách id, giữ đúng thứ tự `ids` (id không còn đăng thì bỏ qua).
    * Cho module khác đã tự chọn bài (tìm kiếm) dùng chung cách dựng `PostListItem`.
    */
-  async listPublishedByIds(ids: string[]): Promise<PostListItem[]> {
+  async listPublishedByIds(user: SessionUser, ids: string[]): Promise<PostListItem[]> {
     if (ids.length === 0) return [];
     const rows = await this.postsRepository.findByIds(ids, POST_STATUSES.PUBLISHED);
     const byId = new Map(rows.map((row) => [row.id, row]));
-    return ids.flatMap((id) => {
+    const ordered = ids.flatMap((id) => {
       const row = byId.get(id);
-      return row ? [toPostListItem(row)] : [];
+      return row ? [row] : [];
     });
+    return this.toListItems(user, ordered);
+  }
+
+  /**
+   * Dựng thẻ bài cho một trang: thêm `likedByMe` và bình luận xem trước. Hai truy vấn cho cả trang (không phải
+   * mỗi bài một truy vấn), giữ nguyên thứ tự `rows`.
+   */
+  private async toListItems(
+    user: SessionUser,
+    rows: readonly PostListRow[],
+  ): Promise<PostListItem[]> {
+    const ids = rows.map((row) => row.id);
+    const [liked, comments] = await Promise.all([
+      this.postsRepository.findLikedPostIds(user.id, ids),
+      this.postsRepository.findLatestComments(ids, LIMITS.FEED_LATEST_COMMENTS),
+    ]);
+    const commentsByPost = new Map<string, CommentPreviewRow[]>();
+    for (const comment of comments) {
+      const list = commentsByPost.get(comment.postId) ?? [];
+      list.push(comment);
+      commentsByPost.set(comment.postId, list);
+    }
+    return rows.map((row) =>
+      toPostListItem(row, {
+        likedByMe: liked.has(row.id),
+        latestComments: commentsByPost.get(row.id) ?? [],
+      }),
+    );
   }
 
   /**
@@ -216,7 +263,48 @@ export class PostsService {
     if (!row || !PostsPolicy.canView(user, { status: row.status, authorId: row.author.id })) {
       throw new AppException("NOT_FOUND", POST_NOT_FOUND);
     }
-    return toPostDetail(row);
+    const liked = user
+      ? await this.postsRepository.findLikedPostIds(user.id, [row.id])
+      : new Set<string>();
+    return toPostDetail(row, liked.has(row.id));
+  }
+
+  /**
+   * Thích bài (docs/tinh-nang.md mục 2.6). Gọi lặp lại vẫn chỉ tính một lần. Không xem được bài: NOT_FOUND.
+   * Xem được mà bài chưa đăng hoặc đã bị ẩn (chủ bài, trưởng xóm): FORBIDDEN.
+   */
+  async like(user: SessionUser, id: string): Promise<PostLikeState> {
+    const post = await this.findViewable(user, id);
+    if (!PostsPolicy.canLike(user, post)) {
+      throw new AppException("FORBIDDEN", LIKE_MESSAGES.POST_CLOSED);
+    }
+    this.rateLimiter.consume(`like:${user.id}`, LIKE_RATE);
+    await this.postsRepository.addLike(id, user.id);
+    return this.likeState(id, user.id);
+  }
+
+  /** Bỏ thích. Chưa thích cũng không lỗi. Chỉ cần xem được bài, kể cả bài đã bị ẩn. */
+  async unlike(user: SessionUser, id: string): Promise<PostLikeState> {
+    await this.findViewable(user, id);
+    this.rateLimiter.consume(`like:${user.id}`, LIKE_RATE);
+    await this.postsRepository.removeLike(id, user.id);
+    return this.likeState(id, user.id);
+  }
+
+  private async likeState(postId: string, userId: string): Promise<PostLikeState> {
+    const { liked, count } = await this.postsRepository.findLikeState(postId, userId);
+    return { liked, likeCount: count };
+  }
+
+  /** Bài mà `user` xem được. Không có, id sai dạng, hoặc không được xem: NOT_FOUND (không lộ là có). */
+  private async findViewable(user: SessionUser, id: string): Promise<PostAccessTarget> {
+    if (!pathIdSchema.safeParse(id).success) throw new AppException("NOT_FOUND", POST_NOT_FOUND);
+
+    const target = await this.postsRepository.findAccessTarget(id);
+    if (!target || !PostsPolicy.canView(user, target)) {
+      throw new AppException("NOT_FOUND", POST_NOT_FOUND);
+    }
+    return target;
   }
 
   /**
@@ -224,13 +312,7 @@ export class PostsService {
    * Không có, id sai dạng, hoặc không được xem: NOT_FOUND như `getBySlug`.
    */
   async getVisibleStatus(user: SessionUser, id: string): Promise<PostStatus> {
-    if (!pathIdSchema.safeParse(id).success) throw new AppException("NOT_FOUND", POST_NOT_FOUND);
-
-    const target = await this.postsRepository.findAccessTarget(id);
-    if (!target || !PostsPolicy.canView(user, target)) {
-      throw new AppException("NOT_FOUND", POST_NOT_FOUND);
-    }
-    return target.status;
+    return (await this.findViewable(user, id)).status;
   }
 
   /** Tăng lượt xem. Chỉ tính cho bài đã đăng; bài khác coi như không có. */

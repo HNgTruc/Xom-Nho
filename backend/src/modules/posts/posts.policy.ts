@@ -27,4 +27,13 @@ export const PostsPolicy = {
     if (user.banned) return false;
     return user.id === post.authorId;
   },
+
+  /**
+   * Thích bài: chỉ bài đã đăng, mọi thành viên không bị cấm (kể cả tác giả tự thích bài mình). Bỏ thích thì chỉ
+   * cần xem được bài, để ai đã thích trước khi bài bị ẩn vẫn gỡ được.
+   */
+  canLike(user: SessionUser, post: PostAccessTarget): boolean {
+    if (user.banned) return false;
+    return post.status === POST_STATUSES.PUBLISHED;
+  },
 };

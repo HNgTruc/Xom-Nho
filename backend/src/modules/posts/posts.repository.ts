@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import type { ContentFormat, PostSort, PostStatus } from "@xom-nho/api";
-import type { Prisma } from "../../generated/prisma/client.js";
+import { Prisma } from "../../generated/prisma/client.js";
 import { PrismaService } from "../../infrastructure/database/prisma.service.js";
 
 /** Cột cho danh sách bài: không lấy `content` để danh sách nhẹ. */
@@ -17,7 +17,7 @@ export const postListSelect = {
     select: { tag: { select: { name: true, slug: true } } },
     orderBy: { tag: { name: "asc" } },
   },
-  _count: { select: { comments: { where: { status: "VISIBLE" } } } },
+  _count: { select: { comments: { where: { status: "VISIBLE" } }, likes: true } },
   media: { select: { id: true, kind: true, mimeType: true }, orderBy: { position: "asc" } },
 } satisfies Prisma.PostSelect;
 
@@ -31,6 +31,17 @@ export const postDetailSelect = {
 } satisfies Prisma.PostSelect;
 
 export type PostListRow = Prisma.PostGetPayload<{ select: typeof postListSelect }>;
+
+/** Bình luận xem trước trên thẻ bài; tác giả chỉ phần `UserSummary`. */
+const commentPreviewSelect = {
+  id: true,
+  postId: true,
+  content: true,
+  createdAt: true,
+  author: { select: { id: true, name: true, username: true, image: true, avatarId: true } },
+} satisfies Prisma.CommentSelect;
+
+export type CommentPreviewRow = Prisma.CommentGetPayload<{ select: typeof commentPreviewSelect }>;
 export type PostDetailRow = Prisma.PostGetPayload<{ select: typeof postDetailSelect }>;
 
 export interface PostListFilter {
@@ -263,6 +274,63 @@ export class PostsRepository {
       await tx.post.deleteMany({ where: { id } });
       return media.map((item) => item.storageKey);
     });
+  }
+
+  /** Trong `postIds`, các bài mà `userId` đã thích (một truy vấn theo khóa chính cho cả trang). */
+  async findLikedPostIds(userId: string, postIds: readonly string[]): Promise<Set<string>> {
+    if (postIds.length === 0) return new Set();
+    const rows = await this.prisma.postLike.findMany({
+      where: { userId, postId: { in: [...postIds] } },
+      select: { postId: true },
+    });
+    return new Set(rows.map((row) => row.postId));
+  }
+
+  /**
+   * Tối đa `perPost` bình luận gốc đang hiện, mới nhất trước, của mỗi bài trong `postIds`. Một truy vấn cho cả
+   * trang: `ROW_NUMBER()` đánh số theo từng bài (chỉ mục `postId, status, createdAt`) rồi lấy `perPost` dòng đầu.
+   * Không dùng `take` lồng trong `findMany` danh sách bài: Prisma có thể tải hết bình luận rồi mới cắt.
+   */
+  async findLatestComments(
+    postIds: readonly string[],
+    perPost: number,
+  ): Promise<CommentPreviewRow[]> {
+    if (postIds.length === 0 || perPost <= 0) return [];
+    const ranked = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM (
+        SELECT id, ROW_NUMBER() OVER (PARTITION BY postId ORDER BY createdAt DESC, id DESC) AS rn
+        FROM comment
+        WHERE postId IN (${Prisma.join(postIds)}) AND status = 'VISIBLE' AND parentId IS NULL
+      ) AS ranked
+      WHERE rn <= ${perPost}`;
+    if (ranked.length === 0) return [];
+    return this.prisma.comment.findMany({
+      where: { id: { in: ranked.map((row) => row.id) } },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: commentPreviewSelect,
+    });
+  }
+
+  /** Ghi lượt thích. Đã thích rồi thì bỏ qua (khóa chính `postId, userId`), không lỗi, không tăng số. */
+  async addLike(postId: string, userId: string): Promise<void> {
+    await this.prisma.postLike.createMany({ data: [{ postId, userId }], skipDuplicates: true });
+  }
+
+  /** Bỏ lượt thích. Chưa thích thì không làm gì. */
+  async removeLike(postId: string, userId: string): Promise<void> {
+    await this.prisma.postLike.deleteMany({ where: { postId, userId } });
+  }
+
+  /** Số thích của bài và `userId` đã thích chưa. */
+  async findLikeState(postId: string, userId: string): Promise<{ liked: boolean; count: number }> {
+    const [count, mine] = await Promise.all([
+      this.prisma.postLike.count({ where: { postId } }),
+      this.prisma.postLike.findUnique({
+        where: { postId_userId: { postId, userId } },
+        select: { postId: true },
+      }),
+    ]);
+    return { liked: mine !== null, count };
   }
 
   /** Phần policy cần để quyết định ai xem được bài (module khác gọi qua PostsService). */

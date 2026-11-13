@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { POST_STATUSES, type PostListItem, type SearchQuery } from "@xom-nho/api";
 import { paginate, type Paginated } from "../../common/types/paginated.js";
+import type { SessionUser } from "../../common/types/session-user.js";
 import { PostsService } from "../posts/posts.service.js";
 import { toBooleanQuery } from "./search.query.js";
 import { SearchRepository } from "./search.repository.js";
@@ -13,10 +14,10 @@ export class SearchService {
   ) {}
 
   /**
-   * Tìm bài đã đăng theo tiêu đề, tóm tắt, tag; có dấu hay không đều được. Ai cũng xem được.
+   * Tìm bài đã đăng theo tiêu đề, tóm tắt, tag; có dấu hay không đều được. Mọi thành viên xem được.
    * Từ khóa rỗng (hoặc chỉ có ký tự đặc biệt) trả trang rỗng, không chạm database.
    */
-  async search(query: SearchQuery): Promise<Paginated<PostListItem>> {
+  async search(user: SessionUser, query: SearchQuery): Promise<Paginated<PostListItem>> {
     const { q, category, page, pageSize } = query;
     const booleanQuery = toBooleanQuery(q);
     if (!booleanQuery) return paginate([], 0, page, pageSize);
@@ -26,7 +27,7 @@ export class SearchService {
       { skip: (page - 1) * pageSize, take: pageSize },
     );
     // Dựng PostListItem qua module posts để kết quả tìm kiếm giống hệt danh sách thường
-    const items = await this.postsService.listPublishedByIds(ids);
+    const items = await this.postsService.listPublishedByIds(user, ids);
     return paginate(items, total, page, pageSize);
   }
 }

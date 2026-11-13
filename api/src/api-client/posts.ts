@@ -1,6 +1,6 @@
 import type { CreatePostInput, ListPostsQuery, UpdatePostInput } from "../schemas/post.js";
 import type { ApiResponse, PaginatedResponse } from "../types/api-response.js";
-import type { PostDetail, PostListItem } from "../types/post.js";
+import type { PostDetail, PostLikeState, PostListItem } from "../types/post.js";
 import type { RequestFn } from "./client.js";
 
 export function postsApi(request: RequestFn) {
@@ -33,5 +33,20 @@ export function postsApi(request: RequestFn) {
     /** `POST /posts/:id/view`: tăng lượt xem. Frontend chỉ gọi một lần mỗi phiên cho mỗi bài. */
     view: (id: string) =>
       request<void>(`/posts/${encodeURIComponent(id)}/view`, { method: "POST" }),
+
+    /**
+     * `PUT /posts/:id/like`: thích bài. Gọi lặp lại vẫn chỉ tính một lần. Trả số thích mới.
+     * Bài chưa đăng hoặc đã ẩn: ApiError 403. Bấm dồn dập: ApiError 429.
+     */
+    like: (id: string) =>
+      request<ApiResponse<PostLikeState>>(`/posts/${encodeURIComponent(id)}/like`, {
+        method: "PUT",
+      }),
+
+    /** `DELETE /posts/:id/like`: bỏ thích. Chưa thích mà gọi cũng không lỗi. Trả số thích mới. */
+    unlike: (id: string) =>
+      request<ApiResponse<PostLikeState>>(`/posts/${encodeURIComponent(id)}/like`, {
+        method: "DELETE",
+      }),
   };
 }

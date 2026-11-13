@@ -141,6 +141,15 @@ export const COMMENT_MESSAGES = {
   LOAD_FAILED: "Chưa tải được bình luận. Bạn thử lại nhé.",
 } as const;
 
+/** Thích bài (docs/tinh-nang.md mục 2.6), dùng chung backend, web, mobile. */
+export const LIKE_MESSAGES = {
+  LIKE: "Thích",
+  RATE_LIMITED: "Bạn bấm nhanh quá, nghỉ tay một chút rồi thử lại nhé.",
+  /** Bài chưa đăng hoặc đã bị trưởng xóm ẩn (chủ bài vẫn mở được trang bài) */
+  POST_CLOSED: "Bài này đang ẩn nên chưa thích được.",
+  FAILED: "Chưa lưu được lượt thích. Bạn thử lại nhé.",
+} as const;
+
 /** Nhãn ô trả lời: "Trả lời Lan Anh". */
 export function commentReplyLabel(name: string): string {
   return `Trả lời ${name}`;

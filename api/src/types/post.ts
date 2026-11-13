@@ -9,6 +9,27 @@ import type { UserSummary } from "./user.js";
 export type CategoryRef = Pick<Category, "name" | "slug" | "color">;
 
 /**
+ * Bình luận xem trước trên thẻ bài: chỉ bình luận gốc đang hiện (không có trả lời, không có bình luận đã ẩn,
+ * kể cả với trưởng xóm). Đủ để hiện tên, ảnh, nội dung; xem đủ thì vào trang bài.
+ * `content` là chữ thường: hiện dạng text như `CommentItem`.
+ */
+export interface CommentPreview {
+  id: string;
+  content: string;
+  author: UserSummary;
+  /** ISO 8601 */
+  createdAt: string;
+}
+
+/** Phần thích của một bài theo người đang xem. `PUT`, `DELETE /posts/:id/like` trả kiểu này. */
+export interface PostLikeState {
+  /** Người đang xem đã thích bài chưa */
+  liked: boolean;
+  /** Tổng số người thích bài */
+  likeCount: number;
+}
+
+/**
  * Một bài trong danh sách: `GET /posts`, `GET /search`.
  * Không có `content` để danh sách nhẹ.
  */
@@ -23,6 +44,11 @@ export interface PostListItem {
   viewCount: number;
   /** Chỉ đếm bình luận đang hiện */
   commentCount: number;
+  likeCount: number;
+  /** Người đang xem đã thích bài chưa (để tô nút Thích, đặt `aria-pressed`) */
+  likedByMe: boolean;
+  /** Tối đa `LIMITS.FEED_LATEST_COMMENTS` bình luận gốc đang hiện, mới nhất trước */
+  latestComments: CommentPreview[];
   author: UserSummary;
   category: CategoryRef;
   tags: TagRef[];
@@ -33,8 +59,9 @@ export interface PostListItem {
 /**
  * `GET /posts/:slug`. Bài chưa đăng chỉ tác giả và trưởng xóm xem được, người khác nhận 404.
  * `content` là Markdown thô hoặc chữ thường (xem `contentFormat`): frontend tự render an toàn.
+ * Không có `latestComments`: trang bài tải đủ bình luận bằng `GET /posts/:id/comments`.
  */
-export interface PostDetail extends PostListItem {
+export interface PostDetail extends Omit<PostListItem, "latestComments"> {
   content: string;
   /** MARKDOWN: render qua component an toàn. PLAIN: chữ thường, giữ xuống dòng */
   contentFormat: ContentFormat;

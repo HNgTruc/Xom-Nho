@@ -31,6 +31,8 @@ export const LIMITS = {
 
   /** Độ dài một bình luận (chữ thường) */
   COMMENT_MAX: 2000,
+  /** Số bình luận xem trước trên mỗi thẻ bài trong danh sách */
+  FEED_LATEST_COMMENTS: 2,
 
   CATEGORY_NAME_MAX: 50,
   TAG_NAME_MAX: 30,

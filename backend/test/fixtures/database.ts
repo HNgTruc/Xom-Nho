@@ -13,6 +13,7 @@ export function createTestPrisma(): PrismaClient {
 /** Xóa sạch dữ liệu, theo thứ tự con trước cha để không vướng khóa ngoại. */
 export async function resetDatabase(prisma: PrismaClient): Promise<void> {
   await prisma.$transaction([
+    prisma.postLike.deleteMany(),
     prisma.comment.deleteMany(),
     prisma.media.deleteMany(),
     prisma.postTag.deleteMany(),

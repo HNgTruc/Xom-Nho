@@ -299,8 +299,18 @@ async function main() {
     }
   }
 
+  // Lượt thích: bài thứ i có (i mod số người + 1) người thích, để số thích trên các thẻ bài khác nhau.
+  // Xóa lượt thích của người mẫu trên bài mẫu rồi tạo lại (lượt thích người dùng thật tự bấm vẫn giữ).
+  await prisma.postLike.deleteMany({
+    where: { postId: { in: publishedPostIds }, userId: { in: authorIds } },
+  });
+  const likes = publishedPostIds.flatMap((postId, i) =>
+    authorIds.slice(0, (i % authorIds.length) + 1).map((userId) => ({ postId, userId })),
+  );
+  await prisma.postLike.createMany({ data: likes, skipDuplicates: true });
+
   console.info(
-    `Seed xong: ${users.length} người dùng, ${categories.length} danh mục, ${tags.length} tag, ${posts.length} bài, ${n} bình luận.`,
+    `Seed xong: ${users.length} người dùng, ${categories.length} danh mục, ${tags.length} tag, ${posts.length} bài, ${n} bình luận, ${likes.length} lượt thích.`,
   );
   console.info(
     `Đăng nhập: truongxom@xomnho.local (trưởng xóm), lananh@xomnho.local (cây bút), baongoc@xomnho.local (hàng xóm); mật khẩu ${SEED_PASSWORD}`,
