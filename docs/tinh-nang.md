@@ -97,6 +97,7 @@ Tiêu chí:
 Tiêu chí:
 
 - [x] Web có thanh phân trang, URL giữ số trang (`?page=3`)
+- [x] Backend trả số thích, `likedByMe` và 2 bình luận gốc đang hiện mới nhất cho mỗi bài, cả trang chỉ thêm 2 truy vấn (2026-11-13)
 - [ ] App cuộn vô hạn, kéo xuống để làm mới
 - [ ] Trang trống có lời nhắn thân thiện (xem `giong-van-va-giao-dien.md`)
 
@@ -137,14 +138,16 @@ Tiêu chí:
 
 ### 2.6 Thích và chia sẻ 🌐📱
 
-- Hàng xóm đã đăng nhập bấm Thích / Bỏ thích bài đã đăng; ai cũng thấy số thích.
+- Thành viên bấm Thích / Bỏ thích bài đã đăng, kể cả bài của mình; mọi thành viên thấy số thích. Bài đã ẩn không thích được nữa nhưng vẫn bỏ thích được.
 - Chia sẻ: điện thoại mở bảng chia sẻ của hệ điều hành; máy tính sao chép liên kết bài, báo "Đã sao chép liên kết".
 
 Tiêu chí:
 
-- [ ] Mỗi người thích một bài một lần; bấm liên tục không làm sai số
-- [ ] Chưa đăng nhập bấm Thích thì chuyển tới đăng nhập rồi quay lại bài
+- [x] Mỗi người thích một bài một lần; bấm liên tục hay gửi cùng lúc không làm sai số (2026-11-13): khóa chính `(postId, userId)`, `PUT`/`DELETE /posts/:id/like` (`posts-like.e2e-spec.ts`)
+- [ ] Nút Thích đổi ngay khi bấm (cập nhật lạc quan), lỗi thì trả lại như cũ và báo `LIKE_MESSAGES.FAILED`
 - [ ] Nút Thích có `aria-pressed`, không chỉ đổi màu
+
+Không cần xử lý khách bấm Thích: khách không xem được bài nào (ADR 0007).
 
 ### 2.5 Tìm kiếm 🌐📱
 

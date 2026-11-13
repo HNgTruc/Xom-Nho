@@ -21,6 +21,7 @@ Vai trò lưu ở cột `role` của bảng `user` (plugin admin của Better Au
 | Xem hồ sơ hàng xóm                      |       |    ✅    |   ✅    |     ✅     |
 | Bình luận, trả lời bình luận            |       |    ✅    |   ✅    |     ✅     |
 | Sửa/xóa bình luận của mình              |       |    ✅    |   ✅    |     ✅     |
+| Thích / bỏ thích bài đã đăng            |       |    ✅    |   ✅    |     ✅     |
 | Viết bài, kèm ảnh/video (đăng thẳng)    |       |    ✅    |   ✅    |     ✅     |
 | Tải ảnh, video lên                      |       |    ✅    |   ✅    |     ✅     |
 | Xem ảnh, video của bài đã đăng          |       |    ✅    |   ✅    |     ✅     |
@@ -47,6 +48,8 @@ Từ ADR 0008 mọi thành viên đăng thẳng: bài soạn ở trang chủ và
 Bài viết, sửa và xóa (`posts.policy.ts`, `canModify`): qua route thường chỉ tác giả, ở mọi trạng thái (kể cả bài bị ẩn); bài đã đăng của người khác trả 403, bài ẩn của người khác trả 404. Trưởng xóm sửa, xóa bài bất kỳ bằng route admin (giai đoạn 5).
 
 Bình luận (`comments.policy.ts`): bình luận đã ẩn chỉ trưởng xóm thấy (người viết cũng không); sửa, xóa chỉ người viết và khi bình luận còn hiện; bài chứa bình luận phải xem được (bài đã ẩn chỉ chủ bài, trưởng xóm mở, và không nhận bình luận mới).
+
+Thích bài (`posts.policy.ts`, `canLike`): mọi thành viên không bị cấm, kể cả tác giả tự thích bài mình, chỉ với bài đã đăng. Bài đã ẩn: chủ bài và trưởng xóm nhận 403, người khác 404 (như mọi route đọc). Bỏ thích chỉ cần xem được bài, kể cả bài đã ẩn. Trên thẻ bài, bình luận xem trước chỉ gồm bình luận đang hiện, kể cả với trưởng xóm.
 
 Ảnh, video (`GET /files/:id`): ảnh đại diện và file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
 

@@ -85,10 +85,19 @@ Kiểu trong `api` chỉ bảo vệ lúc build. App đã cài trên điện tho�
 | POST   | `/posts`                                            | 🔒  | Đăng bài, vào thẳng `PUBLISHED` (ADR 0008). Body: `createPostSchema` (`title` tùy chọn, `content` chữ thường, `category` slug, `mediaIds` tối đa 10, chỉ file `POST /files` của mình chưa gắn bài, không nhận ảnh đại diện). Trả 201 + `PostDetail`. Giới hạn 10 bài / 10 phút |
 | PATCH  | `/posts/:id`                                        | 🔒  | Sửa bài của mình. Body: `updatePostSchema` (chỉ gửi trường muốn đổi). Trả `PostDetail`, slug giữ nguyên. Xem ghi chú bên dưới                                                                                                                                                  |
 | DELETE | `/posts/:id`                                        | 🔒  | Xóa hẳn bài của mình: bình luận, tag, ảnh, video đi theo, file xóa khỏi ổ đĩa. Trả 204                                                                                                                                                                                         |
+| PUT    | `/posts/:id/like`                                   | 🔒  | Thích bài. Trả `PostLikeState` `{ liked, likeCount }`. Gọi lặp lại vẫn chỉ tính một lần. Xem ghi chú bên dưới                                                                                                                                                                  |
+| DELETE | `/posts/:id/like`                                   | 🔒  | Bỏ thích. Trả 200 + `PostLikeState` (không phải 204, để frontend cập nhật số). Chưa thích cũng không lỗi                                                                                                                                                                       |
 | GET    | `/me/posts?status=`                                 | 🔒  | Bài của tôi, mọi trạng thái                                                                                                                                                                                                                                                    |
 
-`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, author { id, name, username, image }, category { name, slug, color }, tags [{ name, slug }], media [{ id, kind, mimeType }]`. `title` rỗng với bài không đặt tiêu đề (frontend hiện `excerpt`). `media` theo thứ tự trong bài. `commentCount` chỉ đếm bình luận đang hiện. `author.id` để frontend so với `Me.id`.
-`PostDetail`: `PostListItem` + `content, contentFormat (MARKDOWN | PLAIN), status, rejectReason, updatedAt`. `PLAIN`: chữ thường giữ xuống dòng, không render Markdown. `rejectReason` là `null` trừ khi bài bị từ chối.
+`PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, likeCount, likedByMe, latestComments [{ id, content, author, createdAt }], author { id, name, username, image, avatarId }, category { name, slug, color }, tags [{ name, slug }], media [{ id, kind, mimeType }]`. `title` rỗng với bài không đặt tiêu đề (frontend hiện `excerpt`). `media` theo thứ tự trong bài. `commentCount` chỉ đếm bình luận đang hiện. `likedByMe` theo người đang gọi. `latestComments` (`CommentPreview[]`): tối đa `LIMITS.FEED_LATEST_COMMENTS` (2) bình luận **gốc** đang hiện, mới nhất trước; không có trả lời, không có bình luận đã ẩn, kể cả với trưởng xóm. `author.id` để frontend so với `Me.id`.
+`PostDetail`: `PostListItem` (trừ `latestComments`: trang bài tải đủ bằng `GET /posts/:id/comments`) + `content, contentFormat (MARKDOWN | PLAIN), status, rejectReason, updatedAt`. `PLAIN`: chữ thường giữ xuống dòng, không render Markdown. `rejectReason` là `null` trừ khi bài bị từ chối.
+
+**Thích bài** (`PUT`, `DELETE /posts/:id/like`, docs/tinh-nang.md mục 2.6):
+
+- Thích: mọi thành viên không bị cấm, kể cả tác giả tự thích bài mình, chỉ với bài `PUBLISHED`. Bài không xem được (bài ẩn của người khác) hoặc không có: 404. Xem được mà bài không ở `PUBLISHED` (chủ bài, trưởng xóm mở bài đã ẩn): 403 `LIKE_MESSAGES.POST_CLOSED`.
+- Bỏ thích: chỉ cần xem được bài, kể cả bài đã ẩn.
+- Gọi lặp lại hay gửi cùng lúc đều không sai số: khóa chính `(postId, userId)` ở bảng `post_like` (docs/co-so-du-lieu.md). Frontend nên dùng `PUT`/`DELETE` theo trạng thái muốn có, không tự đảo trạng thái.
+- Giới hạn 60 lần thích hoặc bỏ thích / phút / người: 429 `LIKE_MESSAGES.RATE_LIMITED`.
 
 **Sửa, xóa bài** (`PATCH`, `DELETE /posts/:id`, docs/tinh-nang.md mục 2.3):
 
@@ -244,6 +253,7 @@ Phần đổi vai trò và cấm có thể dùng API của plugin admin trong Be
 - Tạo bài: tối đa 10 bài / 10 phút mỗi người (`posts.service.ts`).
 - Tải file: tối đa 30 file / 10 phút mỗi người (`files.service.ts`).
 - Bình luận: tối đa 1 bình luận / 10 giây / người (`comments.service.ts`). Bình luận bị từ chối vì dữ liệu sai không tính.
+- Thích, bỏ thích: tối đa 60 lần / phút / người, chung một bộ đếm (`posts.service.ts`). Ghi lặp không làm sai số; giới hạn để chặn script bấm liên tục.
 - Lượt xem (`POST /posts/:id/view`): hiện chưa giới hạn, ai gọi lặp cũng tăng được. Khi làm `infrastructure/rate-limit` (giai đoạn 4), giới hạn theo IP + bài (ví dụ 1 lần / 30 phút).
 
 Bộ đếm lưu trong bộ nhớ (`infrastructure/rate-limit/rate-limiter.ts`, cửa sổ trượt theo khóa); khi chạy nhiều instance thì chuyển sang MySQL hoặc Redis.

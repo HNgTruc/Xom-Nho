@@ -67,7 +67,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] Backend: sửa/xóa bài (xóa cả file trên đĩa), chặn gắn ảnh đại diện vào bài
 - [x] Web: sửa, xóa bài của mình (menu trên thẻ bài và trang bài, hộp soạn ở chế độ sửa)
 - [x] Dọn file tải lên mà không gắn bài quá 1 ngày (bỏ qua ảnh đại diện: `purpose = AVATAR`)
-- [ ] Backend: `PostLike` (thích / bỏ thích), feed trả số thích và 2 bình luận công khai mới nhất
+- [x] Backend: `PostLike` (thích / bỏ thích, `PUT`/`DELETE /posts/:id/like`), feed trả số thích, `likedByMe` và 2 bình luận gốc đang hiện mới nhất
 - [x] Web: bình luận + trả lời ở trang bài (gửi, trả lời có "@tên", sửa, xóa có hỏi lại, "đã sửa", bình luận ẩn hiện mờ cho admin)
 - [ ] Web: trình soạn Markdown có xem trước, bài của tôi
 - [ ] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất

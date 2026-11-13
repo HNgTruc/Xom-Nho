@@ -19,6 +19,8 @@ erDiagram
   User |o--o| Media : "ảnh đại diện (avatarId)"
   Post ||--o{ Media : "gắn"
   User ||--o{ Post : "duyệt (reviewer)"
+  Post ||--o{ PostLike : "được thích"
+  User ||--o{ PostLike : "thích"
 
   User {
     string id PK
@@ -81,6 +83,11 @@ erDiagram
     string postId PK
     string tagId PK
   }
+  PostLike {
+    string postId PK
+    string userId PK
+    datetime createdAt
+  }
   Comment {
     string id PK
     text content
@@ -106,6 +113,8 @@ Ghi chú cài đặt:
 - `Post.contentFormat`: `MARKDOWN` (bài kiểu diễn đàn, có trước) hoặc `PLAIN` (soạn ở trang chủ, ADR 0008). Bài soạn ở trang chủ có thể có `title` rỗng.
 - `Media`: ảnh, video tải lên (ADR 0005). File nằm trên đĩa backend (`UPLOAD_DIR`, mặc định `media/` ở gốc repo), đường dẫn là `storageKey` dạng `<thư mục>/<uuid>.<đuôi>`: thư mục `images` hoặc `videos` theo `kind`, `avatars` cho ảnh đại diện; đuôi do backend chọn theo chữ ký nhị phân. `purpose` cho biết file dùng vào đâu: `POST` (ảnh, video trong bài: tải lên trước với `postId = null`, gắn khi đăng bài) hay `AVATAR` (ảnh đại diện: `postId` luôn `null`, `user.avatarId` trỏ tới). Xóa bài thì xóa dòng media (cascade); gỡ file khỏi bài khi sửa thì xóa dòng. Cả hai trường hợp backend xóa file trên đĩa sau khi transaction xong (`posts.service.ts`). Chỉ gắn được file `purpose = POST` vào bài. Việc dọn file không gắn bài **phải bỏ qua `AVATAR`**: `FilesScheduler` (`@nestjs/schedule`) chạy mỗi giờ, xóa file `purpose = POST`, `postId = null` tạo quá 1 ngày, mỗi lần tối đa 1000 file (10 lô 100). Xóa dòng trước rồi chỉ xóa trên đĩa file đã xóa dòng thật, nên file vừa được gắn bài giữa chừng không bị mất (`files.service.ts`, `files-cleanup.e2e-spec.ts`).
 - `Comment`: trả lời chỉ một cấp, `parentId` luôn trỏ về bình luận gốc. Xóa bình luận gốc thì trả lời bị xóa theo (`onDelete: Cascade`). `editedAt` ghi lần người viết sửa nội dung; không dùng `updatedAt` để hiện "đã sửa" vì trưởng xóm ẩn, hiện bình luận cũng đổi cột đó.
+- `PostLike` (bảng `post_like`): một hàng xóm thích một bài. Khóa chính ghép `(postId, userId)` nên mỗi người thích mỗi bài một lần ngay ở tầng database; backend ghi bằng `createMany({ skipDuplicates: true })` (`INSERT IGNORE`) và bỏ thích bằng `deleteMany`, nên gọi lặp lại hay gửi cùng lúc không làm sai số. Xóa bài hay người dùng thì lượt thích đi theo (`onDelete: Cascade`). Số thích đếm bằng `COUNT` theo khóa chính (`_count.likes`), chưa lưu sẵn cột đếm trong `post`: xem lại ở giai đoạn 7 nếu feed chậm.
+- Bình luận xem trước trên thẻ bài (`PostListItem.latestComments`): 2 bình luận gốc `VISIBLE` mới nhất của mỗi bài, lấy cho cả trang trong **một** truy vấn `ROW_NUMBER() OVER (PARTITION BY postId ORDER BY createdAt DESC, id DESC)` (`posts.repository.ts`, `findLatestComments`). Không dùng `take` lồng trong `findMany` danh sách bài, vì Prisma có thể tải hết bình luận rồi mới cắt.
 - `User.avatarId`: ảnh đại diện tự tải lên (`PUT /me/avatar`). Có thì hiện ảnh này, không thì hiện `image` (link từ Google, GitHub). Đổi ảnh hay xóa ảnh thì backend xóa dòng media cũ và file trên đĩa; xóa dòng media thì `avatarId` tự về `null` (`ON DELETE SET NULL`).
 - `Post.content` là `MEDIUMTEXT` (16 MB): `TEXT` chỉ 64 KB, bài tiếng Việt dài (mỗi chữ có dấu 2-3 byte) dễ vượt.
 - Server MySQL mặc định `utf8mb4_0900_ai_ci`, nhưng Prisma tạo từng bảng với `utf8mb4_unicode_ci` và không theo dõi collation. Giữ nguyên `unicode_ci` cho mọi bảng (không sửa tay migration) để các bảng luôn đồng nhất. Cả hai collation đều không phân biệt dấu khi so sánh, nên cột `UNIQUE` coi "bàn" và "ban" là trùng (hai tag này không cùng tồn tại được). Đây là hành vi mong muốn cho tên tag, danh mục. Tìm kiếm không phụ thuộc collation vì `searchText` đã bỏ dấu sẵn.
@@ -121,17 +130,19 @@ Ghi chú cài đặt:
 
 ## Chỉ mục
 
-| Bảng    | Chỉ mục                             | Phục vụ                          |
-| ------- | ----------------------------------- | -------------------------------- |
-| Post    | `(status, publishedAt DESC)`        | Trang chủ: bài mới nhất đã đăng  |
-| Post    | `(categoryId, status, publishedAt)` | Lọc theo danh mục                |
-| Post    | `(authorId, status, publishedAt)`   | Bài của tôi, hồ sơ (`?author=`)  |
-| Post    | `FULLTEXT(searchText)`              | Tìm kiếm                         |
-| Media   | `(postId, position)`                | Ảnh, video của bài theo thứ tự   |
-| Media   | `(ownerId, postId, createdAt)`      | File chưa gắn bài (gắn, dọn rác) |
-| Comment | `(postId, status, createdAt)`       | Bình luận dưới bài               |
-| Comment | `(parentId)`                        | Trả lời                          |
-| PostTag | `(tagId)`                           | Lọc theo tag                     |
+| Bảng     | Chỉ mục                             | Phục vụ                                     |
+| -------- | ----------------------------------- | ------------------------------------------- |
+| Post     | `(status, publishedAt DESC)`        | Trang chủ: bài mới nhất đã đăng             |
+| Post     | `(categoryId, status, publishedAt)` | Lọc theo danh mục                           |
+| Post     | `(authorId, status, publishedAt)`   | Bài của tôi, hồ sơ (`?author=`)             |
+| Post     | `FULLTEXT(searchText)`              | Tìm kiếm                                    |
+| Media    | `(postId, position)`                | Ảnh, video của bài theo thứ tự              |
+| Media    | `(ownerId, postId, createdAt)`      | File chưa gắn bài (gắn, dọn rác)            |
+| Comment  | `(postId, status, createdAt)`       | Bình luận dưới bài                          |
+| Comment  | `(parentId)`                        | Trả lời                                     |
+| PostTag  | `(tagId)`                           | Lọc theo tag                                |
+| PostLike | `(postId, userId)` (khóa chính)     | Đếm số thích, người xem đã thích chưa       |
+| PostLike | `(userId, createdAt)`               | Bài một người đã thích; khóa ngoại `userId` |
 
 Không có index cho `Post.viewCount` (tab "Nhiều người đọc"): cột bị ghi mỗi lượt xem. Đánh đổi có chủ ý, xem lại ở giai đoạn 7 nếu bài nhiều.
 
@@ -171,3 +182,4 @@ Cách làm:
 - 1 trưởng xóm, 2 cây bút, 3 hàng xóm (mật khẩu ghi trong file seed, chỉ dùng ở máy dev)
 - 5 danh mục: Đời sống, Công nghệ, Học tập, Góc kể chuyện, Hỏi đáp
 - khoảng 15 tag, 30 bài ở đủ các trạng thái, 100 bình luận có trả lời
+- lượt thích trên bài đã đăng, mỗi bài 1 đến 6 người thích (chạy lại chỉ tạo lại lượt thích của người mẫu)
