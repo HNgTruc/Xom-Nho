@@ -3,6 +3,9 @@ export const LIMITS = {
   PAGE_SIZE_DEFAULT: 10,
   PAGE_SIZE_MAX: 50,
   ADMIN_PAGE_SIZE_MAX: 100,
+  ADMIN_PAGE_SIZE_DEFAULT: 20,
+  /** Lý do ẩn bài, cấm thành viên: cột `post.rejectReason`, `user.banReason` (VARCHAR 500) */
+  MODERATION_REASON_MAX: 500,
 
   PASSWORD_MIN: 8,
   /** Better Auth mặc định từ chối mật khẩu dài hơn 128 */

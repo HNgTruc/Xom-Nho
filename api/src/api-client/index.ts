@@ -1,3 +1,4 @@
+import { adminApi } from "./admin/index.js";
 import { categoriesApi } from "./categories.js";
 import { commentsApi } from "./comments.js";
 import { type ClientOptions, createRequest } from "./client.js";
@@ -29,6 +30,7 @@ export function createClient(options: ClientOptions) {
     search: searchApi(request),
     me: meApi(request),
     auth: authApi(request),
+    admin: adminApi(request),
   };
 }
 

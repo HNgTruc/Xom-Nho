@@ -219,3 +219,40 @@ export const POST_STATUS_NOTES = {
 export function rejectedNote(reason: string | null): string {
   return reason ? `Bài chưa được duyệt. Lý do: ${reason}` : "Bài chưa được duyệt.";
 }
+
+/**
+ * Bài đang ẩn, câu cho tác giả: trưởng xóm ẩn thì có lý do (`PostDetail.rejectReason`), theo câu mẫu ở
+ * docs/giong-van-va-giao-dien.md; không có lý do thì dùng câu chung `POST_STATUS_NOTES.ARCHIVED`.
+ */
+export function archivedNote(reason: string | null): string {
+  return reason ? `Trưởng xóm đã ẩn bài này. Lý do: ${reason}` : POST_STATUS_NOTES.ARCHIVED;
+}
+
+/**
+ * Lý do chọn nhanh khi trưởng xóm ẩn bài (pages/admin.md mục "Ẩn bài"). Chọn "Lý do khác" thì tự ghi;
+ * backend chỉ nhận chuỗi `reason`, không giới hạn trong danh sách này.
+ */
+export const POST_HIDE_REASONS = [
+  "Quảng cáo, rao vặt",
+  "Lời lẽ xúc phạm",
+  "Lộ thông tin cá nhân",
+] as const;
+
+/** Trang quản trị (`/api/v1/admin/*`): ngắn gọn, trung tính (giong-van-va-giao-dien.md, mục admin). */
+export const ADMIN_MESSAGES = {
+  HIDE_REASON_REQUIRED: "Ghi lý do ẩn bài.",
+  HIDE_REASON_TOO_LONG: "Lý do tối đa 500 ký tự.",
+  POST_NOT_PUBLISHED: "Chỉ ẩn được bài đang hiện trên xóm.",
+  POST_NOT_HIDDEN: "Bài này không ở trạng thái ẩn.",
+  POST_NOT_FOUND: "Không tìm thấy bài viết này.",
+  COMMENT_NOT_FOUND: "Không tìm thấy bình luận này.",
+  USER_NOT_FOUND: "Không tìm thấy thành viên này.",
+  CANNOT_CHANGE_OWN_ROLE: "Không đổi được vai trò của chính mình.",
+  CANNOT_BAN_SELF: "Không cấm được chính mình.",
+  CANNOT_BAN_ADMIN: "Không cấm được trưởng xóm. Đổi vai trò người này trước.",
+  BAN_REASON_REQUIRED: "Ghi lý do cấm.",
+  BAN_REASON_TOO_LONG: "Lý do tối đa 500 ký tự.",
+  BAN_EXPIRES_INVALID: "Thời hạn cấm không hợp lệ.",
+  BAN_EXPIRES_PAST: "Thời hạn cấm phải sau thời điểm hiện tại.",
+  SINCE_INVALID: "Mốc thời gian không hợp lệ.",
+} as const;

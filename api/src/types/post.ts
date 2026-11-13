@@ -66,7 +66,10 @@ export interface PostDetail extends Omit<PostListItem, "latestComments"> {
   /** MARKDOWN: render qua component an toàn. PLAIN: chữ thường, giữ xuống dòng */
   contentFormat: ContentFormat;
   status: PostStatus;
-  /** Lý do bị từ chối. `null` nếu bài không ở trạng thái REJECTED */
+  /**
+   * Lý do bị từ chối (REJECTED) hoặc bị trưởng xóm ẩn (ARCHIVED, `archivedNote`). `null` với trạng thái khác.
+   * Bài ẩn chỉ tác giả và trưởng xóm mở được nên chỉ họ thấy lý do.
+   */
   rejectReason: string | null;
   /** ISO 8601 */
   updatedAt: string;
