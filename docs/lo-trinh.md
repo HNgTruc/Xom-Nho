@@ -99,6 +99,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 5: Trang quản trị
 
+Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kính mờ" (admin dùng kính như web), "Thẻ số liệu" (biểu đồ cột có chuyển động) và "Bản thiết kế tham khảo" (bản demo trên canvas, quyết định rút ra, đề xuất chưa chốt).
+
 - [ ] Backend: các `*.admin.controller.ts` theo `api.md`, `modules/dashboard`
 - [ ] Admin: layout (sidebar, topbar), `DataTable` dùng chung
 - [ ] Tổng quan số liệu
