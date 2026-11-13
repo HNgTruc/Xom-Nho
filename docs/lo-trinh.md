@@ -109,6 +109,8 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 
 ## Giai đoạn 6: Mobile app
 
+Thiết kế: [pages/mobile.md](design-system/xom-nho/pages/mobile.md), mục "Điều hướng" (thanh tab nổi, co khi cuộn) và "Bản thiết kế tham khảo" (bản demo trên canvas, quyết định rút ra).
+
 - [ ] Tab: Trang chủ, Tìm kiếm, Viết, Cá nhân
 - [ ] Danh sách bài cuộn vô hạn, kéo để làm mới
 - [ ] Chi tiết bài, bình luận, trả lời

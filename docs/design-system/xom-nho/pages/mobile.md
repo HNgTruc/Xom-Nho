@@ -12,7 +12,14 @@
 ## Điều hướng
 
 - Thanh tab dưới **4 tab** (giới hạn ≤ 5): Trang chủ, Tìm kiếm, Viết, Cá nhân. Mỗi tab có biểu tượng + nhãn chữ.
-- Tab đang chọn: biểu tượng và nhãn màu `primary`, có `accessibilityState={{ selected: true }}`.
+- **Thanh tab nổi** (chốt 2026-11-13): viên `glass-bar` bo `radius-full`, cách hai mép 12, cách đáy 20 (cộng `useSafeAreaInsets().bottom` nếu lớn hơn), cao 64, đệm 6, bóng `glass-shadow-hover`. Biểu tượng Lucide 22, nhãn 12/16 đậm 600. Danh sách cuộn có đệm đáy ≥ 100 để mục cuối không bị che.
+- Tab đang chọn: một **viên `glass-primary` trượt** phủ cả ô (biểu tượng và nhãn), chữ và biểu tượng trong viên màu `primary-foreground`; tab khác màu `muted-foreground`. Có `accessibilityState={{ selected: true }}`.
+- Chuyển động của thanh tab (chỉ `transform`, `opacity`; tắt hết khi bật Reduce Motion):
+  - Chạm xuống một tab: viên trượt sang tab đó ngay (320ms, `cubic-bezier(0.2, 0, 0, 1)`), rồi mới chuyển màn hình.
+  - Vào màn hình: viên nảy nhẹ (scale 0.72 → 1.04 → 1, 460ms).
+  - Cuộn xuống quá 48 (mỗi lần lệch ≥ 6): thanh thu còn `scale(0.86)` neo đáy giữa, nhãn mờ hẳn, biểu tượng dời xuống giữa ô; header trượt lên ẩn (`translateY(-100%)`). Cuộn lên: hiện lại đủ. Nhãn chỉ tạm ẩn khi đang cuộn xuống, vẫn đọc được bằng trình đọc màn hình.
+- Thanh chọn dạng viên trong màn hình (sắp xếp feed, Bài viết / Bản nháp ở hồ sơ) dùng cùng kiểu viên trượt; các ô bằng nhau (104, 112). Thanh lọc danh mục ở Tìm kiếm (chip dài ngắn khác nhau, cuộn ngang) giữ đổi màu tức thì, không trượt.
+- Làm bằng `Animated` có sẵn của React Native (`useNativeDriver: true`), không cần thêm thư viện.
 - Nút quay lại luôn đưa về đúng màn hình trước; hỗ trợ vuốt quay lại trên iOS, nút Back trên Android.
 - Màn hình chi tiết bài mở được bằng deep link (`xomnho://bai-viet/<slug>`).
 
@@ -60,6 +67,24 @@
 - [ ] Trạng thái vô hiệu rõ ràng và thật sự không bấm được
 - [ ] Thứ tự focus của trình đọc màn hình khớp thứ tự hiển thị; nhãn mô tả rõ
 - [ ] Không có xung đột cử chỉ (chạm/kéo/vuốt quay lại)
+
+## Bản thiết kế tham khảo (giai đoạn 6)
+
+Bản demo bấm thử được (riêng tư trong tài khoản claude.ai của chủ dự án): <https://claude.ai/artifact/LJPrv7UVt6DaQcanfRvMBd>. Gồm Đăng nhập, Trang chủ, Bài viết, Viết bài, Tìm kiếm, Cá nhân, hai màn chế độ tối và component thanh tab; mỗi màn có Tweaks bật/tắt chế độ tối và kính mờ. Khi code lệch với bản demo thì file này và MASTER thắng.
+
+Quyết định rút ra từ bản demo (2026-11-13), áp dụng khi làm giai đoạn 6:
+
+- **Ô tạo bài ở Trang chủ gọn một hàng**: viên "Chào {tên}, hôm nay có chuyện gì?" và nút tròn 44 "Đăng ảnh hoặc video" (cả hai mở màn Viết). Không có avatar và hàng Ảnh/Video riêng như web, vì đã có tab Viết và màn hẹp.
+- **Avatar người khác nền `muted`, chữ `foreground`**; chỉ avatar của chính mình nền `accent`. Không tô avatar bằng màu danh mục: màu danh mục chỉ mang một nghĩa.
+- **Vùng chạm 44 cho mọi thứ bấm được**, kể cả nút Thích, Trả lời / Sửa / Xóa, chip danh mục, viên tab sắp xếp, "Quên mật khẩu?". Viên số bình luận nhìn cao 28 nhưng vùng bấm 44. Nút gỡ ảnh 32 và chip thẻ (tag) 32 dùng `hitSlop` cho đủ 44.
+- **Hàng hành động của thẻ bài**: nút Thích (biểu tượng tim, tô `rose` khi đã thích, `accessibilityState={{ selected }}`) bên trái, viên số bình luận `accent` bên phải; dưới là tối đa 2 bình luận xem trước trên nền `muted`.
+- **Ảnh bìa hồ sơ** giảm sáng 25% ở chế độ tối như ảnh nền.
+- Chữ nhỏ nhất 12 ở mọi chỗ, kể cả chữ cái trong avatar.
+
+Đề xuất chưa chốt (cần chủ dự án duyệt trước khi làm):
+
+- Thẻ bài đưa tác giả lên đầu (avatar, tên, giờ, badge danh mục) rồi mới tới nội dung, vì từ ADR 0008 nhiều bài không có tiêu đề.
+- Bỏ viền quanh viên logo ở header mobile để bớt nhiễu.
 
 ## Kính mờ (MASTER 2.4)
 
