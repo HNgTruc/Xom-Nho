@@ -1,4 +1,4 @@
-import { CONTENT_FORMATS, formatDate, POST_STATUSES } from "@xom-nho/api";
+import { CONTENT_FORMATS, formatDateTime, POST_STATUSES } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { notFound } from "next/navigation";
@@ -11,9 +11,11 @@ import { getCategories } from "../api/get-category";
 import { getPost } from "../api/get-post";
 import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
+import { requestTime } from "@/lib/request-time";
 import { CategoryBadge } from "./category-badge";
 import { PlainContent } from "./plain-content";
 import { PostActions } from "./post-actions";
+import { PostEngagement } from "./post-engagement";
 import { PostMediaGallery } from "./post-media";
 import { PostStatusNote } from "./post-status-note";
 import { TableOfContents } from "./table-of-contents";
@@ -32,7 +34,7 @@ const numberFormat = new Intl.NumberFormat("vi-VN");
 export async function PostDetailView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const viewer = await requireUser(`/bai-viet/${slug}`);
-  const post = await getPost(slug);
+  const [post, now] = await Promise.all([getPost(slug), requestTime()]);
   if (!post) notFound();
   const own = post.author.id === viewer.id;
   // Danh mục chỉ cần cho hộp sửa bài (đã `cache`: header gọi rồi)
@@ -66,24 +68,25 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
           <h1 className="sr-only">Bài của {post.author.name}</h1>
         )}
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
-          <Avatar>
+        {/* Hai dòng: tên ở trên, giờ đăng và lượt đọc ở dưới, để giờ cụ thể ("16:20, 13 tháng 11") không đẩy
+            dấu "·" xuống dòng lơ lửng trên điện thoại */}
+        <div className="flex items-center gap-3">
+          <Avatar size="lg">
             <AvatarImage src={userAvatarSrc(post.author) ?? undefined} alt="" />
             <AvatarFallback>{initials(post.author.name)}</AvatarFallback>
           </Avatar>
-          <span className="text-base font-medium text-foreground">{post.author.name}</span>
-          {post.publishedAt && (
-            <>
-              <span aria-hidden="true">·</span>
-              <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-            </>
-          )}
-          {published && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>{numberFormat.format(post.viewCount)} lượt đọc</span>
-            </>
-          )}
+          <div className="flex min-w-0 flex-col">
+            <span className="text-base font-medium text-foreground">{post.author.name}</span>
+            {(post.publishedAt || published) && (
+              <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
+                {post.publishedAt && (
+                  <time dateTime={post.publishedAt}>{formatDateTime(post.publishedAt, now)}</time>
+                )}
+                {post.publishedAt && published && <span aria-hidden="true">·</span>}
+                {published && <span>{numberFormat.format(post.viewCount)} lượt đọc</span>}
+              </p>
+            )}
+          </div>
         </div>
       </header>
 
@@ -99,7 +102,8 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
       <PostMediaGallery media={post.media} authorName={post.author.name} />
 
       {post.tags.length > 0 && (
-        <footer className="border-t border-border pt-6">
+        // Không kẻ đường trên tag: ngay dưới đã có hai đường kẻ ôm hàng Thích, Bình luận, Chia sẻ
+        <footer>
           <h2 className="sr-only">Thẻ</h2>
           <ul className="flex flex-wrap gap-2">
             {post.tags.map((tag) => (
@@ -113,9 +117,22 @@ export async function PostDetailView({ params }: { params: Promise<{ slug: strin
         </footer>
       )}
 
-      <Suspense fallback={<CommentSectionSkeleton />}>
-        <CommentSection postId={post.id} canComment={published} />
-      </Suspense>
+      <PostEngagement
+        postId={post.id}
+        slug={post.slug}
+        shareTitle={post.title || `Bài của ${post.author.name}`}
+        like={{ liked: post.likedByMe, likeCount: post.likeCount }}
+        commentCount={post.commentCount}
+        commentsHref="#binh-luan"
+        showCommentCount={false}
+      />
+
+      {/* Đích của nút Bình luận (`#binh-luan`); chừa chỗ cho header dính khi cuộn tới */}
+      <div id="binh-luan" className="scroll-mt-32">
+        <Suspense fallback={<CommentSectionSkeleton />}>
+          <CommentSection postId={post.id} canComment={published} />
+        </Suspense>
+      </div>
 
       {/* Chỉ bài đã đăng mới tính lượt xem (backend cũng chặn) */}
       {published && <ViewTracker postId={post.id} />}

@@ -1,21 +1,23 @@
-import { type Category, formatDate, formatRelativeTime, type PostListItem } from "@xom-nho/api";
+import { type Category, formatDateTime, type PostListItem } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
-import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 import { CategoryBadge } from "./category-badge";
+import { LatestComments } from "./latest-comments";
 import { PostActions } from "./post-actions";
+import { PostEngagement } from "./post-engagement";
 import { PostMediaGrid } from "./post-media";
 
 /**
- * Thẻ bài trong feed (MASTER mục 7): badge danh mục, tiêu đề, tóm tắt 2 dòng, ảnh/video, rồi tác giả, thời gian,
- * số bình luận. Bài soạn kiểu mạng xã hội không có tiêu đề: phần đầu nội dung làm chữ chính (4 dòng).
- * Cả thẻ bấm được nhờ liên kết tiêu đề phủ kín thẻ (`after:inset-0`); badge danh mục, tag nằm trên lớp đó
- * (`relative z-10`) nên vẫn bấm riêng được, không lồng thẻ `<a>` trong nhau.
+ * Thẻ bài trong feed (MASTER mục 7, docs/tinh-nang.md mục 2.1): badge danh mục, tiêu đề, tóm tắt 2 dòng,
+ * ảnh/video, tag, tác giả và giờ đăng cụ thể ("14:05, 4 tháng 11"), số thích và số bình luận, hàng nút Thích,
+ * Bình luận, Chia sẻ, rồi 2 bình luận mới nhất. Bài soạn kiểu mạng xã hội không có tiêu đề: phần đầu nội dung
+ * làm chữ chính (4 dòng).
+ * Cả thẻ bấm được nhờ liên kết tiêu đề phủ kín thẻ (`after:inset-0`); badge danh mục, tag, tên, các nút nằm trên
+ * lớp đó (`relative z-10`) nên vẫn bấm riêng được, không lồng thẻ `<a>` trong nhau.
  * Tấm `glass` (MASTER 2.4). Hover: nổi lên 2px, kính đặc hơn, viền và bóng rõ lên (MASTER 5). Bóng đổi ngay,
  * không chuyển mượt: bóng lớn chuyển mượt phải vẽ lại mỗi khung hình.
- * Số bình luận nằm trong viên `accent` (xanh nhạt), điểm nhấn như viên màu trong mẫu thiết kế.
  * Bài của chính người xem (`viewerId`) có menu "…" (Sửa bài, Xóa bài) ở góc phải, nằm trên lớp liên kết.
  */
 const cardLinkClass = "after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none";
@@ -105,18 +107,21 @@ export function PostCard({
         {post.publishedAt && (
           <>
             <span aria-hidden="true">·</span>
-            <time dateTime={post.publishedAt} title={formatDate(post.publishedAt)}>
-              {formatRelativeTime(post.publishedAt, now)}
-            </time>
+            <time dateTime={post.publishedAt}>{formatDateTime(post.publishedAt, now)}</time>
           </>
         )}
-        <span aria-hidden="true">·</span>
-        <span className="inline-flex h-6 items-center gap-1 rounded-full bg-accent px-2 font-medium text-accent-foreground">
-          <MessageCircle aria-hidden="true" className="size-4" strokeWidth={1.75} />
-          {post.commentCount}
-          <span className="sr-only"> bình luận</span>
-        </span>
       </div>
+
+      <PostEngagement
+        postId={post.id}
+        slug={post.slug}
+        shareTitle={post.title || `Bài của ${post.author.name}`}
+        like={{ liked: post.likedByMe, likeCount: post.likeCount }}
+        commentCount={post.commentCount}
+        commentsHref={`/bai-viet/${post.slug}#binh-luan`}
+      />
+
+      <LatestComments comments={post.latestComments} now={now} />
     </article>
   );
 }
