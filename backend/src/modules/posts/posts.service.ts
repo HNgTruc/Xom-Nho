@@ -1,7 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import {
   ADMIN_MESSAGES,
-  ADMIN_POST_SORTS,
+  ADMIN_STATS_RANGE_DAYS,
+  type AdminPostStats,
+  type AdminPostStatsQuery,
+  type AdminStatsRange,
   type AdminListPostsQuery,
   type AdminPostListItem,
   type ArchivePostInput,
@@ -16,6 +19,7 @@ import {
   type ListPostsQuery,
   POST_MESSAGES,
   POST_STATUSES,
+  POST_STATUS_VALUES,
   type PostDetail,
   type PostLikeState,
   type PostListItem,
@@ -70,6 +74,14 @@ function saveFailure(reason: CreatePostFailure): AppException {
   return new AppException("VALIDATION_ERROR", message, {
     [categoryGone ? "category" : "mediaIds"]: message,
   });
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Đầu khoảng thống kê tính tới `now` (7, 30 ngày); `all` thì `null`. */
+function rangeStart(range: AdminStatsRange, now: Date): Date | null {
+  const days = ADMIN_STATS_RANGE_DAYS[range];
+  return days === null ? null : new Date(now.getTime() - days * DAY_MS);
 }
 
 @Injectable()
@@ -362,7 +374,7 @@ export class PostsService {
    * (pages/admin.md mục "Bài mới"). Từ khóa có dấu hay không đều được (so với `searchText` đã bỏ dấu).
    */
   async adminList(query: AdminListPostsQuery): Promise<Paginated<AdminPostListItem>> {
-    const { page, pageSize, status, category, author, q, since, sort } = query;
+    const { page, pageSize, status, category, author, q, since, range, sort, order } = query;
     const [rows, total] = await this.postsRepository.findAdminList(
       {
         status,
@@ -370,14 +382,41 @@ export class PostsService {
         authorUsername: author,
         searchText: q ? toSearchText(q) : undefined,
         createdAfter: since ? new Date(since) : undefined,
+        createdFrom: range ? (rangeStart(range, new Date()) ?? undefined) : undefined,
       },
-      {
-        order: sort === ADMIN_POST_SORTS.OLDEST ? "asc" : "desc",
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      },
+      { sort, order, skip: (page - 1) * pageSize, take: pageSize },
     );
     return paginate(rows.map(toAdminPostListItem), total, page, pageSize);
+  }
+
+  /**
+   * Thẻ số liệu ở màn Bài viết: số bài tạo trong khoảng (mọi trạng thái), so với khoảng liền trước cùng độ dài,
+   * và số bài theo trạng thái (mọi lúc) cho các tab. `all` không có khoảng trước để so.
+   */
+  async adminStats(query: AdminPostStatsQuery): Promise<AdminPostStats> {
+    const now = new Date();
+    const from = rangeStart(query.range, now);
+    const previousFrom = from ? new Date(2 * from.getTime() - now.getTime()) : null;
+    const [total, previousTotal, statusRows] = await Promise.all([
+      this.postsRepository.countCreated({ from: from ?? undefined }),
+      previousFrom
+        ? this.postsRepository.countCreated({ from: previousFrom, before: from ?? undefined })
+        : Promise.resolve(null),
+      this.postsRepository.countByStatus(),
+    ]);
+    const byStatus = Object.fromEntries(POST_STATUS_VALUES.map((s) => [s, 0])) as Record<
+      PostStatus,
+      number
+    >;
+    for (const row of statusRows) byStatus[row.status] = row.count;
+    return {
+      range: query.range,
+      from: from?.toISOString() ?? null,
+      to: now.toISOString(),
+      total,
+      previousTotal,
+      byStatus,
+    };
   }
 
   /**

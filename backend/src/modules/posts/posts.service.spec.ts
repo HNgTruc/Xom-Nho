@@ -812,13 +812,14 @@ describe("PostsService (route admin)", () => {
     return { service, repository: repository as typeof repository & typeof admin, storage };
   }
 
-  it("adminList: since thành mốc createdAfter, oldest thành asc, từ khóa bỏ dấu", async () => {
+  it("adminList: since thành mốc createdAfter, sort truyền xuống, từ khóa bỏ dấu", async () => {
     const { service, repository } = adminSetup();
 
     const result = await service.adminList({
       page: 2,
       pageSize: 20,
       sort: "oldest",
+      order: "desc",
       since: "2026-11-13T07:00:00.000Z",
       q: "Bánh Mì",
       status: "PUBLISHED",
@@ -831,11 +832,100 @@ describe("PostsService (route admin)", () => {
         authorUsername: undefined,
         searchText: "banh mi",
         createdAfter: new Date("2026-11-13T07:00:00.000Z"),
+        createdFrom: undefined,
       },
-      { order: "asc", skip: 20, take: 20 },
+      { sort: "oldest", order: "desc", skip: 20, take: 20 },
     );
     expect(result.items[0]).toMatchObject({ id: "p1", commentCount: 4, mediaCount: 1 });
     expect(result.meta).toEqual({ page: 2, pageSize: 20, total: 1, totalPages: 1 });
+  });
+
+  describe("bảng xếp hạng và thẻ số liệu", () => {
+    const now = new Date("2026-11-13T12:00:00.000Z");
+    const DAY = 24 * 60 * 60 * 1000;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(now);
+    });
+    afterEach(() => vi.useRealTimers());
+
+    it("range 7d thành mốc createdFrom 7 ngày trước, sort và order truyền xuống", async () => {
+      const { service, repository } = adminSetup();
+
+      await service.adminList({
+        page: 1,
+        pageSize: 30,
+        range: "7d",
+        sort: "dislikes",
+        order: "asc",
+      });
+
+      expect(repository.findAdminList).toHaveBeenCalledWith(
+        expect.objectContaining({ createdFrom: new Date(now.getTime() - 7 * DAY) }),
+        { sort: "dislikes", order: "asc", skip: 0, take: 30 },
+      );
+    });
+
+    it("range all thì không lọc thời gian", async () => {
+      const { service, repository } = adminSetup();
+
+      await service.adminList({
+        page: 1,
+        pageSize: 20,
+        range: "all",
+        sort: "likes",
+        order: "desc",
+      });
+
+      expect(repository.findAdminList).toHaveBeenCalledWith(
+        expect.objectContaining({ createdFrom: undefined }),
+        expect.anything(),
+      );
+    });
+
+    it("stats 30d: đếm khoảng này và 30 ngày liền trước, đủ mọi trạng thái", async () => {
+      const { service, repository } = adminSetup();
+      const counts = { countCreated: vi.fn(), countByStatus: vi.fn() };
+      counts.countCreated.mockResolvedValueOnce(12).mockResolvedValueOnce(8);
+      counts.countByStatus.mockResolvedValue([
+        { status: "PUBLISHED", count: 120 },
+        { status: "ARCHIVED", count: 3 },
+      ]);
+      Object.assign(repository, counts);
+      const from = new Date(now.getTime() - 30 * DAY);
+
+      const stats = await service.adminStats({ range: "30d" });
+
+      expect(counts.countCreated).toHaveBeenNthCalledWith(1, { from });
+      expect(counts.countCreated).toHaveBeenNthCalledWith(2, {
+        from: new Date(now.getTime() - 60 * DAY),
+        before: from,
+      });
+      expect(stats).toEqual({
+        range: "30d",
+        from: from.toISOString(),
+        to: now.toISOString(),
+        total: 12,
+        previousTotal: 8,
+        byStatus: { DRAFT: 0, PENDING: 0, PUBLISHED: 120, REJECTED: 0, ARCHIVED: 3 },
+      });
+    });
+
+    it("stats all: đếm mọi bài, không có khoảng trước", async () => {
+      const { service, repository } = adminSetup();
+      const counts = {
+        countCreated: vi.fn().mockResolvedValue(130),
+        countByStatus: vi.fn().mockResolvedValue([]),
+      };
+      Object.assign(repository, counts);
+
+      const stats = await service.adminStats({ range: "all" });
+
+      expect(counts.countCreated).toHaveBeenCalledTimes(1);
+      expect(counts.countCreated).toHaveBeenCalledWith({ from: undefined });
+      expect(stats).toMatchObject({ from: null, total: 130, previousTotal: null });
+    });
   });
 
   it("archive: bài đang hiện thành ARCHIVED, lưu lý do và trưởng xóm đã ẩn", async () => {

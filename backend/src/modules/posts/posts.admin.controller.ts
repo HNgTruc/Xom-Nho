@@ -13,6 +13,9 @@ import {
   type AdminListPostsQuery,
   adminListPostsQuerySchema,
   type AdminPostListItem,
+  type AdminPostStats,
+  type AdminPostStatsQuery,
+  adminPostStatsQuerySchema,
   type ArchivePostInput,
   archivePostSchema,
   ROLES,
@@ -35,6 +38,14 @@ export class PostsAdminController {
     @Query(new ZodValidationPipe(adminListPostsQuerySchema)) query: AdminListPostsQuery,
   ): Promise<Paginated<AdminPostListItem>> {
     return this.postsService.adminList(query);
+  }
+
+  /** Thẻ số liệu màn Bài viết. Khai báo trước mọi route `:id` sau này để `stats` không bị hiểu là id. */
+  @Get("stats")
+  stats(
+    @Query(new ZodValidationPipe(adminPostStatsQuerySchema)) query: AdminPostStatsQuery,
+  ): Promise<AdminPostStats> {
+    return this.postsService.adminStats(query);
   }
 
   /** Ẩn bài đang hiện, lý do bắt buộc. Trả 200 kèm dòng bài sau khi ẩn. */

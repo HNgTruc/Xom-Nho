@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { ContentFormat, PostSort, PostStatus } from "@xom-nho/api";
+import type { AdminPostSort, ContentFormat, PostSort, PostStatus, SortOrder } from "@xom-nho/api";
 import { Prisma } from "../../generated/prisma/client.js";
 import { PrismaService } from "../../infrastructure/database/prisma.service.js";
 
@@ -58,7 +58,38 @@ export interface AdminPostListFilter {
   categorySlug?: string;
   authorUsername?: string;
   searchText?: string;
+  /** Bài tạo sau mốc (không tính đúng mốc): màn Bài mới, `since` */
   createdAfter?: Date;
+  /** Bài tạo từ mốc trở đi: khoảng thống kê `range` */
+  createdFrom?: Date;
+}
+
+/**
+ * Thứ tự của bảng quản trị. Bảng xếp hạng theo số đếm quan hệ (`_count`) hoặc lượt xem, trùng số thì bài mới hơn
+ * trước; luôn thêm `id` cuối để thứ tự ổn định giữa các trang.
+ */
+function adminOrderBy(
+  sort: AdminPostSort,
+  order: SortOrder,
+): Prisma.PostOrderByWithRelationInput[] {
+  const newestFirst: Prisma.PostOrderByWithRelationInput[] = [
+    { createdAt: "desc" },
+    { id: "desc" },
+  ];
+  switch (sort) {
+    case "newest":
+      return newestFirst;
+    case "oldest":
+      return [{ createdAt: "asc" }, { id: "asc" }];
+    case "likes":
+      return [{ likes: { _count: order } }, ...newestFirst];
+    case "dislikes":
+      return [{ dislikes: { _count: order } }, ...newestFirst];
+    case "comments":
+      return [{ comments: { _count: order } }, ...newestFirst];
+    case "views":
+      return [{ viewCount: order }, ...newestFirst];
+  }
 }
 
 /** Đổi trạng thái kiểm duyệt: lý do ẩn (hoặc `null` khi hiện lại) và trưởng xóm đã làm. */
@@ -192,25 +223,39 @@ export class PostsRepository {
    */
   async findAdminList(
     filter: AdminPostListFilter,
-    page: { order: "asc" | "desc"; skip: number; take: number },
+    page: { sort: AdminPostSort; order: SortOrder; skip: number; take: number },
   ): Promise<[AdminPostListRow[], number]> {
     const where: Prisma.PostWhereInput = {
       status: filter.status,
       category: filter.categorySlug ? { slug: filter.categorySlug } : undefined,
       author: filter.authorUsername ? { username: filter.authorUsername } : undefined,
       searchText: filter.searchText ? { contains: filter.searchText } : undefined,
-      createdAt: filter.createdAfter ? { gt: filter.createdAfter } : undefined,
+      createdAt:
+        filter.createdAfter || filter.createdFrom
+          ? { gt: filter.createdAfter, gte: filter.createdFrom }
+          : undefined,
     };
     return Promise.all([
       this.prisma.post.findMany({
         where,
         select: adminPostListSelect,
-        orderBy: [{ createdAt: page.order }, { id: page.order }],
+        orderBy: adminOrderBy(page.sort, page.order),
         skip: page.skip,
         take: page.take,
       }),
       this.prisma.post.count({ where }),
     ]);
+  }
+
+  /** Số bài tạo trong `[from, before)`; trường bỏ trống thì không giới hạn phía đó. */
+  countCreated(range: { from?: Date; before?: Date }): Promise<number> {
+    return this.prisma.post.count({ where: { createdAt: { gte: range.from, lt: range.before } } });
+  }
+
+  /** Số bài theo từng trạng thái (mọi lúc), cho số trên các tab của màn Bài viết. */
+  async countByStatus(): Promise<{ status: PostStatus; count: number }[]> {
+    const rows = await this.prisma.post.groupBy({ by: ["status"], _count: { _all: true } });
+    return rows.map((row) => ({ status: row.status, count: row._count._all }));
   }
 
   /** Đổi trạng thái kiểm duyệt của bài, trả dòng cho bảng quản trị. */

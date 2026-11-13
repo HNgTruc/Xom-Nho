@@ -7,7 +7,7 @@ import { createTestPrisma, resetDatabase } from "../fixtures/database.js";
 import { signUp } from "../fixtures/session.js";
 
 type Account = { cookie: string; id: string };
-type Method = "get" | "post" | "patch" | "delete";
+type Method = "get" | "post" | "put" | "patch" | "delete";
 
 /**
  * Kiểm duyệt tối thiểu (`/api/v1/admin/*`, docs/api.md mục "Quản trị"): ẩn bài kèm lý do, ẩn bình luận,
@@ -63,6 +63,7 @@ describe("Quản trị: bài viết, bình luận, thành viên (/api/v1/admin)"
   describe("chỉ trưởng xóm gọi được", () => {
     const routes: [Method, string, object?][] = [
       ["get", "/admin/posts"],
+      ["get", "/admin/posts/stats"],
       ["post", "/admin/posts/p1/archive", { reason: "Spam" }],
       ["post", "/admin/posts/p1/restore"],
       ["delete", "/admin/posts/p1"],
@@ -165,6 +166,104 @@ describe("Quản trị: bài viết, bình luận, thành viên (/api/v1/admin)"
       expect(await prisma.post.count()).toBe(0);
       expect(await prisma.comment.count()).toBe(0);
       await call(admin, "delete", `/admin/posts/${post.id}`).expect(404);
+    });
+  });
+
+  describe("bảng xếp hạng và thẻ số liệu (màn Bài viết)", () => {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    /** Ba bài: a nhiều thích, b nhiều không thích và lượt xem, c nhiều bình luận. */
+    async function seedRanking() {
+      const a = await createPost(lan, "Bài A");
+      const b = await createPost(lan, "Bài B");
+      const c = await createPost(minh, "Bài C");
+      for (const who of [lan, minh, author]) {
+        await call(who, "put", `/posts/${a.id}/like`).expect(200);
+      }
+      for (const who of [lan, minh]) {
+        await call(who, "put", `/posts/${b.id}/dislike`).expect(200);
+      }
+      await prisma.post.update({ where: { id: b.id }, data: { viewCount: 50 } });
+      await prisma.comment.createMany({
+        data: [lan, minh, author].map((who) => ({
+          postId: c.id,
+          authorId: who.id,
+          content: "Góp ý",
+        })),
+      });
+      return { a, b, c };
+    }
+
+    const ids = (res: request.Response) => res.body.data.map((p: { id: string }) => p.id);
+
+    it.each([
+      ["likes", "a"],
+      ["dislikes", "b"],
+      ["comments", "c"],
+      ["views", "b"],
+    ] as const)("sort=%s: bài cao nhất đứng đầu, order=asc thì đứng cuối", async (sort, top) => {
+      const posts = await seedRanking();
+
+      const desc = await call(admin, "get", `/admin/posts?sort=${sort}`).expect(200);
+      expect(ids(desc)[0]).toBe(posts[top].id);
+
+      const asc = await call(admin, "get", `/admin/posts?sort=${sort}&order=asc`).expect(200);
+      expect(ids(asc).at(-1)).toBe(posts[top].id);
+    });
+
+    it("dòng bảng có số không thích", async () => {
+      const { b } = await seedRanking();
+
+      const res = await call(admin, "get", "/admin/posts?sort=dislikes").expect(200);
+
+      expect(res.body.data[0]).toMatchObject({ id: b.id, dislikeCount: 2, likeCount: 0 });
+    });
+
+    it("range=7d chỉ lấy bài đăng trong 7 ngày; pageSize=30 được", async () => {
+      const recent = await createPost(lan, "Bài tuần này");
+      const old = await createPost(lan, "Bài tháng trước");
+      await prisma.post.update({
+        where: { id: old.id },
+        data: { createdAt: new Date(Date.now() - 20 * DAY) },
+      });
+
+      const week = await call(admin, "get", "/admin/posts?range=7d&pageSize=30").expect(200);
+      expect(ids(week)).toEqual([recent.id]);
+      const all = await call(admin, "get", "/admin/posts?range=all").expect(200);
+      expect(all.body.meta.total).toBe(2);
+    });
+
+    it("stats: số bài trong khoảng so với khoảng trước, số theo trạng thái", async () => {
+      const now = Date.now();
+      const created = [1, 2, 10, 40, 45];
+      for (const [i, daysAgo] of created.entries()) {
+        const post = await createPost(lan, `Bài ${i}`);
+        await prisma.post.update({
+          where: { id: post.id },
+          data: { createdAt: new Date(now - daysAgo * DAY) },
+        });
+      }
+      const hidden = await createPost(minh, "Bài bị ẩn");
+      await call(admin, "post", `/admin/posts/${hidden.id}/archive`, { reason: "Spam" }).expect(
+        200,
+      );
+
+      const month = await call(admin, "get", "/admin/posts/stats").expect(200);
+      // 30 ngày: 1, 2, 10 ngày trước + bài bị ẩn (vừa tạo); 30 ngày trước đó: 40, 45 ngày trước
+      expect(month.body.data).toMatchObject({
+        range: "30d",
+        total: 4,
+        previousTotal: 2,
+        byStatus: { PUBLISHED: 5, ARCHIVED: 1, DRAFT: 0, PENDING: 0, REJECTED: 0 },
+      });
+
+      const week = await call(admin, "get", "/admin/posts/stats?range=7d").expect(200);
+      expect(week.body.data).toMatchObject({ total: 3, previousTotal: 1 });
+
+      const all = await call(admin, "get", "/admin/posts/stats?range=all").expect(200);
+      expect(all.body.data).toMatchObject({ total: 6, previousTotal: null, from: null });
+
+      await call(admin, "get", "/admin/posts/stats?range=1y").expect(400);
     });
   });
 
