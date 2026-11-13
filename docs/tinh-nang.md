@@ -219,8 +219,8 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Xem lần lượt bài đăng từ lần xem trước, bài cũ nhất trước; số bài chưa xem hiện ở sidebar.
 - Xem trước nội dung đầy đủ, thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa); "Ẩn bài", "Bài tiếp theo"; phím `J`/`K`/`H`/`O`.
-- [ ] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài
-- [ ] Hiện lại bài thì xóa lý do
+- [ ] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài (backend: xong 2026-11-13, `POST /admin/posts/:id/archive`, `PostDetail.rejectReason`; web hiện lý do, màn admin: chưa)
+- [ ] Hiện lại bài thì xóa lý do (backend: xong 2026-11-13; màn admin: chưa)
 - [ ] Hết bài mới thì báo "Đã xem hết bài mới."
 
 ### 4.3 Quản lý bài, bình luận
@@ -239,10 +239,10 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 Tiêu chí chung cho admin:
 
-- [ ] Người không phải admin đăng nhập vào app admin bị từ chối; gọi thẳng `/api/v1/admin/*` nhận 403
-- [ ] Mọi bảng có phân trang, lọc, tìm
+- [x] Người không phải admin đăng nhập vào app admin bị từ chối; gọi thẳng `/api/v1/admin/*` nhận 403 (e2e: `backend/test/e2e/admin-moderation.e2e-spec.ts`)
+- [ ] Mọi bảng có phân trang, lọc, tìm (backend bài, bình luận, thành viên: xong 2026-11-13)
 - [ ] Thao tác xóa có hộp xác nhận
-- [ ] Admin không tự hạ quyền hoặc tự cấm chính mình
+- [x] Admin không tự hạ quyền hoặc tự cấm chính mình; không cấm trưởng xóm khác (`users.policy.ts`)
 
 ## Để sau (chưa làm)
 

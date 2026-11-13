@@ -102,7 +102,9 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kính mờ" (admin dùng kính như web), "Thẻ số liệu" (biểu đồ cột có chuyển động) và "Bản thiết kế tham khảo" (bản demo trên canvas, quyết định rút ra), "Bài mới", "Ẩn bài".
 
 - [x] Chốt đề xuất thiết kế admin: màn Bài mới thay hàng chờ duyệt, ẩn bài bắt buộc lý do, bảng dày hơn MASTER (2026-11-13)
-- [ ] Backend: các `*.admin.controller.ts` theo `api.md`, `modules/dashboard`
+- [x] Backend kiểm duyệt tối thiểu: `posts.admin.controller.ts` (danh sách có `since`, ẩn kèm lý do, hiện lại, xóa), `comments.admin.controller.ts` (danh sách, ẩn, hiện, xóa), `users.admin.controller.ts` (danh sách có email, đổi vai trò, cấm, bỏ cấm), `api.admin.*` trong api-client, test policy, service, e2e (2026-11-13)
+- [ ] Web: hiện lý do ẩn cho tác giả trên trang bài (`archivedNote`, hộp `destructive` nhạt)
+- [ ] Backend còn lại: `modules/dashboard`, danh mục, tag, `GET /admin/users/:id`, `PATCH /admin/posts/:id`
 - [ ] Admin: layout (sidebar, topbar), `DataTable` dùng chung
 - [ ] Tổng quan số liệu
 - [ ] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt

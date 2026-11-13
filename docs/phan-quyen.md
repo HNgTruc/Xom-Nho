@@ -30,8 +30,9 @@ Vai trò lưu ở cột `role` của bảng `user` (plugin admin của Better Au
 | Sửa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
 | Xóa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
 | Tạo tag mới khi viết bài                |       |          |   ✅    |     ✅     |
-| Duyệt / từ chối bài                     |       |          |         |     ✅     |
-| Ẩn / hiện bình luận bất kỳ              |       |          |         |     ✅     |
+| Duyệt / từ chối bài (tạm không dùng)    |       |          |         |     ✅     |
+| Ẩn / hiện bài bất kỳ (ẩn kèm lý do)     |       |          |         |     ✅     |
+| Ẩn / hiện / xóa bình luận bất kỳ        |       |          |         |     ✅     |
 | Sửa / xóa bài bất kỳ                    |       |          |         |     ✅     |
 | Quản lý danh mục, tag                   |       |          |         |     ✅     |
 | Đổi vai trò, cấm người dùng             |       |          |         |     ✅     |
@@ -67,7 +68,17 @@ stateDiagram-v2
   ARCHIVED --> PUBLISHED: khôi phục
 ```
 
-Trưởng xóm ẩn bài (`POST /admin/posts/:id/archive`) thì bắt buộc ghi lý do, lưu ở `rejectReason`; tác giả thấy lý do trên bài của mình, hiện lại thì lý do bị xóa (chốt 2026-11-13, `pages/admin.md` mục "Ẩn bài").
+Trưởng xóm ẩn bài (`POST /admin/posts/:id/archive`) thì bắt buộc ghi lý do, lưu ở `rejectReason`; tác giả thấy lý do trên bài của mình, hiện lại thì lý do bị xóa (chốt 2026-11-13, `pages/admin.md` mục "Ẩn bài"). Chỉ ẩn được bài đang hiện, chỉ hiện lại được bài đang ẩn (`PostsPolicy.canArchive`, `canRestore`), sai trạng thái thì 409.
+
+## Trưởng xóm quản lý thành viên
+
+Theo `users.policy.ts` (chốt 2026-11-13):
+
+- Không tự đổi vai trò của mình, không tự cấm mình (403). Tránh trường hợp tự hạ quyền rồi không còn ai là trưởng xóm.
+- Không cấm trưởng xóm khác (403), nhưng hạ vai trò họ thì được. Muốn cấm thì hạ vai trò trước, để không cấm nhầm.
+- Cấm bắt buộc có lý do, hạn tùy chọn (bỏ trống là vĩnh viễn). Cấm xong thì mọi phiên của người đó bị xóa: họ bị đăng xuất ngay, đăng nhập lại nhận 403 kèm lý do. Hết hạn thì tự mở, không cần bỏ cấm.
+- Đổi vai trò có hiệu lực ngay ở request sau (phiên đọc lại bảng `user`, không có cookie cache).
+- `GET /admin/users` là **route duy nhất trả `email` của người khác**, để trưởng xóm tìm thành viên theo email. Mọi route khác chỉ trả `UserSummary` (không email).
 
 Chỉ bài `PUBLISHED` hiện cho người khác. Tác giả luôn xem được bài của mình ở mọi trạng thái.
 

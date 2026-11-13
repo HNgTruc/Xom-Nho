@@ -193,7 +193,9 @@ Mã lỗi Better Auth → câu tiếng Việt: `authErrorMessage()` trong `api/s
 
 ## Dành cho admin (`/api/v1/admin`, tất cả 🛡️)
 
-Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với controller công khai.
+Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với controller công khai. Khách nhận 401, người không phải `admin` nhận 403 ở mọi route dưới đây. Client: `api.admin.posts`, `api.admin.comments`, `api.admin.users` (`api/src/api-client/admin/`).
+
+Đã làm (2026-11-13): bài viết, bình luận, thành viên, trừ các dòng ghi "Chưa làm". Danh sách mặc định 20 dòng mỗi trang, tối đa 100 (`?pageSize=`).
 
 ### Tổng quan (`modules/dashboard`)
 
@@ -203,26 +205,30 @@ Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với 
 
 ### Bài viết
 
-| Method | Đường dẫn                                               | Mô tả                                                                                       |
-| ------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| GET    | `/admin/posts?status=&category=&author=&q=&page=&sort=` | Mọi bài, mọi trạng thái                                                                     |
-| GET    | `/admin/posts?since=&sort=oldest`                       | Màn Bài mới: bài đăng sau mốc `since` (ISO), cũ nhất trước; `meta.total` là số bài chưa xem |
-| GET    | `/admin/posts/:id`                                      | Chi tiết, kể cả bài nháp                                                                    |
-| POST   | `/admin/posts/:id/archive`                              | Ẩn bài: `PUBLISHED` → `ARCHIVED`. Body: `{ reason }` (bắt buộc), lưu vào `rejectReason`     |
-| POST   | `/admin/posts/:id/restore`                              | Hiện lại: `ARCHIVED` → `PUBLISHED`, xóa `rejectReason`                                      |
-| POST   | `/admin/posts/:id/approve`                              | Chưa làm (ADR 0008): chỉ khi bật lại duyệt bài. Duyệt `PENDING` → `PUBLISHED`               |
-| POST   | `/admin/posts/:id/reject`                               | Chưa làm (ADR 0008): như trên. Từ chối, body `{ reason }`                                   |
-| PATCH  | `/admin/posts/:id`                                      | Sửa bài bất kỳ                                                                              |
-| DELETE | `/admin/posts/:id`                                      | Xóa bài bất kỳ                                                                              |
+| Method | Đường dẫn                                               | Mô tả                                                                                                                                                 |
+| ------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/admin/posts?status=&category=&author=&q=&page=&sort=` | Mọi bài, mọi trạng thái, sắp theo lúc tạo (`sort=newest` mặc định, `oldest`). `q` có dấu hay không đều được (so với `searchText`)                     |
+| GET    | `/admin/posts?since=&sort=oldest`                       | Màn Bài mới: bài tạo sau mốc `since` (ISO 8601 có múi giờ), cũ nhất trước; `meta.total` là số bài chưa xem                                            |
+| GET    | `/admin/posts/:id`                                      | Chưa làm. Chi tiết, kể cả bài nháp (tạm dùng `GET /posts/:slug`: trưởng xóm mở được bài ẩn)                                                           |
+| POST   | `/admin/posts/:id/archive`                              | Ẩn bài: `PUBLISHED` → `ARCHIVED`. Body: `{ reason }` (bắt buộc, tối đa 500 ký tự), lưu vào `rejectReason`, ghi `reviewerId`. Bài không đang hiện: 409 |
+| POST   | `/admin/posts/:id/restore`                              | Hiện lại: `ARCHIVED` → `PUBLISHED`, xóa `rejectReason`. Bài không đang ẩn: 409                                                                        |
+| POST   | `/admin/posts/:id/approve`                              | Chưa làm (ADR 0008): chỉ khi bật lại duyệt bài. Duyệt `PENDING` → `PUBLISHED`                                                                         |
+| POST   | `/admin/posts/:id/reject`                               | Chưa làm (ADR 0008): như trên. Từ chối, body `{ reason }`                                                                                             |
+| PATCH  | `/admin/posts/:id`                                      | Chưa làm. Sửa bài bất kỳ                                                                                                                              |
+| DELETE | `/admin/posts/:id`                                      | Xóa hẳn bài bất kỳ, cả bình luận, ảnh, video (xóa cả file trên đĩa). Trả 204                                                                          |
+
+`GET` trả `AdminPostListItem[]`; `archive`, `restore` trả `AdminPostListItem`: `id, title, slug, excerpt, status, rejectReason, createdAt, publishedAt, viewCount, commentCount (cả bình luận đã ẩn), likeCount, mediaCount, author (UserSummary), category`. Không có `content`.
 
 ### Bình luận
 
-| Method | Đường dẫn                                        | Mô tả         |
-| ------ | ------------------------------------------------ | ------------- |
-| GET    | `/admin/comments?status=&post=&author=&q=&page=` | Mọi bình luận |
-| POST   | `/admin/comments/:id/hide`                       | Ẩn            |
-| POST   | `/admin/comments/:id/show`                       | Hiện lại      |
-| DELETE | `/admin/comments/:id`                            | Xóa           |
+| Method | Đường dẫn                                        | Mô tả                                                                              |
+| ------ | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| GET    | `/admin/comments?status=&post=&author=&q=&page=` | Mọi bình luận (cả đã ẩn), mới nhất trước. `post` là id bài, `q` tìm trong nội dung |
+| POST   | `/admin/comments/:id/hide`                       | Ẩn. Gọi lặp lại không lỗi                                                          |
+| POST   | `/admin/comments/:id/show`                       | Hiện lại. Gọi lặp lại không lỗi                                                    |
+| DELETE | `/admin/comments/:id`                            | Xóa hẳn, trả lời bên dưới bị xóa theo. Trả 204                                     |
+
+`AdminCommentListItem`: `id, content, status, parentId, createdAt, editedAt, author (UserSummary), post { id, title, slug, excerpt }`.
 
 ### Danh mục, tag
 
@@ -238,15 +244,17 @@ Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với 
 
 ### Thành viên
 
-| Method | Đường dẫn                             | Mô tả                                                 |
-| ------ | ------------------------------------- | ----------------------------------------------------- |
-| GET    | `/admin/users?role=&banned=&q=&page=` | Danh sách, tìm theo tên/email                         |
-| GET    | `/admin/users/:id`                    | Chi tiết + số bài, bình luận                          |
-| PATCH  | `/admin/users/:id/role`               | Body: `{ role }`. Không tự đổi vai trò của chính mình |
-| POST   | `/admin/users/:id/ban`                | Body: `{ reason, expiresAt? }`. Không tự cấm mình     |
-| POST   | `/admin/users/:id/unban`              | Bỏ cấm                                                |
+| Method | Đường dẫn                             | Mô tả                                                                                                                                                                                                                                                |
+| ------ | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/admin/users?role=&banned=&q=&page=` | Danh sách, mới tham gia trước, tìm theo tên/email. `banned=true` chỉ người đang bị cấm (cấm hết hạn không tính)                                                                                                                                      |
+| GET    | `/admin/users/:id`                    | Chưa làm. Chi tiết + số bài, bình luận (danh sách đã có `postCount`, `commentCount`)                                                                                                                                                                 |
+| PATCH  | `/admin/users/:id/role`               | Body: `{ role }`. Có hiệu lực ngay ở request sau. Tự đổi vai trò của mình: 403                                                                                                                                                                       |
+| POST   | `/admin/users/:id/ban`                | Body: `{ reason, expiresAt? }` (`expiresAt` ISO 8601, sau hiện tại; bỏ trống hoặc `null` là vĩnh viễn). Xóa mọi phiên của người đó: bị đăng xuất ngay, đăng nhập lại nhận 403. Tự cấm mình hoặc cấm trưởng xóm khác: 403 (hạ vai trò người đó trước) |
+| POST   | `/admin/users/:id/unban`              | Bỏ cấm. Không bị cấm thì giữ nguyên                                                                                                                                                                                                                  |
 
-Phần đổi vai trò và cấm có thể dùng API của plugin admin trong Better Auth; nếu vậy, endpoint ở đây là lớp mỏng gọi qua để giữ cùng định dạng phản hồi.
+`AdminUserListItem`: `UserSummary` + `email, role, banned, banReason, banExpires, createdAt, postCount, commentCount`. Đây là route duy nhất trả `email` của người khác (docs/phan-quyen.md). `banned` theo cùng quy tắc AuthGuard: cấm đã hết hạn thì `false`, không trả lý do, hạn cũ.
+
+Đổi vai trò, cấm ghi thẳng các cột của plugin admin Better Auth (`role`, `banned`, `banReason`, `banExpires`) và xóa bảng `session` trong một transaction, như `banUser` của plugin, chứ không gọi `auth.api.*` (cần header phiên của admin, service không đọc request). Better Auth không bật cookie cache nên thay đổi có hiệu lực ngay. Endpoint `/api/auth/admin/*` của plugin vẫn mở cho admin nhưng frontend không dùng: chúng không chặn tự hạ vai trò, không bắt lý do.
 
 ## Giới hạn tần suất
 
