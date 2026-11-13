@@ -137,9 +137,10 @@ Tiêu chí:
 
 - Trang `/danh-muc/<slug>` và `/tag/<slug>` liệt kê bài.
 
-### 2.6 Thích và chia sẻ 🌐📱
+### 2.6 Thích, Không thích và chia sẻ 🌐📱
 
 - Thành viên bấm Thích / Bỏ thích bài đã đăng, kể cả bài của mình; mọi thành viên thấy số thích. Bài đã ẩn không thích được nữa nhưng vẫn bỏ thích được.
+- Không thích (ADR 0009): như Thích, số hiện công khai. Mỗi người chọn Thích **hoặc** Không thích một bài: bấm cái này thì cái kia tự gỡ. Nút chỉ có biểu tượng, ghép cặp với nút Thích (MASTER mục 7).
 - Chia sẻ: điện thoại mở bảng chia sẻ của hệ điều hành; máy tính sao chép liên kết bài, báo "Đã sao chép liên kết".
 
 Tiêu chí:
@@ -148,6 +149,8 @@ Tiêu chí:
 - [x] Nút Thích đổi ngay khi bấm (cập nhật lạc quan), lỗi thì trả lại như cũ và báo `LIKE_MESSAGES.FAILED` (web, 2026-11-13; bấm liên tục chỉ hiện kết quả lần cuối; `features/posts/lib/like-state.test.ts`). App chưa
 - [x] Nút Thích có `aria-pressed`, không chỉ đổi màu (web: tim tô đặc, chữ đậm)
 - [x] Chia sẻ: màn hình cảm ứng có `navigator.share` thì mở bảng chia sẻ, còn lại sao chép liên kết và báo `SHARE_MESSAGES.COPIED` (web, 2026-11-13). App chưa
+- [x] Không thích: một lần mỗi người, loại trừ với Thích, gửi cùng lúc Thích, Không thích, bỏ không lỗi và không để lại cả hai (2026-11-13, `posts-dislike.e2e-spec.ts`)
+- [x] Nút Không thích có `aria-label`, `aria-pressed`, vùng chạm 44px trên điện thoại; bấm liền hai nút thì lưu đúng thứ tự bấm (web, 2026-11-13; Playwright `main-flow.e2e.ts`). App chưa
 
 Không cần xử lý khách bấm Thích: khách không xem được bài nào (ADR 0007).
 

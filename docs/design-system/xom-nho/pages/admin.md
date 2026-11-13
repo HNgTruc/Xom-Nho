@@ -66,6 +66,8 @@ Theo kết quả `--stack shadcn` và gợi ý dashboard của skill:
 Thay cho "Hàng chờ duyệt" (chốt 2026-11-13): từ ADR 0008 bài đăng thẳng, không còn bài nào chờ duyệt. Trưởng xóm đọc lại các bài đã lên xóm và ẩn bài vi phạm.
 
 - Xem lần lượt các bài đăng **từ lần xem trước**, bài cũ nhất trước. Số bài chưa xem hiện ở sidebar (mục "Bài mới").
+- **Bài đã mở không biến mất** trong lúc đang xem: mờ đi (72%) kèm nhãn "Đã xem"; bài đã ẩn có nhãn "Đã ẩn". Quay lại được bằng `K`, vẫn ẩn được bài vừa đọc.
+- **Mốc "lần xem trước" chỉ dời khi bấm "Đánh dấu đã xem hết"** (chốt 2026-11-13, cách chắc chắn: không bao giờ sót bài chưa đọc). Mở bài, chuyển bài không dời mốc. Lần mở trang sau, bộ lọc mặc định "Từ: Lần xem trước" không còn hiện các bài trước mốc; xem lại bằng "24 giờ qua", "7 ngày qua" hoặc màn Bài viết.
 - Bố cục hai cột trên màn hình rộng: danh sách bài (trái, 360px) + xem trước nội dung đầy đủ (phải), có khung nhỏ thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa). Nút "Ẩn bài" (nút viền) và "Bài tiếp theo" cố định ở đáy vùng xem trước.
 - Phím tắt (có ghi chú trên giao diện): `J`/`K` chuyển bài, `H` mở hộp ẩn bài, `O` mở bài trên Xóm Nhỏ. Không kích hoạt khi đang gõ trong ô nhập.
 - Hết bài: "Đã xem hết bài mới." kèm nút về Tổng quan.
