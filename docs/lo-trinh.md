@@ -69,8 +69,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] Dọn file tải lên mà không gắn bài quá 1 ngày (bỏ qua ảnh đại diện: `purpose = AVATAR`)
 - [x] Backend: `PostLike` (thích / bỏ thích, `PUT`/`DELETE /posts/:id/like`), feed trả số thích, `likedByMe` và 2 bình luận gốc đang hiện mới nhất
 - [x] Web: bình luận + trả lời ở trang bài (gửi, trả lời có "@tên", sửa, xóa có hỏi lại, "đã sửa", bình luận ẩn hiện mờ cho admin)
-- [ ] Web: trình soạn Markdown có xem trước, bài của tôi
-- [ ] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất
+- [x] Web: thẻ bài có người đăng, thời gian cụ thể, Thích, Chia sẻ, 2 bình luận mới nhất; trang bài có Thích, Chia sẻ
 - [ ] Test Playwright: đăng ký → viết bài → bình luận
 
 ## Giai đoạn 4b: Hồ sơ, cài đặt, kết bạn
@@ -80,6 +79,7 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Migration: `user.coverImage`, `user.location`, bảng `Friendship`, `UserBlock`
 - [ ] Backend: `modules/friends` (mời, chấp nhận, từ chối, hủy), hồ sơ trả số bạn bè và quan hệ với người xem
 - [ ] Web: trang hồ sơ có ảnh bìa, ảnh đại diện, nơi ở, số bạn bè, bài viết, ô viết bài
+- [ ] Web: bài của tôi (`GET /me/posts`, mọi trạng thái), chuyển từ giai đoạn 4; làm cùng trang hồ sơ
 - [ ] Web: trang cài đặt, trang bạn bè
 - [ ] Test phân quyền cho từng vai trò, người bị cấm
 
@@ -128,3 +128,4 @@ Thiết kế: [pages/mobile.md](design-system/xom-nho/pages/mobile.md), mục "�
 - [ ] Deploy: backend + MySQL, web, admin (tên miền con riêng). MySQL cần `innodb_ft_min_token_size=1` và `innodb_ft_enable_stopword=OFF` (xem `co-so-du-lieu.md`, mục Tìm kiếm tiếng Việt)
 - [ ] Thử đăng nhập Google/GitHub trên app (cần backend có địa chỉ công khai; code và test e2e đã có từ giai đoạn 2, xem `thiet-lap-moi-truong.md` mục 6)
 - [ ] Build app bằng EAS (tùy chọn)
+- [ ] Trình soạn Markdown có xem trước cho bài dài (tùy chọn, `contentFormat = MARKDOWN`): chuyển từ giai đoạn 4, vì hộp soạn kiểu mạng xã hội đã thay (ADR 0008)

@@ -98,6 +98,7 @@ Tiêu chí:
 
 - [x] Web có thanh phân trang, URL giữ số trang (`?page=3`)
 - [x] Backend trả số thích, `likedByMe` và 2 bình luận gốc đang hiện mới nhất cho mỗi bài, cả trang chỉ thêm 2 truy vấn (2026-11-13)
+- [x] Web: thẻ bài có giờ đăng cụ thể (`formatDateTime`), số thích, số bình luận, nút Thích, Bình luận, Chia sẻ, 2 bình luận mới nhất (2026-11-13; `features/posts/components/post-engagement.tsx`, `latest-comments.tsx`)
 - [ ] App cuộn vô hạn, kéo xuống để làm mới
 - [ ] Trang trống có lời nhắn thân thiện (xem `giong-van-va-giao-dien.md`)
 
@@ -144,8 +145,9 @@ Tiêu chí:
 Tiêu chí:
 
 - [x] Mỗi người thích một bài một lần; bấm liên tục hay gửi cùng lúc không làm sai số (2026-11-13): khóa chính `(postId, userId)`, `PUT`/`DELETE /posts/:id/like` (`posts-like.e2e-spec.ts`)
-- [ ] Nút Thích đổi ngay khi bấm (cập nhật lạc quan), lỗi thì trả lại như cũ và báo `LIKE_MESSAGES.FAILED`
-- [ ] Nút Thích có `aria-pressed`, không chỉ đổi màu
+- [x] Nút Thích đổi ngay khi bấm (cập nhật lạc quan), lỗi thì trả lại như cũ và báo `LIKE_MESSAGES.FAILED` (web, 2026-11-13; bấm liên tục chỉ hiện kết quả lần cuối; `features/posts/lib/like-state.test.ts`). App chưa
+- [x] Nút Thích có `aria-pressed`, không chỉ đổi màu (web: tim tô đặc, chữ đậm)
+- [x] Chia sẻ: màn hình cảm ứng có `navigator.share` thì mở bảng chia sẻ, còn lại sao chép liên kết và báo `SHARE_MESSAGES.COPIED` (web, 2026-11-13). App chưa
 
 Không cần xử lý khách bấm Thích: khách không xem được bài nào (ADR 0007).
 

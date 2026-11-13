@@ -236,18 +236,22 @@ Biểu trưng **xn chữ ký** (chọn 2026-11-12): "xn" viết một mạch, ch
 
 ### Thẻ bài trong feed
 
-- Thứ tự đọc: badge danh mục → tiêu đề (`text-lg`, 600) → tóm tắt 2 dòng (`muted-foreground`) → lưới ảnh/video → hàng metadata (avatar 24, tên, "2 giờ trước", số bình luận).
+- Thứ tự đọc: badge danh mục → tiêu đề (`text-lg`, 600) → tóm tắt 2 dòng (`muted-foreground`) → lưới ảnh/video → tag → hàng metadata (avatar 24, tên, giờ đăng cụ thể "14:05, 4 tháng 11", có năm nếu khác năm) → dòng số liệu → hàng hành động → 2 bình luận mới nhất.
+- Dòng số liệu (`text-sm`, `muted-foreground`, chỉ hiện khi có số): trái là tim đặc 16px + số thích (trình đọc màn hình nghe "12 lượt thích"), phải là liên kết "3 bình luận" tới `#binh-luan` của trang bài (hover gạch chân).
+- Hàng hành động (đổi ngày 2026-11-13, thay viên số bình luận `accent`): đường kẻ `border` phía trên, ba nút ghost chia đều ba cột **Thích** (`Heart`), **Bình luận** (`MessageCircle`, liên kết tới `#binh-luan`), **Chia sẻ** (`Share2`), biểu tượng 20px, cao 40px (dưới 640px 44px), nằm trên lớp liên kết của thẻ. Đã thích: tim tô đặc màu chữ và chữ đậm (600), kèm `aria-pressed`; không dùng màu riêng (giữ đơn sắc, không để màu là tín hiệu duy nhất). Bấm thì tim thu 90% trong 120ms (tắt khi `prefers-reduced-motion`).
+- Thích đổi ngay khi bấm; lỗi thì trả về như cũ và câu lỗi (`text-sm`, 500, `destructive`) hiện dưới hàng nút 5 giây. Chia sẻ: màn hình cảm ứng mở bảng chia sẻ của hệ điều hành; còn lại sao chép liên kết và báo "Đã sao chép liên kết" (`foreground`) cùng chỗ đó.
+- 2 bình luận mới nhất: avatar 24, tên (600, liên kết hồ sơ) và thời gian tương đối (`muted-foreground`) cỡ `text-sm`, nội dung `text-base` chữ thường tối đa 2 dòng; xếp cũ trước, mới sau để đọc xuôi. Không có nút Trả lời: bấm vào là mở bài, xem đủ bình luận.
 - Bài không có tiêu đề (soạn kiểu mạng xã hội): phần đầu nội dung làm chữ chính (`text-base`, `card-foreground`, tối đa 4 dòng).
 - Lưới ảnh/video bo `radius-lg`, khe 4px: 1 ô tỉ lệ 16:9; 2 ô đôi; 3 ô thì ô đầu cao gấp đôi bên trái; 4 ô trở lên 2x2, ô cuối phủ đen 55% ghi "+N". Video chỉ hiện khung đầu và nút phát tròn đen 60%. Ảnh lấy thẳng từ backend (`next/image` `unoptimized`, vì cần cookie). Lưới nằm dưới lớp liên kết của thẻ: bấm ô nào cũng mở bài.
 - Trang bài: ảnh xếp dọc, giữ tỉ lệ (`object-contain`, cao tối đa 80vh), video có điều khiển, nền đen.
 - Tấm `glass`, bo `radius-xl`. Cả thẻ bấm được (một liên kết bao ngoài), vùng bấm đủ lớn; hover theo mục 5.
-- Số bình luận trong viên `accent` (xanh nhạt, chữ đen), như viên màu nhấn của mẫu.
 - Bài chưa đăng (chỉ tác giả thấy): badge trạng thái ở góc phải.
 - Bài của chính mình: nút ghost tròn "…" (Lucide `Ellipsis` 20px, 40px, dưới 640px 44px, nhãn "Tùy chọn bài viết") ở góc phải hàng badge danh mục, lề âm để hàng không cao thêm; nằm trên lớp liên kết của thẻ. Mở menu thả xuống `modal={false}` canh phải: **Sửa bài** (`Pencil`), **Xóa bài** (`Trash2`, màu `destructive`). Lưu xong thì chữ "Đã lưu thay đổi." (`text-sm`, 500, `role=status`) hiện cạnh nút 5 giây. Đóng hộp thì focus về nút "…".
 
 ### Trang chi tiết bài (thread view)
 
-- Cả bài trên một tấm `glass-strong`: tiêu đề, metadata, nội dung Markdown font Lora, danh sách tag, rồi khối bình luận.
+- Cả bài trên một tấm `glass-strong`: tiêu đề, metadata, nội dung Markdown font Lora, danh sách tag, dòng số thích và hàng hành động như thẻ bài (không có số bình luận: khối bình luận tự đếm), rồi khối bình luận (`id="binh-luan"`). Không kẻ đường trên danh sách tag: hai đường kẻ của hàng hành động đã chia khối.
+- Metadata hai dòng: avatar 40, tên (`text-base`, 500) ở trên, giờ đăng cụ thể · lượt đọc (`text-sm`, `muted-foreground`) ở dưới, để giờ dài không đẩy dấu "·" xuống dòng lơ lửng trên điện thoại.
 - Tác giả có nút "…" như trên thẻ bài, cạnh badge danh mục. Xóa bài hỏi lại bằng hộp thoại "Xóa bài viết?" (nói rõ mất cả bình luận, ảnh, video; nút `destructive` "Xóa bài", nút viền "Giữ lại"; lỗi hiện trong hộp, hộp không tự đóng). Xóa xong ở trang bài thì về trang chủ; ở feed thì thẻ biến mất.
 - Bình luận: avatar 32, tên, thời gian ("· đã sửa" nếu có), nội dung `text-base` chữ thường giữ xuống dòng. Trả lời thụt vào 1 cấp (40px trên web, 24px trên mobile; web dưới 640px thụt 28px cho đủ chỗ) với đường dọc `border` 2px bên trái; không lồng sâu hơn.
 - Dưới mỗi bình luận: nút ghost "Trả lời" (và "Sửa", "Xóa" cho người viết), cao 40px; dưới 640px bỏ biểu tượng, chỉ giữ chữ để ba nút nằm một hàng. Xóa hỏi lại bằng hộp thoại (nút `destructive` "Xóa bình luận", nút viền "Giữ lại"). Ô viết bình luận có nhãn hiện rõ ("Bình luận của bạn", "Trả lời {tên}"); trả lời một trả lời thì ô nằm cuối nhánh, điền sẵn "@tên ".
