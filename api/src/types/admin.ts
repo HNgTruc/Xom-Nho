@@ -24,6 +24,8 @@ export interface AdminPostListItem {
   /** Mọi bình luận, kể cả đã ẩn */
   commentCount: number;
   likeCount: number;
+  /** Số không thích (ADR 0009) */
+  dislikeCount: number;
   mediaCount: number;
   author: UserSummary;
   category: CategoryRef;

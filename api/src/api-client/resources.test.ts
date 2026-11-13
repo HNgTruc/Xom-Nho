@@ -60,6 +60,24 @@ describe("api.posts", () => {
     expect(calledUrl()).toBe("http://x/api/v1/posts/a%2Fb/like");
     expect(calledInit().method).toBe("DELETE");
   });
+
+  it("dislike gọi PUT /dislike, trả cả số thích lẫn số không thích", async () => {
+    const state = { liked: false, likeCount: 2, disliked: true, dislikeCount: 1 };
+    const { api, calledUrl, calledInit } = setup({ data: state });
+
+    await expect(api.posts.dislike("p1")).resolves.toEqual({ data: state });
+    expect(calledUrl()).toBe("http://x/api/v1/posts/p1/dislike");
+    expect(calledInit().method).toBe("PUT");
+  });
+
+  it("undislike gọi DELETE cùng đường dẫn, mã hóa id", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+
+    await api.posts.undislike("a/b");
+
+    expect(calledUrl()).toBe("http://x/api/v1/posts/a%2Fb/dislike");
+    expect(calledInit().method).toBe("DELETE");
+  });
 });
 
 describe("api.posts.create và api.files", () => {

@@ -150,6 +150,16 @@ export const LIKE_MESSAGES = {
   FAILED: "Chưa lưu được lượt thích. Bạn thử lại nhé.",
 } as const;
 
+/**
+ * Không thích bài (ADR 0009, docs/tinh-nang.md mục 2.6). Thích và Không thích loại trừ nhau. Dùng chung
+ * backend, web, mobile; giới hạn tần suất dùng chung câu `LIKE_MESSAGES.RATE_LIMITED`.
+ */
+export const DISLIKE_MESSAGES = {
+  DISLIKE: "Không thích",
+  POST_CLOSED: "Bài này đang ẩn nên chưa bấm Không thích được.",
+  FAILED: "Chưa lưu được lượt không thích. Bạn thử lại nhé.",
+} as const;
+
 /** Chia sẻ bài (docs/tinh-nang.md mục 2.6): điện thoại mở bảng chia sẻ, máy tính sao chép liên kết. */
 export const SHARE_MESSAGES = {
   SHARE: "Chia sẻ",
@@ -160,6 +170,11 @@ export const SHARE_MESSAGES = {
 /** Số thích cho trình đọc màn hình và nhãn: "12 lượt thích". */
 export function likeCountLabel(count: number): string {
   return `${count.toLocaleString("vi-VN")} lượt thích`;
+}
+
+/** Số không thích cho trình đọc màn hình và nhãn: "2 lượt không thích". */
+export function dislikeCountLabel(count: number): string {
+  return `${count.toLocaleString("vi-VN")} lượt không thích`;
 }
 
 /** Số bình luận trên thẻ bài: "3 bình luận". */

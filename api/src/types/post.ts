@@ -21,12 +21,19 @@ export interface CommentPreview {
   createdAt: string;
 }
 
-/** Phần thích của một bài theo người đang xem. `PUT`, `DELETE /posts/:id/like` trả kiểu này. */
+/**
+ * Thích, Không thích của một bài theo người đang xem. `PUT`, `DELETE /posts/:id/like` và `/dislike` trả kiểu
+ * này. Thích và Không thích loại trừ nhau (ADR 0009): `liked` và `disliked` không cùng `true`.
+ */
 export interface PostLikeState {
   /** Người đang xem đã thích bài chưa */
   liked: boolean;
   /** Tổng số người thích bài */
   likeCount: number;
+  /** Người đang xem đã bấm Không thích chưa */
+  disliked: boolean;
+  /** Tổng số người không thích bài, hiện công khai (ADR 0009) */
+  dislikeCount: number;
 }
 
 /**
@@ -47,6 +54,10 @@ export interface PostListItem {
   likeCount: number;
   /** Người đang xem đã thích bài chưa (để tô nút Thích, đặt `aria-pressed`) */
   likedByMe: boolean;
+  /** Số người không thích bài, hiện công khai (ADR 0009) */
+  dislikeCount: number;
+  /** Người đang xem đã bấm Không thích chưa; không cùng `true` với `likedByMe` */
+  dislikedByMe: boolean;
   /** Tối đa `LIMITS.FEED_LATEST_COMMENTS` bình luận gốc đang hiện, mới nhất trước */
   latestComments: CommentPreview[];
   author: UserSummary;

@@ -48,5 +48,20 @@ export function postsApi(request: RequestFn) {
       request<ApiResponse<PostLikeState>>(`/posts/${encodeURIComponent(id)}/like`, {
         method: "DELETE",
       }),
+
+    /**
+     * `PUT /posts/:id/dislike`: Không thích bài (ADR 0009). Đang Thích thì tự bỏ Thích. Gọi lặp lại vẫn chỉ tính
+     * một lần. Trả cả số thích lẫn số không thích. Bài chưa đăng hoặc đã ẩn: ApiError 403.
+     */
+    dislike: (id: string) =>
+      request<ApiResponse<PostLikeState>>(`/posts/${encodeURIComponent(id)}/dislike`, {
+        method: "PUT",
+      }),
+
+    /** `DELETE /posts/:id/dislike`: bỏ Không thích. Chưa bấm mà gọi cũng không lỗi. */
+    undislike: (id: string) =>
+      request<ApiResponse<PostLikeState>>(`/posts/${encodeURIComponent(id)}/dislike`, {
+        method: "DELETE",
+      }),
   };
 }
