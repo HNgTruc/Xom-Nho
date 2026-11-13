@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "e2e:serve": "tsc -p tsconfig.build.json --outDir dist-e2e && prisma migrate deploy && tsx scripts/seed.ts && node dist-e2e/main.js",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

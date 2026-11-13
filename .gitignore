@@ -9,6 +9,9 @@ out/
 build/
 dist/
 .turbo/
+# Bản build riêng cho test Playwright (frontend/web/playwright.config.ts)
+.next-e2e/
+dist-e2e/
 *.tsbuildinfo
 next-env.d.ts
 
