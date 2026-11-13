@@ -1,4 +1,4 @@
-import { COMMENT_MESSAGES } from "@xom-nho/api";
+import { ADMIN_MESSAGES, COMMENT_MESSAGES } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
@@ -251,5 +251,63 @@ describe("CommentsService.update, remove", () => {
     await service.remove(lan, "c1");
 
     expect(repository.delete).toHaveBeenCalledWith("c1");
+  });
+});
+
+describe("CommentsService (route admin)", () => {
+  const post = { id: "p1", title: "Chợ phiên", slug: "cho-phien", excerpt: "Sáng mai" };
+
+  function adminSetup(rows: CommentRow[] = [row()]) {
+    const { service, repository } = setup({ rows });
+    const admin = {
+      findAdminList: vi.fn().mockResolvedValue([[{ ...row(), post }], 1]),
+      setStatus: vi
+        .fn()
+        .mockImplementation((id: string, status: CommentRow["status"]) =>
+          Promise.resolve({ ...row({ id, status }), post }),
+        ),
+    };
+    Object.assign(repository, admin);
+    return { service, repository: repository as typeof repository & typeof admin };
+  }
+
+  it("adminList: truyền bộ lọc, trả bài chứa bình luận, không lộ authorId", async () => {
+    const { service, repository } = adminSetup();
+
+    const result = await service.adminList({ page: 1, pageSize: 20, status: "HIDDEN", q: "hay" });
+
+    expect(repository.findAdminList).toHaveBeenCalledWith(
+      { status: "HIDDEN", postId: undefined, authorUsername: undefined, contentContains: "hay" },
+      { skip: 0, take: 20 },
+    );
+    expect(result.items[0]).toMatchObject({ id: "c1", post });
+    expect(result.items[0]).not.toHaveProperty("authorId");
+    expect(result.items[0]).not.toHaveProperty("postId");
+  });
+
+  it("ẩn, hiện bình luận của người khác", async () => {
+    const { service, repository } = adminSetup();
+
+    expect((await service.setStatus("c1", "HIDDEN")).status).toBe("HIDDEN");
+    expect((await service.setStatus("c1", "VISIBLE")).status).toBe("VISIBLE");
+    expect(repository.setStatus).toHaveBeenNthCalledWith(1, "c1", "HIDDEN");
+  });
+
+  it("xóa bình luận của người khác, kể cả đang ẩn", async () => {
+    const { service, repository } = adminSetup([row({ status: "HIDDEN" })]);
+
+    await service.adminRemove("c1");
+
+    expect(repository.delete).toHaveBeenCalledWith("c1");
+  });
+
+  it.each(["khong-co", "../c1"])("bình luận %j không có thì NOT_FOUND", async (id) => {
+    const { service, repository } = adminSetup();
+    const expected = { code: "NOT_FOUND", message: ADMIN_MESSAGES.COMMENT_NOT_FOUND };
+
+    expect(await errorOf(service.setStatus(id, "HIDDEN"))).toEqual(expected);
+    expect(await errorOf(service.adminRemove(id))).toEqual(expected);
+    expect(repository.setStatus).not.toHaveBeenCalled();
+    expect(repository.delete).not.toHaveBeenCalled();
   });
 });

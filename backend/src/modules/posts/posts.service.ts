@@ -1,5 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import {
+  ADMIN_MESSAGES,
+  ADMIN_POST_SORTS,
+  type AdminListPostsQuery,
+  type AdminPostListItem,
+  type ArchivePostInput,
   COMPOSER_MESSAGES,
   CONTENT_FORMATS,
   EMPTY_POST_MESSAGE,
@@ -16,6 +21,7 @@ import {
   type PostStatus,
   pathIdSchema,
   pathSlugSchema,
+  toSearchText,
   type UpdatePostInput,
   withSlugSuffix,
 } from "@xom-nho/api";
@@ -25,7 +31,7 @@ import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import { StorageService } from "../../infrastructure/storage/storage.service.js";
 import { baseSlug, excerptFromContent } from "./posts.compose.js";
-import { toPostDetail, toPostListItem } from "./posts.mapper.js";
+import { toAdminPostListItem, toPostDetail, toPostListItem } from "./posts.mapper.js";
 import { type PostAccessTarget, PostsPolicy } from "./posts.policy.js";
 import {
   type CommentPreviewRow,
@@ -313,6 +319,83 @@ export class PostsService {
    */
   async getVisibleStatus(user: SessionUser, id: string): Promise<PostStatus> {
     return (await this.findViewable(user, id)).status;
+  }
+
+  // ===== Quản trị (`posts.admin.controller.ts`, chỉ trưởng xóm: `@Roles("admin")`) =====
+
+  /**
+   * Bảng bài cho trưởng xóm: mọi trạng thái. Màn Bài mới gửi `since` (bài tạo sau mốc) + `sort=oldest`
+   * (pages/admin.md mục "Bài mới"). Từ khóa có dấu hay không đều được (so với `searchText` đã bỏ dấu).
+   */
+  async adminList(query: AdminListPostsQuery): Promise<Paginated<AdminPostListItem>> {
+    const { page, pageSize, status, category, author, q, since, sort } = query;
+    const [rows, total] = await this.postsRepository.findAdminList(
+      {
+        status,
+        categorySlug: category,
+        authorUsername: author,
+        searchText: q ? toSearchText(q) : undefined,
+        createdAfter: since ? new Date(since) : undefined,
+      },
+      {
+        order: sort === ADMIN_POST_SORTS.OLDEST ? "asc" : "desc",
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      },
+    );
+    return paginate(rows.map(toAdminPostListItem), total, page, pageSize);
+  }
+
+  /**
+   * Trưởng xóm ẩn bài đang hiện, lý do bắt buộc (pages/admin.md mục "Ẩn bài"). Lý do lưu ở `rejectReason`,
+   * tác giả thấy trên trang bài; người khác không còn thấy bài. Bài không đang hiện: CONFLICT.
+   */
+  async archive(
+    admin: SessionUser,
+    id: string,
+    input: ArchivePostInput,
+  ): Promise<AdminPostListItem> {
+    const post = await this.findForModeration(id);
+    if (!PostsPolicy.canArchive(post)) {
+      throw new AppException("CONFLICT", ADMIN_MESSAGES.POST_NOT_PUBLISHED);
+    }
+    const row = await this.postsRepository.setModeration(id, {
+      status: POST_STATUSES.ARCHIVED,
+      rejectReason: input.reason,
+      reviewerId: admin.id,
+    });
+    return toAdminPostListItem(row);
+  }
+
+  /** Hiện lại bài đang ẩn, xóa lý do. Bài không đang ẩn: CONFLICT. */
+  async restore(admin: SessionUser, id: string): Promise<AdminPostListItem> {
+    const post = await this.findForModeration(id);
+    if (!PostsPolicy.canRestore(post)) {
+      throw new AppException("CONFLICT", ADMIN_MESSAGES.POST_NOT_HIDDEN);
+    }
+    const row = await this.postsRepository.setModeration(id, {
+      status: POST_STATUSES.PUBLISHED,
+      rejectReason: null,
+      reviewerId: admin.id,
+    });
+    return toAdminPostListItem(row);
+  }
+
+  /** Trưởng xóm xóa hẳn bài bất kỳ: như `remove` nhưng không cần là tác giả. */
+  async adminRemove(id: string): Promise<void> {
+    await this.findForModeration(id);
+    const storageKeys = await this.postsRepository.deleteWithMedia(id);
+    await this.removeFiles(storageKeys);
+  }
+
+  /** Bài bất kỳ theo id cho route admin. Không có hoặc id sai dạng: NOT_FOUND. */
+  private async findForModeration(id: string): Promise<PostAccessTarget> {
+    if (!pathIdSchema.safeParse(id).success) {
+      throw new AppException("NOT_FOUND", ADMIN_MESSAGES.POST_NOT_FOUND);
+    }
+    const post = await this.postsRepository.findAccessTarget(id);
+    if (!post) throw new AppException("NOT_FOUND", ADMIN_MESSAGES.POST_NOT_FOUND);
+    return post;
   }
 
   /** Tăng lượt xem. Chỉ tính cho bài đã đăng; bài khác coi như không có. */

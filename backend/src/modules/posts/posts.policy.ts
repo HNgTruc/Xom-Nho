@@ -36,4 +36,17 @@ export const PostsPolicy = {
     if (user.banned) return false;
     return post.status === POST_STATUSES.PUBLISHED;
   },
+
+  /**
+   * Trưởng xóm ẩn bài (`POST /admin/posts/:id/archive`): chỉ bài đang hiện trên xóm. Vai trò đã được
+   * `@Roles("admin")` kiểm tra; ở đây chỉ còn điều kiện trên bản ghi.
+   */
+  canArchive(post: Pick<PostAccessTarget, "status">): boolean {
+    return post.status === POST_STATUSES.PUBLISHED;
+  },
+
+  /** Hiện lại (`POST /admin/posts/:id/restore`): chỉ bài đang ẩn. */
+  canRestore(post: Pick<PostAccessTarget, "status">): boolean {
+    return post.status === POST_STATUSES.ARCHIVED;
+  },
 };

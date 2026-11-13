@@ -1,7 +1,20 @@
-import type { CommentItem, CommentThread } from "@xom-nho/api";
-import type { CommentRow } from "./comments.repository.js";
+import type { AdminCommentListItem, CommentItem, CommentThread } from "@xom-nho/api";
+import type { AdminCommentRow, CommentRow } from "./comments.repository.js";
 
 // Map từng trường thay vì trả nguyên row: thêm cột vào `select` (ví dụ `authorId`) không tự lọt ra API
+
+export function toAdminCommentListItem(row: AdminCommentRow): AdminCommentListItem {
+  const { postId: _postId, ...item } = toCommentItem(row);
+  return {
+    ...item,
+    post: {
+      id: row.post.id,
+      title: row.post.title,
+      slug: row.post.slug,
+      excerpt: row.post.excerpt,
+    },
+  };
+}
 
 export function toCommentItem(row: CommentRow): CommentItem {
   return {

@@ -32,6 +32,40 @@ export const postDetailSelect = {
 
 export type PostListRow = Prisma.PostGetPayload<{ select: typeof postListSelect }>;
 
+/** Cột cho bảng quản trị: mọi trạng thái, có lý do ẩn; đếm cả bình luận đã ẩn. Không lấy `content`. */
+const adminPostListSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  excerpt: true,
+  status: true,
+  rejectReason: true,
+  createdAt: true,
+  publishedAt: true,
+  viewCount: true,
+  author: { select: { id: true, name: true, username: true, image: true, avatarId: true } },
+  category: { select: { name: true, slug: true, color: true } },
+  _count: { select: { comments: true, likes: true, media: true } },
+} satisfies Prisma.PostSelect;
+
+export type AdminPostListRow = Prisma.PostGetPayload<{ select: typeof adminPostListSelect }>;
+
+/** Bộ lọc của `GET /admin/posts`; trường `undefined` thì bỏ qua. `searchText`: từ khóa đã bỏ dấu. */
+export interface AdminPostListFilter {
+  status?: PostStatus;
+  categorySlug?: string;
+  authorUsername?: string;
+  searchText?: string;
+  createdAfter?: Date;
+}
+
+/** Đổi trạng thái kiểm duyệt: lý do ẩn (hoặc `null` khi hiện lại) và trưởng xóm đã làm. */
+export interface PostModeration {
+  status: PostStatus;
+  rejectReason: string | null;
+  reviewerId: string;
+}
+
 /** Bình luận xem trước trên thẻ bài; tác giả chỉ phần `UserSummary`. */
 const commentPreviewSelect = {
   id: true,
@@ -140,6 +174,42 @@ export class PostsRepository {
       }),
       this.prisma.post.count({ where }),
     ]);
+  }
+
+  /**
+   * Một trang bài cho bảng quản trị, mọi trạng thái, sắp theo lúc tạo (thêm `id` để thứ tự ổn định khi trùng
+   * giờ). Từ khóa so với `searchText` (tiêu đề, tóm tắt, tag đã bỏ dấu) bằng LIKE: bảng admin, không cần FULLTEXT.
+   */
+  async findAdminList(
+    filter: AdminPostListFilter,
+    page: { order: "asc" | "desc"; skip: number; take: number },
+  ): Promise<[AdminPostListRow[], number]> {
+    const where: Prisma.PostWhereInput = {
+      status: filter.status,
+      category: filter.categorySlug ? { slug: filter.categorySlug } : undefined,
+      author: filter.authorUsername ? { username: filter.authorUsername } : undefined,
+      searchText: filter.searchText ? { contains: filter.searchText } : undefined,
+      createdAt: filter.createdAfter ? { gt: filter.createdAfter } : undefined,
+    };
+    return Promise.all([
+      this.prisma.post.findMany({
+        where,
+        select: adminPostListSelect,
+        orderBy: [{ createdAt: page.order }, { id: page.order }],
+        skip: page.skip,
+        take: page.take,
+      }),
+      this.prisma.post.count({ where }),
+    ]);
+  }
+
+  /** Đổi trạng thái kiểm duyệt của bài, trả dòng cho bảng quản trị. */
+  setModeration(id: string, moderation: PostModeration): Promise<AdminPostListRow> {
+    return this.prisma.post.update({
+      where: { id },
+      data: moderation,
+      select: adminPostListSelect,
+    });
   }
 
   /** Bài theo id, chỉ lấy bài ở trạng thái `status`. Không giữ thứ tự: service tự sắp lại. */

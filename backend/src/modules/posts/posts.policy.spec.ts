@@ -107,3 +107,24 @@ describe("PostsPolicy.canLike", () => {
     expect(PostsPolicy.canLike(userOf("admin"), post)).toBe(false);
   });
 });
+
+describe("PostsPolicy.canArchive, canRestore (route admin)", () => {
+  it("chỉ ẩn được bài đang hiện", () => {
+    expect(PostsPolicy.canArchive({ status: "PUBLISHED" })).toBe(true);
+  });
+
+  it.each(NOT_PUBLISHED)("bài %s không ẩn được", (status) => {
+    expect(PostsPolicy.canArchive({ status })).toBe(false);
+  });
+
+  it("chỉ hiện lại được bài đang ẩn", () => {
+    expect(PostsPolicy.canRestore({ status: "ARCHIVED" })).toBe(true);
+  });
+
+  it.each(POST_STATUS_VALUES.filter((status) => status !== "ARCHIVED"))(
+    "bài %s không hiện lại được",
+    (status) => {
+      expect(PostsPolicy.canRestore({ status })).toBe(false);
+    },
+  );
+});

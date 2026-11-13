@@ -1,8 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import {
+  ADMIN_MESSAGES,
+  type AdminCommentListItem,
+  type AdminListCommentsQuery,
   COMMENT_MESSAGES,
   COMMENT_STATUSES,
   type CommentItem,
+  type CommentStatus,
   type CommentThread,
   type CreateCommentInput,
   POST_STATUSES,
@@ -10,10 +14,11 @@ import {
   type UpdateCommentInput,
 } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
+import { paginate, type Paginated } from "../../common/types/paginated.js";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import { PostsService } from "../posts/posts.service.js";
-import { toCommentItem, toCommentThreads } from "./comments.mapper.js";
+import { toAdminCommentListItem, toCommentItem, toCommentThreads } from "./comments.mapper.js";
 import { CommentsPolicy } from "./comments.policy.js";
 import { type CommentRow, CommentsRepository } from "./comments.repository.js";
 
@@ -79,6 +84,41 @@ export class CommentsService {
   async remove(user: SessionUser, id: string): Promise<void> {
     await this.findModifiable(user, id);
     await this.commentsRepository.delete(id);
+  }
+
+  // ===== Quản trị (`comments.admin.controller.ts`, chỉ trưởng xóm: `@Roles("admin")`) =====
+
+  /** Bảng bình luận cho trưởng xóm: cả đang hiện lẫn đã ẩn, mới nhất trước. */
+  async adminList(query: AdminListCommentsQuery): Promise<Paginated<AdminCommentListItem>> {
+    const { page, pageSize, status, post, author, q } = query;
+    const [rows, total] = await this.commentsRepository.findAdminList(
+      { status, postId: post, authorUsername: author, contentContains: q },
+      { skip: (page - 1) * pageSize, take: pageSize },
+    );
+    return paginate(rows.map(toAdminCommentListItem), total, page, pageSize);
+  }
+
+  /**
+   * Ẩn (`HIDDEN`) hoặc hiện lại (`VISIBLE`) bình luận bất kỳ. Gọi lặp lại vẫn ra cùng kết quả. Bình luận ẩn
+   * không hiện với ai trừ trưởng xóm, kể cả người viết; trả lời của nó cũng không hiện theo (`toCommentThreads`).
+   */
+  async setStatus(id: string, status: CommentStatus): Promise<AdminCommentListItem> {
+    await this.findForModeration(id);
+    return toAdminCommentListItem(await this.commentsRepository.setStatus(id, status));
+  }
+
+  /** Trưởng xóm xóa hẳn bình luận bất kỳ; trả lời bên dưới bị xóa theo. */
+  async adminRemove(id: string): Promise<void> {
+    await this.findForModeration(id);
+    await this.commentsRepository.delete(id);
+  }
+
+  private async findForModeration(id: string): Promise<CommentRow> {
+    const comment = pathIdSchema.safeParse(id).success
+      ? await this.commentsRepository.findById(id)
+      : null;
+    if (!comment) throw new AppException("NOT_FOUND", ADMIN_MESSAGES.COMMENT_NOT_FOUND);
+    return comment;
   }
 
   /**

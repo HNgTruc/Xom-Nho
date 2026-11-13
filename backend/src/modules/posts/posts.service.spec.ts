@@ -1,8 +1,9 @@
-import type { PostStatus, Role } from "@xom-nho/api";
+import { ADMIN_MESSAGES, type PostStatus, type Role } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import type { StorageService } from "../../infrastructure/storage/storage.service.js";
 import type {
+  AdminPostListRow,
   PostDetailRow,
   PostEditRow,
   PostListRow,
@@ -689,5 +690,153 @@ describe("PostsService.update, remove", () => {
 
     expect(repository.deleteWithMedia).toHaveBeenCalledWith("p1");
     expect(storage.remove).toHaveBeenCalledWith("images/a.png");
+  });
+});
+
+describe("PostsService (route admin)", () => {
+  const admin = userOf("admin");
+  const createdAt = new Date("2026-11-13T07:00:00.000Z");
+
+  function adminRow(overrides: Partial<AdminPostListRow> = {}): AdminPostListRow {
+    return {
+      id: "p1",
+      title: "Bàn tròn cuối tuần",
+      slug: "ban-tron-cuoi-tuan",
+      excerpt: "Món ngon dễ nấu",
+      status: "PUBLISHED",
+      rejectReason: null,
+      createdAt,
+      publishedAt: createdAt,
+      viewCount: 12,
+      author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
+      category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
+      _count: { comments: 4, likes: 2, media: 1 },
+      ...overrides,
+    };
+  }
+
+  function adminSetup(status: PostStatus | null = "PUBLISHED") {
+    const { service, repository, storage } = setup();
+    repository.findAccessTarget.mockResolvedValue(status ? { status, authorId: "tac-gia" } : null);
+    const admin = {
+      findAdminList: vi.fn().mockResolvedValue([[adminRow()], 1]),
+      setModeration: vi
+        .fn()
+        .mockImplementation((_id: string, moderation: Partial<AdminPostListRow>) =>
+          Promise.resolve(adminRow(moderation)),
+        ),
+    };
+    Object.assign(repository, admin);
+    return { service, repository: repository as typeof repository & typeof admin, storage };
+  }
+
+  it("adminList: since thành mốc createdAfter, oldest thành asc, từ khóa bỏ dấu", async () => {
+    const { service, repository } = adminSetup();
+
+    const result = await service.adminList({
+      page: 2,
+      pageSize: 20,
+      sort: "oldest",
+      since: "2026-11-13T07:00:00.000Z",
+      q: "Bánh Mì",
+      status: "PUBLISHED",
+    });
+
+    expect(repository.findAdminList).toHaveBeenCalledWith(
+      {
+        status: "PUBLISHED",
+        categorySlug: undefined,
+        authorUsername: undefined,
+        searchText: "banh mi",
+        createdAfter: new Date("2026-11-13T07:00:00.000Z"),
+      },
+      { order: "asc", skip: 20, take: 20 },
+    );
+    expect(result.items[0]).toMatchObject({ id: "p1", commentCount: 4, mediaCount: 1 });
+    expect(result.meta).toEqual({ page: 2, pageSize: 20, total: 1, totalPages: 1 });
+  });
+
+  it("archive: bài đang hiện thành ARCHIVED, lưu lý do và trưởng xóm đã ẩn", async () => {
+    const { service, repository } = adminSetup("PUBLISHED");
+
+    const item = await service.archive(admin, "p1", { reason: "Quảng cáo, rao vặt" });
+
+    expect(repository.setModeration).toHaveBeenCalledWith("p1", {
+      status: "ARCHIVED",
+      rejectReason: "Quảng cáo, rao vặt",
+      reviewerId: admin.id,
+    });
+    expect(item).toMatchObject({ status: "ARCHIVED", rejectReason: "Quảng cáo, rao vặt" });
+  });
+
+  it.each(["ARCHIVED", "DRAFT", "PENDING", "REJECTED"] as const)(
+    "archive: bài %s thì CONFLICT, không ghi gì",
+    async (status) => {
+      const { service, repository } = adminSetup(status);
+
+      await expect(service.archive(admin, "p1", { reason: "Spam" })).rejects.toMatchObject({
+        code: "CONFLICT",
+        message: ADMIN_MESSAGES.POST_NOT_PUBLISHED,
+      });
+      expect(repository.setModeration).not.toHaveBeenCalled();
+    },
+  );
+
+  it("restore: bài đang ẩn thành PUBLISHED, xóa lý do", async () => {
+    const { service, repository } = adminSetup("ARCHIVED");
+
+    const item = await service.restore(admin, "p1");
+
+    expect(repository.setModeration).toHaveBeenCalledWith("p1", {
+      status: "PUBLISHED",
+      rejectReason: null,
+      reviewerId: admin.id,
+    });
+    expect(item.rejectReason).toBeNull();
+  });
+
+  it("restore: bài không đang ẩn thì CONFLICT", async () => {
+    const { service } = adminSetup("PUBLISHED");
+    await expect(service.restore(admin, "p1")).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: ADMIN_MESSAGES.POST_NOT_HIDDEN,
+    });
+  });
+
+  it.each([
+    ["không có", "p1"],
+    ["id sai dạng", "../p1"],
+  ])("bài %s thì NOT_FOUND ở mọi route admin", async (_label, id) => {
+    const { service } = adminSetup(null);
+    const notFound = { code: "NOT_FOUND", message: ADMIN_MESSAGES.POST_NOT_FOUND };
+
+    await expect(service.archive(admin, id, { reason: "Spam" })).rejects.toMatchObject(notFound);
+    await expect(service.restore(admin, id)).rejects.toMatchObject(notFound);
+    await expect(service.adminRemove(id)).rejects.toMatchObject(notFound);
+  });
+
+  it("adminRemove: xóa bài của người khác và file trên đĩa", async () => {
+    const { service, repository, storage } = adminSetup("PUBLISHED");
+    repository.deleteWithMedia.mockResolvedValue(["images/a.png"]);
+
+    await service.adminRemove("p1");
+
+    expect(repository.deleteWithMedia).toHaveBeenCalledWith("p1");
+    expect(storage.remove).toHaveBeenCalledWith("images/a.png");
+  });
+});
+
+describe("toPostDetail: lý do ẩn", () => {
+  it("bài đang ẩn trả lý do cho tác giả; bài đã hiện lại không trả lý do cũ", async () => {
+    const { service, repository } = setup();
+    const author = userOf("user", "tac-gia");
+
+    repository.findBySlug.mockResolvedValue(detailRow("ARCHIVED", "Lời lẽ xúc phạm"));
+    expect((await service.getBySlug(author, "ban-tron-cuoi-tuan")).rejectReason).toBe(
+      "Lời lẽ xúc phạm",
+    );
+
+    repository.findBySlug.mockResolvedValue(detailRow("PUBLISHED", "Lời lẽ xúc phạm"));
+    expect((await service.getBySlug(author, "ban-tron-cuoi-tuan")).rejectReason).toBeNull();
   });
 });

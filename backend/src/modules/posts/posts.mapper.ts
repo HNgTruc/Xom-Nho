@@ -1,4 +1,5 @@
 import {
+  type AdminPostListItem,
   type CategoryRef,
   type CommentPreview,
   type MediaItem,
@@ -9,11 +10,18 @@ import {
   type TagRef,
   type UserSummary,
 } from "@xom-nho/api";
-import type { CommentPreviewRow, PostDetailRow, PostListRow } from "./posts.repository.js";
+import type {
+  AdminPostListRow,
+  CommentPreviewRow,
+  PostDetailRow,
+  PostListRow,
+} from "./posts.repository.js";
 
 // Map từng trường thay vì trả nguyên object quan hệ: thêm cột vào `select` (ví dụ `email`) không tự lọt ra API
 
-function toUserSummary(author: PostListRow["author"] | CommentPreviewRow["author"]): UserSummary {
+function toUserSummary(
+  author: PostListRow["author"] | CommentPreviewRow["author"] | AdminPostListRow["author"],
+): UserSummary {
   return {
     id: author.id,
     name: author.name,
@@ -79,8 +87,35 @@ export function toPostDetail(row: PostDetailRow, likedByMe: boolean): PostDetail
     content: row.content,
     contentFormat: row.contentFormat,
     status: row.status,
-    // Lý do cũ có thể còn trong DB sau khi bài được gửi lại và duyệt; chỉ trả khi bài đang bị từ chối
-    rejectReason: row.status === POST_STATUSES.REJECTED ? row.rejectReason : null,
+    rejectReason: moderationReason(row),
     updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+/**
+ * Lý do cũ có thể còn trong DB sau khi bài được gửi lại, duyệt, hiện lại; chỉ trả khi bài đang bị từ chối hoặc
+ * đang bị ẩn (lý do ẩn lưu cùng cột, pages/admin.md mục "Ẩn bài").
+ */
+function moderationReason(row: Pick<PostDetailRow, "status" | "rejectReason">): string | null {
+  const moderated = row.status === POST_STATUSES.REJECTED || row.status === POST_STATUSES.ARCHIVED;
+  return moderated ? row.rejectReason : null;
+}
+
+export function toAdminPostListItem(row: AdminPostListRow): AdminPostListItem {
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    excerpt: row.excerpt,
+    status: row.status,
+    rejectReason: moderationReason(row),
+    createdAt: row.createdAt.toISOString(),
+    publishedAt: row.publishedAt?.toISOString() ?? null,
+    viewCount: row.viewCount,
+    commentCount: row._count.comments,
+    likeCount: row._count.likes,
+    mediaCount: row._count.media,
+    author: toUserSummary(row.author),
+    category: toCategoryRef(row.category),
   };
 }
