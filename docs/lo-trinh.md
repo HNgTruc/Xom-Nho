@@ -104,6 +104,7 @@ Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kí
 
 - [x] Chốt đề xuất thiết kế admin: màn Bài mới thay hàng chờ duyệt, ẩn bài bắt buộc lý do, bảng dày hơn MASTER (2026-11-13)
 - [x] Backend kiểm duyệt tối thiểu: `posts.admin.controller.ts` (danh sách có `since`, ẩn kèm lý do, hiện lại, xóa), `comments.admin.controller.ts` (danh sách, ẩn, hiện, xóa), `users.admin.controller.ts` (danh sách có email, đổi vai trò, cấm, bỏ cấm), `api.admin.*` trong api-client, test policy, service, e2e (2026-11-13)
+- [x] Backend thống kê màn Bài viết: `GET /admin/posts/stats`, bảng xếp hạng `range`, `sort=likes|dislikes|comments|views`, `order` (2026-11-13)
 - [ ] Web: hiện lý do ẩn cho tác giả trên trang bài (`archivedNote`, hộp `destructive` nhạt)
 - [ ] Backend còn lại: `modules/dashboard`, danh mục, tag, `GET /admin/users/:id`, `PATCH /admin/posts/:id`
 - [ ] Admin: layout (sidebar, topbar), `DataTable` dùng chung

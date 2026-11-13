@@ -78,6 +78,15 @@ Thay cho "Hàng chờ duyệt" (chốt 2026-11-13): từ ADR 0008 bài đăng th
 - Backend: `POST /admin/posts/:id/archive` nhận `{ reason }`, lưu vào cột `rejectReason` (không cần migration). Hiện lại (`restore`) thì xóa lý do.
 - Phía tác giả (web, mobile): bài đã ẩn hiện lý do trong hộp màu `destructive` nhạt (MASTER mục 6, "dấu hiệu kiểm duyệt").
 
+## Thống kê ở màn Bài viết
+
+Chủ dự án chốt 2026-11-13. Backend đã có (`GET /admin/posts/stats`, `GET /admin/posts?range=&sort=&order=`), giao diện làm cùng màn Bài viết.
+
+- **Khoảng thời gian** chọn được: 7 ngày, 30 ngày (mặc định), Tất cả. Áp cho cả thẻ số liệu lẫn bảng xếp hạng; tính theo bài **đăng** trong khoảng (tương tác cộng dồn tới hiện tại).
+- **Thẻ số liệu**: số bài đăng trong khoảng, so với khoảng liền trước (mũi tên + "tăng"/"giảm", như mục "Thẻ số liệu"); "Tất cả" thì không so. Số trên các tab trạng thái lấy từ `byStatus`.
+- **Bảng xếp hạng** 20 bài, chọn được 30: cột Thích, Không thích, Bình luận, Lượt xem **hiện riêng**, không gộp thành một con số; bấm tiêu đề cột để xếp theo cột đó (`aria-sort` trên `<th>`), mặc định cao xuống thấp, có nút đảo chiều. Trùng số thì bài mới hơn đứng trước.
+- Số Không thích hiện như số khác (không tô đỏ): màu chỉ dành cho trạng thái và việc không đảo ngược được.
+
 ## Thẻ số liệu (dashboard)
 
 - Thẻ `Card`: con số lớn (`text-3xl`, tabular-nums), nhãn `text-sm` `muted-foreground`, so với 7 ngày trước (mũi tên + phần trăm, kèm chữ "tăng"/"giảm", không chỉ dựa vào màu).

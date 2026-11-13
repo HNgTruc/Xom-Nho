@@ -230,6 +230,8 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Bảng bài: lọc theo trạng thái, danh mục, tác giả; tìm theo tiêu đề; sửa, xóa, ẩn.
 - Bảng bình luận: ẩn / hiện, xem bài gốc.
+- Thống kê (chốt 2026-11-13, `pages/admin.md` mục "Thống kê ở màn Bài viết"): khoảng 7 ngày, 30 ngày, tất cả; số bài đăng trong khoảng so với khoảng trước; bảng xếp hạng 20 hoặc 30 bài theo Thích, Không thích, Bình luận, Lượt xem, cao xuống thấp, đảo chiều được.
+- [ ] Thống kê đúng theo khoảng, bảng xếp hạng đúng thứ tự cả hai chiều (backend: xong 2026-11-13, `admin-moderation.e2e-spec.ts`; màn admin: chưa)
 
 ### 4.4 Danh mục, tag
 
