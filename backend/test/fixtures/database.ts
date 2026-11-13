@@ -14,6 +14,7 @@ export function createTestPrisma(): PrismaClient {
 export async function resetDatabase(prisma: PrismaClient): Promise<void> {
   await prisma.$transaction([
     prisma.postLike.deleteMany(),
+    prisma.postDislike.deleteMany(),
     prisma.comment.deleteMany(),
     prisma.media.deleteMany(),
     prisma.postTag.deleteMany(),

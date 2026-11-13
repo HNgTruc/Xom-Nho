@@ -52,8 +52,17 @@ export function toCommentPreview(row: CommentPreviewRow): CommentPreview {
   };
 }
 
-/** Phần chung của thẻ bài và trang bài; `likedByMe` tính riêng theo người xem. */
-function toPostBase(row: PostListRow, likedByMe: boolean): Omit<PostListItem, "latestComments"> {
+/** Người đang xem đã Thích hay Không thích bài (loại trừ nhau, ADR 0009). */
+export interface ViewerReactions {
+  likedByMe: boolean;
+  dislikedByMe: boolean;
+}
+
+/** Phần chung của thẻ bài và trang bài; Thích, Không thích của người xem tính riêng. */
+function toPostBase(
+  row: PostListRow,
+  reactions: ViewerReactions,
+): Omit<PostListItem, "latestComments"> {
   return {
     id: row.id,
     title: row.title,
@@ -63,7 +72,9 @@ function toPostBase(row: PostListRow, likedByMe: boolean): Omit<PostListItem, "l
     viewCount: row.viewCount,
     commentCount: row._count.comments,
     likeCount: row._count.likes,
-    likedByMe,
+    likedByMe: reactions.likedByMe,
+    dislikeCount: row._count.dislikes,
+    dislikedByMe: reactions.dislikedByMe,
     author: toUserSummary(row.author),
     category: toCategoryRef(row.category),
     tags: row.tags.map(toTagRef),
@@ -73,17 +84,17 @@ function toPostBase(row: PostListRow, likedByMe: boolean): Omit<PostListItem, "l
 
 export function toPostListItem(
   row: PostListRow,
-  viewer: { likedByMe: boolean; latestComments: readonly CommentPreviewRow[] },
+  viewer: ViewerReactions & { latestComments: readonly CommentPreviewRow[] },
 ): PostListItem {
   return {
-    ...toPostBase(row, viewer.likedByMe),
+    ...toPostBase(row, viewer),
     latestComments: viewer.latestComments.map(toCommentPreview),
   };
 }
 
-export function toPostDetail(row: PostDetailRow, likedByMe: boolean): PostDetail {
+export function toPostDetail(row: PostDetailRow, reactions: ViewerReactions): PostDetail {
   return {
-    ...toPostBase(row, likedByMe),
+    ...toPostBase(row, reactions),
     content: row.content,
     contentFormat: row.contentFormat,
     status: row.status,
@@ -114,6 +125,7 @@ export function toAdminPostListItem(row: AdminPostListRow): AdminPostListItem {
     viewCount: row.viewCount,
     commentCount: row._count.comments,
     likeCount: row._count.likes,
+    dislikeCount: row._count.dislikes,
     mediaCount: row._count.media,
     author: toUserSummary(row.author),
     category: toCategoryRef(row.category),

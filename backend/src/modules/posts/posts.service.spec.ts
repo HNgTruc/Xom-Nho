@@ -1,4 +1,4 @@
-import { ADMIN_MESSAGES, type PostStatus, type Role } from "@xom-nho/api";
+import { ADMIN_MESSAGES, DISLIKE_MESSAGES, type PostStatus, type Role } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import type { StorageService } from "../../infrastructure/storage/storage.service.js";
@@ -28,7 +28,7 @@ function listRow(overrides: Partial<PostListRow> = {}): PostListRow {
       { tag: { name: "Ăn vặt", slug: "an-vat" } },
       { tag: { name: "Hà Nội", slug: "ha-noi" } },
     ],
-    _count: { comments: 3, likes: 5 },
+    _count: { comments: 3, likes: 5, dislikes: 1 },
     media: [{ id: "m1", kind: "IMAGE", mimeType: "image/png" }],
     ...overrides,
   };
@@ -62,10 +62,15 @@ function setup() {
     findSlugsStartingWith: vi.fn().mockResolvedValue([]),
     createWithMedia: vi.fn().mockResolvedValue({ ok: true, slug: "ban-tron-cuoi-tuan" }),
     findLikedPostIds: vi.fn().mockResolvedValue(new Set<string>()),
+    findDislikedPostIds: vi.fn().mockResolvedValue(new Set<string>()),
     findLatestComments: vi.fn().mockResolvedValue([]),
     addLike: vi.fn().mockResolvedValue(undefined),
     removeLike: vi.fn().mockResolvedValue(undefined),
-    findLikeState: vi.fn().mockResolvedValue({ liked: false, count: 0 }),
+    addDislike: vi.fn().mockResolvedValue(undefined),
+    removeDislike: vi.fn().mockResolvedValue(undefined),
+    findLikeState: vi
+      .fn()
+      .mockResolvedValue({ liked: false, count: 0, disliked: false, dislikeCount: 0 }),
   };
   const storage = { remove: vi.fn().mockResolvedValue(undefined) };
   const service = new PostsService(
@@ -113,6 +118,8 @@ describe("PostsService.list", () => {
         commentCount: 3,
         likeCount: 5,
         likedByMe: false,
+        dislikeCount: 1,
+        dislikedByMe: false,
         latestComments: [],
         author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
         category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
@@ -191,9 +198,19 @@ describe("PostsService.like, unlike", () => {
   ])("%s thích được bài đã đăng, nhận số thích mới", async (_label, user) => {
     const { service, repository } = setup();
     repository.findAccessTarget.mockResolvedValue(published);
-    repository.findLikeState.mockResolvedValue({ liked: true, count: 4 });
+    repository.findLikeState.mockResolvedValue({
+      liked: true,
+      count: 4,
+      disliked: false,
+      dislikeCount: 1,
+    });
 
-    await expect(service.like(user, "p1")).resolves.toEqual({ liked: true, likeCount: 4 });
+    await expect(service.like(user, "p1")).resolves.toEqual({
+      liked: true,
+      likeCount: 4,
+      disliked: false,
+      dislikeCount: 1,
+    });
     expect(repository.addLike).toHaveBeenCalledWith("p1", user.id);
   });
 
@@ -232,6 +249,8 @@ describe("PostsService.like, unlike", () => {
     await expect(service.unlike(userOf("admin"), "p1")).resolves.toEqual({
       liked: false,
       likeCount: 0,
+      disliked: false,
+      dislikeCount: 0,
     });
     expect(repository.removeLike).toHaveBeenCalledWith("p1", "id-admin");
   });
@@ -248,6 +267,64 @@ describe("PostsService.like, unlike", () => {
   });
 });
 
+describe("PostsService.dislike, undislike (ADR 0009)", () => {
+  const published = { status: "PUBLISHED", authorId: "tac-gia" } as const;
+
+  it("không thích bài đã đăng: ghi qua addDislike (repository tự gỡ lượt thích), trả cả hai số", async () => {
+    const { service, repository } = setup();
+    const user = userOf("user");
+    repository.findAccessTarget.mockResolvedValue(published);
+    repository.findLikeState.mockResolvedValue({
+      liked: false,
+      count: 2,
+      disliked: true,
+      dislikeCount: 3,
+    });
+
+    await expect(service.dislike(user, "p1")).resolves.toEqual({
+      liked: false,
+      likeCount: 2,
+      disliked: true,
+      dislikeCount: 3,
+    });
+    expect(repository.addDislike).toHaveBeenCalledWith("p1", user.id);
+    expect(repository.addLike).not.toHaveBeenCalled();
+  });
+
+  it("bài đã ẩn: chủ bài nhận FORBIDDEN kèm câu của Không thích", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "ARCHIVED", authorId: "tac-gia" });
+
+    await expect(service.dislike(userOf("user", "tac-gia"), "p1")).rejects.toMatchObject({
+      code: "FORBIDDEN",
+      message: DISLIKE_MESSAGES.POST_CLOSED,
+    });
+    expect(repository.addDislike).not.toHaveBeenCalled();
+  });
+
+  it("bài đã ẩn của người khác: NOT_FOUND; bỏ Không thích được bài ẩn mình xem được", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue({ status: "ARCHIVED", authorId: "tac-gia" });
+
+    await expect(service.dislike(userOf("user"), "p1")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+    await service.undislike(userOf("user", "tac-gia"), "p1");
+    expect(repository.removeDislike).toHaveBeenCalledWith("p1", "tac-gia");
+  });
+
+  it("dùng chung giới hạn 60 lần một phút với Thích", async () => {
+    const { service, repository } = setup();
+    repository.findAccessTarget.mockResolvedValue(published);
+    const user = userOf("user");
+
+    for (let i = 0; i < 60; i++) await service.like(user, "p1");
+
+    await expect(service.dislike(user, "p1")).rejects.toMatchObject({ code: "RATE_LIMITED" });
+    expect(repository.addDislike).not.toHaveBeenCalled();
+  });
+});
+
 describe("PostsService.getBySlug: thích", () => {
   it("trả số thích và người xem đã thích chưa", async () => {
     const { service, repository } = setup();
@@ -256,7 +333,12 @@ describe("PostsService.getBySlug: thích", () => {
 
     const post = await service.getBySlug(userOf("user"), "ban-tron-cuoi-tuan");
 
-    expect(post).toMatchObject({ likeCount: 5, likedByMe: true });
+    expect(post).toMatchObject({
+      likeCount: 5,
+      likedByMe: true,
+      dislikeCount: 1,
+      dislikedByMe: false,
+    });
     expect(post).not.toHaveProperty("latestComments");
   });
 
@@ -710,7 +792,7 @@ describe("PostsService (route admin)", () => {
       viewCount: 12,
       author: { id: "tac-gia", name: "Lan Anh", username: "lananh", image: null, avatarId: null },
       category: { name: "Ẩm thực", slug: "am-thuc", color: "rose" },
-      _count: { comments: 4, likes: 2, media: 1 },
+      _count: { comments: 4, likes: 2, dislikes: 1, media: 1 },
       ...overrides,
     };
   }

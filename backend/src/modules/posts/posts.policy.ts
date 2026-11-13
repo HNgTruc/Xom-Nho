@@ -37,6 +37,11 @@ export const PostsPolicy = {
     return post.status === POST_STATUSES.PUBLISHED;
   },
 
+  /** Không thích bài (ADR 0009): cùng điều kiện với Thích. Bỏ Không thích chỉ cần xem được bài. */
+  canDislike(user: SessionUser, post: PostAccessTarget): boolean {
+    return PostsPolicy.canLike(user, post);
+  },
+
   /**
    * Trưởng xóm ẩn bài (`POST /admin/posts/:id/archive`): chỉ bài đang hiện trên xóm. Vai trò đã được
    * `@Roles("admin")` kiểm tra; ở đây chỉ còn điều kiện trên bản ghi.

@@ -7,6 +7,7 @@ import {
   type ArchivePostInput,
   COMPOSER_MESSAGES,
   CONTENT_FORMATS,
+  DISLIKE_MESSAGES,
   EMPTY_POST_MESSAGE,
   type CreatePostInput,
   FILE_MESSAGES,
@@ -230,16 +231,17 @@ export class PostsService {
   }
 
   /**
-   * Dựng thẻ bài cho một trang: thêm `likedByMe` và bình luận xem trước. Hai truy vấn cho cả trang (không phải
-   * mỗi bài một truy vấn), giữ nguyên thứ tự `rows`.
+   * Dựng thẻ bài cho một trang: thêm `likedByMe`, `dislikedByMe` và bình luận xem trước. Ba truy vấn cho cả trang
+   * (không phải mỗi bài một truy vấn), giữ nguyên thứ tự `rows`.
    */
   private async toListItems(
     user: SessionUser,
     rows: readonly PostListRow[],
   ): Promise<PostListItem[]> {
     const ids = rows.map((row) => row.id);
-    const [liked, comments] = await Promise.all([
+    const [liked, disliked, comments] = await Promise.all([
       this.postsRepository.findLikedPostIds(user.id, ids),
+      this.postsRepository.findDislikedPostIds(user.id, ids),
       this.postsRepository.findLatestComments(ids, LIMITS.FEED_LATEST_COMMENTS),
     ]);
     const commentsByPost = new Map<string, CommentPreviewRow[]>();
@@ -251,6 +253,7 @@ export class PostsService {
     return rows.map((row) =>
       toPostListItem(row, {
         likedByMe: liked.has(row.id),
+        dislikedByMe: disliked.has(row.id),
         latestComments: commentsByPost.get(row.id) ?? [],
       }),
     );
@@ -269,10 +272,13 @@ export class PostsService {
     if (!row || !PostsPolicy.canView(user, { status: row.status, authorId: row.author.id })) {
       throw new AppException("NOT_FOUND", POST_NOT_FOUND);
     }
-    const liked = user
-      ? await this.postsRepository.findLikedPostIds(user.id, [row.id])
-      : new Set<string>();
-    return toPostDetail(row, liked.has(row.id));
+    const [liked, disliked] = user
+      ? await Promise.all([
+          this.postsRepository.findLikedPostIds(user.id, [row.id]),
+          this.postsRepository.findDislikedPostIds(user.id, [row.id]),
+        ])
+      : [new Set<string>(), new Set<string>()];
+    return toPostDetail(row, { likedByMe: liked.has(row.id), dislikedByMe: disliked.has(row.id) });
   }
 
   /**
@@ -297,9 +303,37 @@ export class PostsService {
     return this.likeState(id, user.id);
   }
 
+  /**
+   * Không thích bài (ADR 0009): cùng quy tắc với Thích, và tự gỡ lượt Thích của người đó. Gọi lặp lại vẫn chỉ
+   * tính một lần. Không xem được bài: NOT_FOUND; bài chưa đăng hoặc đã bị ẩn: FORBIDDEN.
+   */
+  async dislike(user: SessionUser, id: string): Promise<PostLikeState> {
+    const post = await this.findViewable(user, id);
+    if (!PostsPolicy.canDislike(user, post)) {
+      throw new AppException("FORBIDDEN", DISLIKE_MESSAGES.POST_CLOSED);
+    }
+    // Dùng chung bộ đếm với Thích: bấm qua lại giữa hai nút cũng tính vào cùng giới hạn
+    this.rateLimiter.consume(`like:${user.id}`, LIKE_RATE);
+    await this.postsRepository.addDislike(id, user.id);
+    return this.likeState(id, user.id);
+  }
+
+  /** Bỏ Không thích. Chưa bấm cũng không lỗi. Chỉ cần xem được bài, kể cả bài đã bị ẩn. */
+  async undislike(user: SessionUser, id: string): Promise<PostLikeState> {
+    await this.findViewable(user, id);
+    this.rateLimiter.consume(`like:${user.id}`, LIKE_RATE);
+    await this.postsRepository.removeDislike(id, user.id);
+    return this.likeState(id, user.id);
+  }
+
   private async likeState(postId: string, userId: string): Promise<PostLikeState> {
-    const { liked, count } = await this.postsRepository.findLikeState(postId, userId);
-    return { liked, likeCount: count };
+    const state = await this.postsRepository.findLikeState(postId, userId);
+    return {
+      liked: state.liked,
+      likeCount: state.count,
+      disliked: state.disliked,
+      dislikeCount: state.dislikeCount,
+    };
   }
 
   /** Bài mà `user` xem được. Không có, id sai dạng, hoặc không được xem: NOT_FOUND (không lộ là có). */

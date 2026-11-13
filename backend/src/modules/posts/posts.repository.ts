@@ -17,7 +17,9 @@ export const postListSelect = {
     select: { tag: { select: { name: true, slug: true } } },
     orderBy: { tag: { name: "asc" } },
   },
-  _count: { select: { comments: { where: { status: "VISIBLE" } }, likes: true } },
+  _count: {
+    select: { comments: { where: { status: "VISIBLE" } }, likes: true, dislikes: true },
+  },
   media: { select: { id: true, kind: true, mimeType: true }, orderBy: { position: "asc" } },
 } satisfies Prisma.PostSelect;
 
@@ -45,7 +47,7 @@ const adminPostListSelect = {
   viewCount: true,
   author: { select: { id: true, name: true, username: true, image: true, avatarId: true } },
   category: { select: { name: true, slug: true, color: true } },
-  _count: { select: { comments: true, likes: true, media: true } },
+  _count: { select: { comments: true, likes: true, dislikes: true, media: true } },
 } satisfies Prisma.PostSelect;
 
 export type AdminPostListRow = Prisma.PostGetPayload<{ select: typeof adminPostListSelect }>;
@@ -76,6 +78,14 @@ const commentPreviewSelect = {
 } satisfies Prisma.CommentSelect;
 
 export type CommentPreviewRow = Prisma.CommentGetPayload<{ select: typeof commentPreviewSelect }>;
+
+/** Thích, Không thích của một bài theo một người (`findLikeState`). */
+export interface LikeStateRow {
+  liked: boolean;
+  count: number;
+  disliked: boolean;
+  dislikeCount: number;
+}
 export type PostDetailRow = Prisma.PostGetPayload<{ select: typeof postDetailSelect }>;
 
 export interface PostListFilter {
@@ -381,26 +391,74 @@ export class PostsRepository {
     });
   }
 
-  /** Ghi lượt thích. Đã thích rồi thì bỏ qua (khóa chính `postId, userId`), không lỗi, không tăng số. */
+  /** Trong `postIds`, các bài mà `userId` đã bấm Không thích (ADR 0009), như `findLikedPostIds`. */
+  async findDislikedPostIds(userId: string, postIds: readonly string[]): Promise<Set<string>> {
+    if (postIds.length === 0) return new Set();
+    const rows = await this.prisma.postDislike.findMany({
+      where: { userId, postId: { in: [...postIds] } },
+      select: { postId: true },
+    });
+    return new Set(rows.map((row) => row.postId));
+  }
+
+  /**
+   * Ghi lượt thích và gỡ lượt Không thích của cùng người (loại trừ nhau, ADR 0009) trong một transaction.
+   * Đã thích rồi thì bỏ qua (khóa chính `postId, userId`), không lỗi, không tăng số.
+   */
   async addLike(postId: string, userId: string): Promise<void> {
-    await this.prisma.postLike.createMany({ data: [{ postId, userId }], skipDuplicates: true });
+    await this.react(postId, async (tx) => {
+      await tx.postDislike.deleteMany({ where: { postId, userId } });
+      await tx.postLike.createMany({ data: [{ postId, userId }], skipDuplicates: true });
+    });
   }
 
-  /** Bỏ lượt thích. Chưa thích thì không làm gì. */
+  /**
+   * Chạy "gỡ cái kia, ghi cái này" sau khi khóa dòng bài (`SELECT ... FOR UPDATE`): các lượt Thích, Không thích
+   * trên cùng một bài chạy lần lượt. Không khóa thì hai yêu cầu gửi cùng lúc giữ khóa khoảng (gap lock) của
+   * InnoDB rồi chờ nhau (deadlock, 500), hoặc đan xen để lại cả hai dòng. Khóa chỉ giữ trong vài câu lệnh ngắn.
+   */
+  private async react(
+    postId: string,
+    write: (tx: Prisma.TransactionClient) => Promise<void>,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM post WHERE id = ${postId} FOR UPDATE`;
+      await write(tx);
+    });
+  }
+
+  /** Bỏ lượt thích. Chưa thích thì không làm gì. Qua cùng khóa với `addLike`, `addDislike` (`react`). */
   async removeLike(postId: string, userId: string): Promise<void> {
-    await this.prisma.postLike.deleteMany({ where: { postId, userId } });
+    await this.react(postId, async (tx) => {
+      await tx.postLike.deleteMany({ where: { postId, userId } });
+    });
   }
 
-  /** Số thích của bài và `userId` đã thích chưa. */
-  async findLikeState(postId: string, userId: string): Promise<{ liked: boolean; count: number }> {
-    const [count, mine] = await Promise.all([
+  /** Ghi lượt Không thích và gỡ lượt thích của cùng người, như `addLike` theo chiều ngược lại. */
+  async addDislike(postId: string, userId: string): Promise<void> {
+    await this.react(postId, async (tx) => {
+      await tx.postLike.deleteMany({ where: { postId, userId } });
+      await tx.postDislike.createMany({ data: [{ postId, userId }], skipDuplicates: true });
+    });
+  }
+
+  /** Bỏ lượt Không thích. Chưa bấm thì không làm gì. Qua cùng khóa với `addLike`, `addDislike`. */
+  async removeDislike(postId: string, userId: string): Promise<void> {
+    await this.react(postId, async (tx) => {
+      await tx.postDislike.deleteMany({ where: { postId, userId } });
+    });
+  }
+
+  /** Số thích, số không thích của bài và `userId` đã bấm cái nào. */
+  async findLikeState(postId: string, userId: string): Promise<LikeStateRow> {
+    const key = { postId_userId: { postId, userId } };
+    const [count, dislikeCount, mine, myDislike] = await Promise.all([
       this.prisma.postLike.count({ where: { postId } }),
-      this.prisma.postLike.findUnique({
-        where: { postId_userId: { postId, userId } },
-        select: { postId: true },
-      }),
+      this.prisma.postDislike.count({ where: { postId } }),
+      this.prisma.postLike.findUnique({ where: key, select: { postId: true } }),
+      this.prisma.postDislike.findUnique({ where: key, select: { postId: true } }),
     ]);
-    return { liked: mine !== null, count };
+    return { liked: mine !== null, count, disliked: myDislike !== null, dislikeCount };
   }
 
   /** Phần policy cần để quyết định ai xem được bài (module khác gọi qua PostsService). */

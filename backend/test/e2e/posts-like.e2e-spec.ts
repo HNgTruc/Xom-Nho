@@ -87,12 +87,22 @@ describe("Thích bài (/api/v1/posts/:id/like) và thẻ bài trong danh sách",
     it("thích 3 lần liền vẫn chỉ tính 1, bỏ thích thì về 0", async () => {
       for (let i = 0; i < 3; i++) {
         const res = await like(minh).expect(200);
-        expect(res.body.data).toEqual({ liked: true, likeCount: 1 });
+        expect(res.body.data).toEqual({
+          liked: true,
+          likeCount: 1,
+          disliked: false,
+          dislikeCount: 0,
+        });
       }
 
       const res = await unlike(minh).expect(200);
 
-      expect(res.body.data).toEqual({ liked: false, likeCount: 0 });
+      expect(res.body.data).toEqual({
+        liked: false,
+        likeCount: 0,
+        disliked: false,
+        dislikeCount: 0,
+      });
       expect(await prisma.postLike.count()).toBe(0);
     });
 
@@ -108,7 +118,12 @@ describe("Thích bài (/api/v1/posts/:id/like) và thẻ bài trong danh sách",
 
       const res = await unlike(admin).expect(200);
 
-      expect(res.body.data).toEqual({ liked: false, likeCount: 2 });
+      expect(res.body.data).toEqual({
+        liked: false,
+        likeCount: 2,
+        disliked: false,
+        dislikeCount: 0,
+      });
     });
 
     it("bài đã ẩn: chủ bài nhận 403 kèm lời nhắn, người khác 404", async () => {

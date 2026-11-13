@@ -103,4 +103,16 @@ export class PostsController {
   unlike(@CurrentUser() user: SessionUser, @Param("id") id: string): Promise<PostLikeState> {
     return this.postsService.unlike(user, id);
   }
+
+  /** Không thích bài (ADR 0009); tự bỏ Thích nếu đang thích. Trả cả số thích lẫn số không thích. */
+  @Put(":id/dislike")
+  dislike(@CurrentUser() user: SessionUser, @Param("id") id: string): Promise<PostLikeState> {
+    return this.postsService.dislike(user, id);
+  }
+
+  /** Bỏ Không thích. Chưa bấm cũng không lỗi. Trả 200 kèm số mới. */
+  @Delete(":id/dislike")
+  undislike(@CurrentUser() user: SessionUser, @Param("id") id: string): Promise<PostLikeState> {
+    return this.postsService.undislike(user, id);
+  }
 }
