@@ -1,5 +1,9 @@
-import type { AdminListPostsQuery, ArchivePostInput } from "../../schemas/admin.js";
-import type { AdminPostListItem } from "../../types/admin.js";
+import type {
+  AdminListPostsQuery,
+  AdminPostStatsQuery,
+  ArchivePostInput,
+} from "../../schemas/admin.js";
+import type { AdminPostListItem, AdminPostStats } from "../../types/admin.js";
 import type { ApiResponse, PaginatedResponse } from "../../types/api-response.js";
 import type { RequestFn } from "../client.js";
 
@@ -14,6 +18,13 @@ export function adminPostsApi(request: RequestFn) {
      */
     list: (query: Partial<AdminListPostsQuery> = {}, signal?: AbortSignal) =>
       request<PaginatedResponse<AdminPostListItem>>("/admin/posts", { query, signal }),
+
+    /**
+     * `GET /admin/posts/stats`: số bài tạo trong khoảng (`7d`, `30d` mặc định, `all`) so với khoảng trước, và số
+     * bài theo trạng thái cho các tab. Bảng xếp hạng dùng `list({ range, sort: "likes", order, pageSize: 20 })`.
+     */
+    stats: (query: Partial<AdminPostStatsQuery> = {}, signal?: AbortSignal) =>
+      request<ApiResponse<AdminPostStats>>("/admin/posts/stats", { query, signal }),
 
     /** `POST /admin/posts/:id/archive`: ẩn bài đang hiện, lý do bắt buộc. Bài không đang hiện: ApiError 409. */
     archive: (id: string, input: ArchivePostInput) =>

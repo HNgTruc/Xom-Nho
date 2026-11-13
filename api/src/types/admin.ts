@@ -1,4 +1,5 @@
 import type { Role } from "../constants/roles.js";
+import type { AdminStatsRange } from "../schemas/admin.js";
 import type { CommentStatus, PostStatus } from "../constants/statuses.js";
 import type { CategoryRef } from "./post.js";
 import type { UserSummary } from "./user.js";
@@ -29,6 +30,22 @@ export interface AdminPostListItem {
   mediaCount: number;
   author: UserSummary;
   category: CategoryRef;
+}
+
+/**
+ * `GET /admin/posts/stats`: thẻ số liệu ở màn Bài viết. `total` là số bài **tạo** trong khoảng (mọi trạng thái),
+ * `previousTotal` là khoảng liền trước cùng độ dài để so sánh (`null` với `all`). `byStatus` đếm mọi bài, không
+ * theo khoảng: số trên các tab trạng thái.
+ */
+export interface AdminPostStats {
+  range: AdminStatsRange;
+  /** ISO 8601, đầu khoảng; `null` với `all` */
+  from: string | null;
+  /** ISO 8601, lúc tính số liệu */
+  to: string;
+  total: number;
+  previousTotal: number | null;
+  byStatus: Record<PostStatus, number>;
 }
 
 /** Bài chứa bình luận, đủ để hiện tiêu đề và liên kết tới trang bài. */

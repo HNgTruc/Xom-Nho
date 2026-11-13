@@ -38,12 +38,50 @@ function moderationReason(required: string, tooLong: string) {
     .max(LIMITS.MODERATION_REASON_MAX, tooLong);
 }
 
-export const ADMIN_POST_SORTS = { NEWEST: "newest", OLDEST: "oldest" } as const;
+/**
+ * Cách sắp bảng bài của trưởng xóm. `newest`, `oldest`: theo lúc tạo bài. Còn lại: bảng xếp hạng theo một cột
+ * (màn Bài viết, chốt 2026-11-13), chiều theo `order`; trùng số thì bài mới hơn trước.
+ */
+export const ADMIN_POST_SORTS = {
+  NEWEST: "newest",
+  OLDEST: "oldest",
+  LIKES: "likes",
+  DISLIKES: "dislikes",
+  COMMENTS: "comments",
+  VIEWS: "views",
+} as const;
 export type AdminPostSort = (typeof ADMIN_POST_SORTS)[keyof typeof ADMIN_POST_SORTS];
+const ADMIN_POST_SORT_VALUES = Object.values(ADMIN_POST_SORTS) as [
+  AdminPostSort,
+  ...AdminPostSort[],
+];
+
+/** Chiều sắp của bảng xếp hạng: `desc` (cao xuống thấp) mặc định, `asc` là nút đảo chiều. */
+export const SORT_ORDERS = { DESC: "desc", ASC: "asc" } as const;
+export type SortOrder = (typeof SORT_ORDERS)[keyof typeof SORT_ORDERS];
+
+/** Khoảng thời gian thống kê: bài **đăng** trong 7 ngày, 30 ngày gần nhất, hoặc mọi lúc. */
+export const ADMIN_STATS_RANGES = { WEEK: "7d", MONTH: "30d", ALL: "all" } as const;
+export type AdminStatsRange = (typeof ADMIN_STATS_RANGES)[keyof typeof ADMIN_STATS_RANGES];
+const ADMIN_STATS_RANGE_VALUES = Object.values(ADMIN_STATS_RANGES) as [
+  AdminStatsRange,
+  ...AdminStatsRange[],
+];
+
+/** Số ngày của mỗi khoảng; `all` không giới hạn. */
+export const ADMIN_STATS_RANGE_DAYS: Record<AdminStatsRange, number | null> = {
+  "7d": 7,
+  "30d": 30,
+  all: null,
+};
+
+const statsRange = z.enum(ADMIN_STATS_RANGE_VALUES, { error: "Khoảng thời gian không hợp lệ" });
 
 /**
  * Query của `GET /admin/posts`: mọi bài, mọi trạng thái. Sắp theo lúc tạo bài (`newest` mặc định).
  * Màn Bài mới gửi `since` (ISO 8601, mốc lần xem trước) + `sort=oldest`: bài tạo sau mốc, cũ nhất trước.
+ * Bảng xếp hạng ở màn Bài viết gửi `range` + `sort=likes|dislikes|comments|views` + `order` + `pageSize=20|30`.
+ * `range` bỏ trống thì không lọc theo thời gian; có cả `since` thì lấy mốc muộn hơn.
  */
 export const adminListPostsQuerySchema = adminPaginationQuerySchema.extend({
   status: z.preprocess(
@@ -57,14 +95,23 @@ export const adminListPostsQuerySchema = adminPaginationQuerySchema.extend({
     emptyToUndefined,
     z.iso.datetime({ offset: true, error: ADMIN_MESSAGES.SINCE_INVALID }).optional(),
   ),
+  range: z.preprocess(emptyToUndefined, statsRange.optional()),
   sort: z
-    .enum([ADMIN_POST_SORTS.NEWEST, ADMIN_POST_SORTS.OLDEST], {
-      error: "Cách sắp xếp không hợp lệ",
-    })
+    .enum(ADMIN_POST_SORT_VALUES, { error: "Cách sắp xếp không hợp lệ" })
     .default(ADMIN_POST_SORTS.NEWEST),
+  order: z
+    .enum([SORT_ORDERS.DESC, SORT_ORDERS.ASC], { error: "Chiều sắp xếp không hợp lệ" })
+    .default(SORT_ORDERS.DESC),
 });
 
 export type AdminListPostsQuery = z.infer<typeof adminListPostsQuerySchema>;
+
+/** Query của `GET /admin/posts/stats`: thẻ số liệu ở màn Bài viết, mặc định 30 ngày. */
+export const adminPostStatsQuerySchema = z.object({
+  range: statsRange.default(ADMIN_STATS_RANGES.MONTH),
+});
+
+export type AdminPostStatsQuery = z.infer<typeof adminPostStatsQuerySchema>;
 
 /** Body của `POST /admin/posts/:id/archive`: lý do bắt buộc, tác giả thấy (pages/admin.md mục "Ẩn bài"). */
 export const archivePostSchema = z.object({

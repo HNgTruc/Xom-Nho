@@ -4,6 +4,7 @@ import {
   adminListCommentsQuerySchema,
   adminListPostsQuerySchema,
   adminListUsersQuerySchema,
+  adminPostStatsQuerySchema,
   archivePostSchema,
   banUserSchema,
   setUserRoleSchema,
@@ -15,12 +16,38 @@ describe("adminListPostsQuerySchema", () => {
       page: 1,
       pageSize: 20,
       sort: "newest",
+      order: "desc",
     });
   });
 
+  it("nhận bảng xếp hạng: khoảng thời gian, sắp theo cột, đảo chiều, 30 dòng", () => {
+    expect(
+      adminListPostsQuerySchema.parse({
+        range: "7d",
+        sort: "dislikes",
+        order: "asc",
+        pageSize: "30",
+      }),
+    ).toEqual({ page: 1, pageSize: 30, range: "7d", sort: "dislikes", order: "asc" });
+  });
+
+  it.each([
+    ["range", "90d"],
+    ["sort", "shares"],
+    ["order", "up"],
+  ])("từ chối %s=%j", (key, value) => {
+    expect(adminListPostsQuerySchema.safeParse({ [key]: value }).success).toBe(false);
+  });
+
   it("ô lọc rỗng từ URL coi như không lọc", () => {
-    const query = adminListPostsQuerySchema.parse({ status: "", q: "", since: "", author: "" });
-    expect(query).toEqual({ page: 1, pageSize: 20, sort: "newest" });
+    const query = adminListPostsQuerySchema.parse({
+      status: "",
+      q: "",
+      since: "",
+      author: "",
+      range: "",
+    });
+    expect(query).toEqual({ page: 1, pageSize: 20, sort: "newest", order: "desc" });
   });
 
   it("nhận màn Bài mới: since ISO 8601 có múi giờ, cũ nhất trước", () => {
@@ -45,6 +72,14 @@ describe("adminListPostsQuerySchema", () => {
 
   it("cắt khoảng trắng ở từ khóa", () => {
     expect(adminListPostsQuerySchema.parse({ q: "  Bánh mì  " }).q).toBe("Bánh mì");
+  });
+});
+
+describe("adminPostStatsQuerySchema", () => {
+  it("mặc định 30 ngày, nhận 7 ngày và tất cả", () => {
+    expect(adminPostStatsQuerySchema.parse({})).toEqual({ range: "30d" });
+    expect(adminPostStatsQuerySchema.parse({ range: "all" })).toEqual({ range: "all" });
+    expect(adminPostStatsQuerySchema.safeParse({ range: "1y" }).success).toBe(false);
   });
 });
 
