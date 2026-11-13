@@ -150,6 +150,23 @@ export const LIKE_MESSAGES = {
   FAILED: "Chưa lưu được lượt thích. Bạn thử lại nhé.",
 } as const;
 
+/** Chia sẻ bài (docs/tinh-nang.md mục 2.6): điện thoại mở bảng chia sẻ, máy tính sao chép liên kết. */
+export const SHARE_MESSAGES = {
+  SHARE: "Chia sẻ",
+  COPIED: "Đã sao chép liên kết",
+  COPY_FAILED: "Chưa sao chép được liên kết. Bạn thử lại nhé.",
+} as const;
+
+/** Số thích cho trình đọc màn hình và nhãn: "12 lượt thích". */
+export function likeCountLabel(count: number): string {
+  return `${count.toLocaleString("vi-VN")} lượt thích`;
+}
+
+/** Số bình luận trên thẻ bài: "3 bình luận". */
+export function commentCountLabel(count: number): string {
+  return `${count.toLocaleString("vi-VN")} bình luận`;
+}
+
 /** Nhãn ô trả lời: "Trả lời Lan Anh". */
 export function commentReplyLabel(name: string): string {
   return `Trả lời ${name}`;

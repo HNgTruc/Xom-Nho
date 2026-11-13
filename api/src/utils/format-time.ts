@@ -20,6 +20,17 @@ export function formatDate(value: string | Date, now?: Date): string {
 }
 
 /**
+ * Giờ và ngày theo giờ Việt Nam cho thẻ bài (docs/tinh-nang.md mục 2.1): "14:05, 4 tháng 11".
+ * Khác năm với `now` (hoặc không có `now`) thì thêm năm: "14:05, 4 tháng 11, 2025".
+ */
+export function formatDateTime(value: string | Date, now?: Date): string {
+  const local = new Date(toDate(value).getTime() + VIETNAM_OFFSET);
+  const hours = String(local.getUTCHours()).padStart(2, "0");
+  const minutes = String(local.getUTCMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}, ${formatDate(value, now)}`;
+}
+
+/**
  * Thời gian tương đối cho feed và bình luận (MASTER mục 7): "Vừa xong", "5 phút trước", "2 giờ trước",
  * "3 ngày trước"; từ 7 ngày trở lên thì hiện ngày ("3 tháng 11"). `now` truyền vào để dễ test và để
  * server, client tính cùng một mốc.
