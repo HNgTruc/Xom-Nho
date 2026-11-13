@@ -167,6 +167,8 @@ Cách làm:
 
 **Stopword.** Danh sách stopword mặc định của InnoDB (`a, an, de, en, i, la...`) trùng với từ tiếng Việt đã bỏ dấu ("ăn", "để", "dễ", "là"). Nếu để mặc định, index bỏ qua các từ này và "do an" không tìm ra "đồ ăn". Migration `rebuild_fulltext_without_stopwords` tạo lại index với `SET SESSION innodb_ft_enable_stopword = OFF`. InnoDB ghi cách xử lý stopword vào index lúc tạo, nên index đúng trên mọi server. Docker cũng đặt `--innodb-ft-enable-stopword=OFF` để index tạo sau này (ví dụ Prisma tạo lại khi đổi cột) không dính stopword. Kiểm tra bằng `backend/test/e2e/search-fulltext.e2e-spec.ts`.
 
+**Index lệch với dữ liệu.** InnoDB không xóa ngay token của dòng đã xóa khỏi index FULLTEXT mà ghi vào một danh sách chờ dọn. Nếu MySQL tắt không sạch (tắt Docker Desktop, tắt máy) đúng lúc bảng vừa bị xóa nhiều, index có thể lệch: tìm ra cả bài đã xóa (đếm ra nhiều dòng hơn số bài có trong bảng), bỏ sót bài mới đăng. Đã gặp trên `xom_nho_test` ngày 2026-11-13: 16 test tìm kiếm hỏng dù cấu hình đúng. Cách sửa: `OPTIMIZE TABLE post;` (dựng lại bảng và index, không mất dữ liệu). Test e2e tự chạy lệnh này mỗi lần trong `backend/test/e2e/global-setup.ts`. Database dev gặp lỗi tương tự (tìm kiếm ra kết quả lạ) thì chạy tay trong Adminer.
+
 **Server deploy (giai đoạn 7).** MySQL phải khởi động với `innodb_ft_min_token_size=1`. Biến này chỉ đặt được lúc khởi động, migration không thay được, và chỉ áp dụng cho index tạo **sau** khi server chạy với cấu hình đó. Nếu server có sẵn index từ trước khi đặt biến, phải tạo lại index. Nên đặt thêm `innodb_ft_enable_stopword=OFF`.
 
 ## Phân trang
