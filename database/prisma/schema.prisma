@@ -62,12 +62,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  avatar        Media?     @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
-  posts         Post[]     @relation("PostAuthor")
-  reviewedPosts Post[]     @relation("PostReviewer")
+  avatar        Media?        @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
+  posts         Post[]        @relation("PostAuthor")
+  reviewedPosts Post[]        @relation("PostReviewer")
   comments      Comment[]
-  media         Media[]    @relation("MediaOwner")
+  media         Media[]       @relation("MediaOwner")
   postLikes     PostLike[]
+  postDislikes  PostDislike[]
   sessions      Session[]
   accounts      Account[]
 
@@ -181,13 +182,14 @@ model Post {
   updatedAt     DateTime      @updatedAt
 
   // Không xóa người dùng hay danh mục khi còn bài
-  author   User       @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Restrict)
-  category Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  reviewer User?      @relation("PostReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  author   User          @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  category Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  reviewer User?         @relation("PostReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
   tags     PostTag[]
   comments Comment[]
   media    Media[]
   likes    PostLike[]
+  dislikes PostDislike[]
 
   @@index([status, publishedAt(sort: Desc)])
   @@index([categoryId, status, publishedAt])
@@ -249,6 +251,22 @@ model PostLike {
   // Bài một người đã thích, mới trước (danh sách "đã thích" sau này) và khóa ngoại userId
   @@index([userId, createdAt])
   @@map("post_like")
+}
+
+// Không thích bài (ADR 0009). Như PostLike; một người chỉ Thích hoặc Không thích một bài, backend gỡ cái kia
+// trong cùng transaction
+model PostDislike {
+  postId    String
+  userId    String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  // Khóa ngoại userId (MySQL cần chỉ mục bắt đầu bằng cột này)
+  @@index([userId, createdAt])
+  @@map("post_dislike")
 }
 
 model Comment {
