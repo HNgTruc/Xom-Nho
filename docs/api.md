@@ -90,7 +90,7 @@ Kiểu trong `api` chỉ bảo vệ lúc build. App đã cài trên điện tho�
 | GET    | `/me/posts?status=`                                 | 🔒  | Bài của tôi, mọi trạng thái                                                                                                                                                                                                                                                    |
 
 `PostListItem`: `id, title, slug, excerpt, publishedAt, viewCount, commentCount, likeCount, likedByMe, latestComments [{ id, content, author, createdAt }], author { id, name, username, image, avatarId }, category { name, slug, color }, tags [{ name, slug }], media [{ id, kind, mimeType }]`. `title` rỗng với bài không đặt tiêu đề (frontend hiện `excerpt`). `media` theo thứ tự trong bài. `commentCount` chỉ đếm bình luận đang hiện. `likedByMe` theo người đang gọi. `latestComments` (`CommentPreview[]`): tối đa `LIMITS.FEED_LATEST_COMMENTS` (2) bình luận **gốc** đang hiện, mới nhất trước; không có trả lời, không có bình luận đã ẩn, kể cả với trưởng xóm. `author.id` để frontend so với `Me.id`.
-`PostDetail`: `PostListItem` (trừ `latestComments`: trang bài tải đủ bằng `GET /posts/:id/comments`) + `content, contentFormat (MARKDOWN | PLAIN), status, rejectReason, updatedAt`. `PLAIN`: chữ thường giữ xuống dòng, không render Markdown. `rejectReason` là `null` trừ khi bài bị từ chối.
+`PostDetail`: `PostListItem` (trừ `latestComments`: trang bài tải đủ bằng `GET /posts/:id/comments`) + `content, contentFormat (MARKDOWN | PLAIN), status, rejectReason, updatedAt`. `PLAIN`: chữ thường giữ xuống dòng, không render Markdown. `rejectReason` là `null` trừ khi bài bị từ chối hoặc bị trưởng xóm ẩn (lý do ẩn lưu cùng cột, xem `POST /admin/posts/:id/archive`); chỉ tác giả và trưởng xóm nhận được bài đã ẩn nên chỉ họ thấy lý do.
 
 **Thích bài** (`PUT`, `DELETE /posts/:id/like`, docs/tinh-nang.md mục 2.6):
 
@@ -197,22 +197,23 @@ Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với 
 
 ### Tổng quan (`modules/dashboard`)
 
-| Method | Đường dẫn          | Mô tả                                                                        |
-| ------ | ------------------ | ---------------------------------------------------------------------------- |
-| GET    | `/admin/dashboard` | Số bài chờ duyệt, bài/bình luận/thành viên mới trong 7 ngày, biểu đồ 30 ngày |
+| Method | Đường dẫn          | Mô tả                                                                                   |
+| ------ | ------------------ | --------------------------------------------------------------------------------------- |
+| GET    | `/admin/dashboard` | Số đang ẩn (bài, bình luận), bài/bình luận/thành viên mới trong 7 ngày, biểu đồ 30 ngày |
 
 ### Bài viết
 
-| Method | Đường dẫn                                               | Mô tả                                  |
-| ------ | ------------------------------------------------------- | -------------------------------------- |
-| GET    | `/admin/posts?status=&category=&author=&q=&page=&sort=` | Mọi bài, mọi trạng thái                |
-| GET    | `/admin/posts/:id`                                      | Chi tiết, kể cả bài nháp               |
-| POST   | `/admin/posts/:id/approve`                              | Duyệt: `PENDING` → `PUBLISHED`         |
-| POST   | `/admin/posts/:id/reject`                               | Từ chối. Body: `{ reason }` (bắt buộc) |
-| POST   | `/admin/posts/:id/archive`                              | Ẩn bài                                 |
-| POST   | `/admin/posts/:id/restore`                              | Khôi phục                              |
-| PATCH  | `/admin/posts/:id`                                      | Sửa bài bất kỳ                         |
-| DELETE | `/admin/posts/:id`                                      | Xóa bài bất kỳ                         |
+| Method | Đường dẫn                                               | Mô tả                                                                                       |
+| ------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| GET    | `/admin/posts?status=&category=&author=&q=&page=&sort=` | Mọi bài, mọi trạng thái                                                                     |
+| GET    | `/admin/posts?since=&sort=oldest`                       | Màn Bài mới: bài đăng sau mốc `since` (ISO), cũ nhất trước; `meta.total` là số bài chưa xem |
+| GET    | `/admin/posts/:id`                                      | Chi tiết, kể cả bài nháp                                                                    |
+| POST   | `/admin/posts/:id/archive`                              | Ẩn bài: `PUBLISHED` → `ARCHIVED`. Body: `{ reason }` (bắt buộc), lưu vào `rejectReason`     |
+| POST   | `/admin/posts/:id/restore`                              | Hiện lại: `ARCHIVED` → `PUBLISHED`, xóa `rejectReason`                                      |
+| POST   | `/admin/posts/:id/approve`                              | Chưa làm (ADR 0008): chỉ khi bật lại duyệt bài. Duyệt `PENDING` → `PUBLISHED`               |
+| POST   | `/admin/posts/:id/reject`                               | Chưa làm (ADR 0008): như trên. Từ chối, body `{ reason }`                                   |
+| PATCH  | `/admin/posts/:id`                                      | Sửa bài bất kỳ                                                                              |
+| DELETE | `/admin/posts/:id`                                      | Xóa bài bất kỳ                                                                              |
 
 ### Bình luận
 

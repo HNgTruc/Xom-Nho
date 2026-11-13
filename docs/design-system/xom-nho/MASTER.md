@@ -256,7 +256,7 @@ Biểu trưng **xn chữ ký** (chọn 2026-11-12): "xn" viết một mạch, ch
 - Bình luận: avatar 32, tên, thời gian ("· đã sửa" nếu có), nội dung `text-base` chữ thường giữ xuống dòng. Trả lời thụt vào 1 cấp (40px trên web, 24px trên mobile; web dưới 640px thụt 28px cho đủ chỗ) với đường dọc `border` 2px bên trái; không lồng sâu hơn.
 - Dưới mỗi bình luận: nút ghost "Trả lời" (và "Sửa", "Xóa" cho người viết), cao 40px; dưới 640px bỏ biểu tượng, chỉ giữ chữ để ba nút nằm một hàng. Xóa hỏi lại bằng hộp thoại (nút `destructive` "Xóa bình luận", nút viền "Giữ lại"). Ô viết bình luận có nhãn hiện rõ ("Bình luận của bạn", "Trả lời {tên}"); trả lời một trả lời thì ô nằm cuối nhánh, điền sẵn "@tên ".
 - Bình luận bị ẩn: admin thấy mờ (opacity 60%) kèm nhãn "Đã ẩn"; người thường không thấy.
-- Có dấu hiệu kiểm duyệt rõ ràng (skill cảnh báo "no moderation cues" là anti-pattern): bài bị từ chối hiện lý do trong hộp màu `destructive` nhạt cho tác giả.
+- Có dấu hiệu kiểm duyệt rõ ràng (skill cảnh báo "no moderation cues" là anti-pattern): bài bị từ chối hoặc bị trưởng xóm ẩn hiện lý do trong hộp màu `destructive` nhạt cho tác giả.
 
 ### Nút
 

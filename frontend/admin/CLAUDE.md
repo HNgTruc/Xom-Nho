@@ -17,7 +17,7 @@ src/
 ├── features/
 │   ├── auth/                   trang đăng nhập admin
 │   ├── dashboard/              thẻ số liệu, biểu đồ
-│   ├── moderation/             hàng chờ duyệt bài
+│   ├── moderation/             màn Bài mới: xem lần lượt bài mới đăng, ẩn bài kèm lý do
 │   ├── posts/                  bảng bài viết, sửa/xóa/ẩn
 │   ├── comments/               bảng bình luận, ẩn/hiện
 │   ├── categories/             thêm/sửa/sắp xếp

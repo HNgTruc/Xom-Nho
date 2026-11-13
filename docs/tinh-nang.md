@@ -211,11 +211,17 @@ Tiêu chí:
 
 ### 4.1 Tổng quan
 
-- Số liệu: bài chờ duyệt, bài/bình luận mới trong 7 ngày, thành viên mới.
+- Số liệu: đang ẩn (bài, bình luận), bài/bình luận mới trong 7 ngày, thành viên mới, biểu đồ 30 ngày.
 
-### 4.2 Duyệt bài
+### 4.2 Bài mới
 
-- Hàng chờ bài `PENDING`, xem trước, Duyệt / Từ chối (bắt buộc ghi lý do).
+Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng thẳng nên không còn bài `PENDING`. Thiết kế: `pages/admin.md`, mục "Bài mới" và "Ẩn bài".
+
+- Xem lần lượt bài đăng từ lần xem trước, bài cũ nhất trước; số bài chưa xem hiện ở sidebar.
+- Xem trước nội dung đầy đủ, thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa); "Ẩn bài", "Bài tiếp theo"; phím `J`/`K`/`H`/`O`.
+- [ ] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài
+- [ ] Hiện lại bài thì xóa lý do
+- [ ] Hết bài mới thì báo "Đã xem hết bài mới."
 
 ### 4.3 Quản lý bài, bình luận
 

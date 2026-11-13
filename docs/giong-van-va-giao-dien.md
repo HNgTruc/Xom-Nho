@@ -38,6 +38,7 @@ Tên vai trò hiển thị: Hàng xóm, Cây bút, Trưởng xóm.
 | Ô tạo bài                                     | Chào {tên}, hôm nay có chuyện gì?                         |
 | Đăng thành công                               | Bài của bạn đã lên xóm.                                   |
 | Bị từ chối                                    | Bài chưa được duyệt. Lý do: {lý do}                       |
+| Bài bị trưởng xóm ẩn (tác giả xem)            | Trưởng xóm đã ẩn bài này. Lý do: {lý do}                  |
 | 404                                           | Lạc đường rồi. Trang này không có trong xóm.              |
 | Lỗi máy chủ                                   | Có trục trặc bên mình. Bạn thử lại sau ít phút nhé.       |
 | Bị giới hạn tần suất                          | Từ từ thôi bạn ơi, chờ vài giây rồi gửi tiếp.             |

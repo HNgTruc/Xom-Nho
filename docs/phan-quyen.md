@@ -67,6 +67,8 @@ stateDiagram-v2
   ARCHIVED --> PUBLISHED: khôi phục
 ```
 
+Trưởng xóm ẩn bài (`POST /admin/posts/:id/archive`) thì bắt buộc ghi lý do, lưu ở `rejectReason`; tác giả thấy lý do trên bài của mình, hiện lại thì lý do bị xóa (chốt 2026-11-13, `pages/admin.md` mục "Ẩn bài").
+
 Chỉ bài `PUBLISHED` hiện cho người khác. Tác giả luôn xem được bài của mình ở mọi trạng thái.
 
 ## Cách kiểm tra quyền trong code

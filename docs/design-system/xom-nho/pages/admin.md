@@ -6,7 +6,7 @@
 
 | Mục           | Quyết định                                                                                                                |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Loại màn hình | Dashboard / Data View: bảng dữ liệu, hàng chờ duyệt, biểu mẫu                                                             |
+| Loại màn hình | Dashboard / Data View: bảng dữ liệu, màn Bài mới (xem lần lượt), biểu mẫu                                                 |
 | Density       | **8/10** (dày): ưu tiên xem được nhiều dòng, quét nhanh                                                                   |
 | Motion        | 5/10, như MASTER; biểu đồ và thẻ số liệu có chuyển động (mục "Thẻ số liệu")                                               |
 | Màu           | Trung tính, chỉ dùng màu cho **trạng thái** (xanh lá / vàng / đỏ) và hành động chính. Không dùng màu danh mục làm nền lớn |
@@ -39,6 +39,7 @@ Thang 8 đến 32 thay cho 16 đến 64 của MASTER:
 
 - Chữ giao diện `text-sm` (14/20) là mặc định trong bảng; tiêu đề trang `text-2xl`.
 - Chỉ dùng **Be Vietnam Pro**. Lora chỉ xuất hiện khi xem trước nội dung bài.
+- **Trong dòng bảng** (chốt 2026-11-13, ghi đè MASTER): badge chữ 12px, biểu tượng 14px, nút cao 32px. Admin dùng chuột trên máy tính nên bảng dày để thấy nhiều dòng. Ngoài bảng (thanh công cụ, hộp thoại, form) vẫn theo MASTER: nút tối thiểu 40px, badge 14px. Dưới 1024px (màn cảm ứng) nút trong dòng về lại 40px.
 - Số liệu trong bảng và thẻ thống kê dùng `font-variant-numeric: tabular-nums` để cột số thẳng hàng.
 
 ## Bố cục
@@ -54,17 +55,26 @@ Theo kết quả `--stack shadcn` và gợi ý dashboard của skill:
 - Dùng component `Table` với đủ `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`; không dựng bảng bằng `div` lưới.
 - Header bảng dính trên cùng khi cuộn.
 - **Tránh bảng rộng làm vỡ bố cục**: bọc bảng trong vùng `overflow-x-auto` riêng (chỉ bảng cuộn ngang, trang thì không); cột ít quan trọng ẩn dưới 1280px.
-- **Không chỉ có hành động từng dòng**: có checkbox chọn nhiều + thanh hành động hàng loạt (duyệt, ẩn, xóa nhiều mục) xuất hiện khi đã chọn, ghi rõ "Đã chọn 3 bài".
-- Hành động mỗi dòng gom vào `DropdownMenu` (nút ba chấm có `aria-label="Thao tác"`), hành động hay dùng nhất (ví dụ "Duyệt") có thể để nút riêng.
+- **Không chỉ có hành động từng dòng**: có checkbox chọn nhiều + thanh hành động hàng loạt (ẩn, hiện lại, xóa nhiều mục) xuất hiện khi đã chọn, ghi rõ "Đã chọn 3 bài".
+- Hành động mỗi dòng gom vào `DropdownMenu` (nút ba chấm có `aria-label="Thao tác"`), hành động hay dùng nhất (ví dụ "Ẩn") có thể để nút riêng.
 - Trạng thái dùng badge theo bảng 2.3 của MASTER.
 - Phân trang ở dưới bảng: tổng số, chọn số dòng/trang (20, 50, 100), trang trước/sau.
 - Trống: "Không có bài nào khớp bộ lọc" + nút "Xóa bộ lọc".
 
-## Hàng chờ duyệt
+## Bài mới
 
-- Bố cục hai cột trên màn hình rộng: danh sách bài chờ (trái, 360px) + xem trước nội dung đầy đủ (phải) với nút "Duyệt" và "Từ chối" cố định ở đáy vùng xem trước.
-- Phím tắt (có ghi chú trên giao diện): `J`/`K` chuyển bài, `A` duyệt, `R` mở hộp từ chối. Không kích hoạt khi đang gõ trong ô nhập.
-- Từ chối bắt buộc nhập lý do; nút xác nhận bị khóa đến khi có lý do.
+Thay cho "Hàng chờ duyệt" (chốt 2026-11-13): từ ADR 0008 bài đăng thẳng, không còn bài nào chờ duyệt. Trưởng xóm đọc lại các bài đã lên xóm và ẩn bài vi phạm.
+
+- Xem lần lượt các bài đăng **từ lần xem trước**, bài cũ nhất trước. Số bài chưa xem hiện ở sidebar (mục "Bài mới").
+- Bố cục hai cột trên màn hình rộng: danh sách bài (trái, 360px) + xem trước nội dung đầy đủ (phải), có khung nhỏ thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa). Nút "Ẩn bài" (nút viền) và "Bài tiếp theo" cố định ở đáy vùng xem trước.
+- Phím tắt (có ghi chú trên giao diện): `J`/`K` chuyển bài, `H` mở hộp ẩn bài, `O` mở bài trên Xóm Nhỏ. Không kích hoạt khi đang gõ trong ô nhập.
+- Hết bài: "Đã xem hết bài mới." kèm nút về Tổng quan.
+
+## Ẩn bài
+
+- **Bắt buộc lý do, tác giả thấy được** (chốt 2026-11-13). Hộp ẩn bài có chọn nhanh: "Quảng cáo, rao vặt", "Lời lẽ xúc phạm", "Lộ thông tin cá nhân", "Lý do khác" (kèm ô ghi thêm, bắt buộc khi chọn mục này). Nút "Ẩn bài" khóa đến khi có lý do.
+- Backend: `POST /admin/posts/:id/archive` nhận `{ reason }`, lưu vào cột `rejectReason` (không cần migration). Hiện lại (`restore`) thì xóa lý do.
+- Phía tác giả (web, mobile): bài đã ẩn hiện lý do trong hộp màu `destructive` nhạt (MASTER mục 6, "dấu hiệu kiểm duyệt").
 
 ## Thẻ số liệu (dashboard)
 
@@ -85,7 +95,7 @@ Theo kết quả `--stack shadcn` và gợi ý dashboard của skill:
 - [ ] Có chọn nhiều + hành động hàng loạt cho bài và bình luận
 - [ ] Bộ lọc và trang lưu trên URL
 - [ ] Phím tắt không xung đột khi đang gõ; có chỗ hiển thị danh sách phím tắt
-- [ ] Mọi hành động nguy hiểm có xác nhận, có lý do khi cần
+- [ ] Mọi hành động nguy hiểm có xác nhận, có lý do khi cần; ẩn bài luôn có lý do
 - [ ] Bảng, form nằm trên `glass-strong`; tắt trong suốt vẫn đọc được (bản đặc)
 - [ ] Biểu đồ, thẻ số liệu tắt chuyển động khi `prefers-reduced-motion`
 
@@ -103,8 +113,10 @@ Quyết định rút ra từ bản demo (2026-11-13), áp dụng khi làm giai �
 - **Thành viên**: hàng của chính mình khóa nút đổi vai trò, cấm (có `title` giải thích). Hộp cấm: thời hạn (1 ngày, 7 ngày, 30 ngày, Vĩnh viễn, ghi rõ giờ hết hạn), lý do bắt buộc, nút "Cấm tài khoản" khóa đến khi có lý do.
 - **Danh mục**: danh sách theo thứ tự menu Chủ đề, có tay cầm kéo và thanh số bài; khung sửa có ô màu (5 màu, tên màu bằng chữ), ô biểu tượng (5 + "không có" hiện chấm màu), xem trước đầu trang danh mục, mục menu Chủ đề và badge cùng lúc. Xóa danh mục khóa khi còn bài, ghi rõ còn bao nhiêu bài.
 
-Đề xuất chưa chốt (cần chủ dự án duyệt trước khi làm):
+Đề xuất đã chốt 2026-11-13 (chủ dự án duyệt cả ba):
 
-- **Bỏ "Hàng chờ duyệt", thay bằng màn "Bài mới"** (bản demo đã vẽ theo hướng này): từ ADR 0008 bài đăng thẳng, không còn gì chờ duyệt. Màn "Bài mới" xem lần lượt bài từ lần xem trước (danh sách 360px + xem trước, phím `J`/`K`/`H`/`O`), khung nhỏ thông tin tác giả (ngày tham gia, số bài, đã bị ẩn bài chưa), nút "Ẩn bài" và "Bài tiếp theo". Thẻ "Bài chờ duyệt" ở Tổng quan đổi thành "Đang ẩn". Nếu duyệt thì sửa mục "Hàng chờ duyệt" ở trên, `tinh-nang.md` 4.1, 4.2 và `api.md` (`/admin/dashboard`).
-- **Ẩn bài bắt buộc lý do, tác giả thấy được** (chọn nhanh: Quảng cáo, rao vặt; Lời lẽ xúc phạm; Lộ thông tin cá nhân; Lý do khác + ô ghi thêm). Cần `POST /admin/posts/:id/archive` nhận `{ reason }`, có thể dùng lại cột `rejectReason`.
-- **Mật độ trong bảng**: badge chữ 12px, biểu tượng 14px; nút trong dòng bảng cao 32px (MASTER: badge 14px, nút tối thiểu 40px). Hợp lý cho máy tính dùng chuột, nhưng trái MASTER nên cần duyệt.
+- **Bỏ "Hàng chờ duyệt", thay bằng màn "Bài mới"**: xem mục "Bài mới" ở trên. Thẻ "Bài chờ duyệt" ở Tổng quan đổi thành "Đang ẩn".
+- **Ẩn bài bắt buộc lý do, tác giả thấy được**: xem mục "Ẩn bài" ở trên.
+- **Mật độ trong bảng** (badge 12px, biểu tượng 14px, nút trong dòng 32px): xem mục "Chữ" ở trên.
+
+Còn mở, quyết khi làm màn Bài mới: mốc "lần xem trước" lưu ở đâu. Cách gọn nhất là admin giữ mốc trong `localStorage` và gửi `since` lên API (không cần migration, nhưng mỗi máy một mốc). Nếu cần mốc theo tài khoản thì thêm cột cho `User` bằng migration mới.

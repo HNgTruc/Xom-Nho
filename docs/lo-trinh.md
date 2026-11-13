@@ -92,19 +92,20 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [ ] Web: trang `/tin-nhan`, gửi ảnh và video (5 MB / 25 MB), đã xem, đang gõ, số tin chưa đọc
 - [ ] Test: người ngoài cuộc trò chuyện không đọc được tin, không mở được file
 - [x] Web: nút Tin nhắn, Thông báo ở header (giao diện, chưa có dữ liệu)
-- [ ] Backend: `modules/notifications` (bảng `Notification`, tạo khi bình luận, thích, kết bạn, duyệt bài), đẩy qua Socket.IO
+- [ ] Backend: `modules/notifications` (bảng `Notification`, tạo khi bình luận, thích, kết bạn, bài bị ẩn), đẩy qua Socket.IO
 - [ ] Web: bảng Thông báo, bảng Tin nhắn có dữ liệu thật, số chưa đọc
 
 **Xong khi:** hai tài khoản trên hai trình duyệt nhắn cho nhau, tin hiện ngay, gửi được ảnh và video.
 
 ## Giai đoạn 5: Trang quản trị
 
-Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kính mờ" (admin dùng kính như web), "Thẻ số liệu" (biểu đồ cột có chuyển động) và "Bản thiết kế tham khảo" (bản demo trên canvas, quyết định rút ra, đề xuất chưa chốt).
+Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kính mờ" (admin dùng kính như web), "Thẻ số liệu" (biểu đồ cột có chuyển động) và "Bản thiết kế tham khảo" (bản demo trên canvas, quyết định rút ra), "Bài mới", "Ẩn bài".
 
+- [x] Chốt đề xuất thiết kế admin: màn Bài mới thay hàng chờ duyệt, ẩn bài bắt buộc lý do, bảng dày hơn MASTER (2026-11-13)
 - [ ] Backend: các `*.admin.controller.ts` theo `api.md`, `modules/dashboard`
 - [ ] Admin: layout (sidebar, topbar), `DataTable` dùng chung
 - [ ] Tổng quan số liệu
-- [ ] Hàng chờ duyệt bài
+- [ ] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt
 - [ ] Quản lý bài, bình luận
 - [ ] Danh mục, tag
 - [ ] Thành viên: đổi vai trò, cấm

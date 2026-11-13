@@ -212,7 +212,7 @@ Khi deploy: dùng chung tên miền gốc (`xomnho.vn`, `admin.xomnho.vn`, `api.
 2. Gọi `api.posts.create(input)` (từ `api/api-client`) → `POST /api/v1/posts`.
 3. `AuthGuard` lấy phiên qua Better Auth, gắn user vào request.
 4. `ZodValidationPipe` kiểm tra body bằng cùng `createPostSchema`.
-5. `PostsService.create` dùng `PostsPolicy` xác định trạng thái: `user` → `PENDING`, `author`/`admin` → `PUBLISHED`; kiểm tra giới hạn tần suất.
+5. `PostsService.create` kiểm tra giới hạn tần suất, ghi bài thẳng vào `PUBLISHED` với mọi vai trò (ADR 0008).
 6. `PostsRepository` ghi bài và tag trong một transaction.
 7. `PostsMapper` chuyển sang `PostDetail`; interceptor bọc thành `{ data }`.
-8. Trưởng xóm thấy bài trong hàng chờ của `admin` (gọi `GET /api/v1/admin/posts?status=PENDING`).
+8. Bài hiện ngay trên trang chủ. Trưởng xóm đọc lại ở màn Bài mới của `admin` (`GET /api/v1/admin/posts?since=`), bài vi phạm thì ẩn kèm lý do (`POST /api/v1/admin/posts/:id/archive`).
