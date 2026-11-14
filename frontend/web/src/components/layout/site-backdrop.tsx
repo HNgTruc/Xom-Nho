@@ -1,5 +1,5 @@
 import Image from "next/image";
-import backdrop from "@/assets/backdrop/bien-may.jpg";
+import backdrop from "@xom-nho/ui/assets/backdrop/bien-may.jpg";
 
 /**
  * Ảnh nền cố định sau mọi trang (MASTER 2.4): biển và mây, ảnh của Tuấn Vũ trên Pexels.
