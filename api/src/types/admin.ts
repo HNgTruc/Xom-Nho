@@ -1,5 +1,5 @@
 import type { Role } from "../constants/roles.js";
-import type { AdminStatsRange } from "../schemas/admin.js";
+import type { AdminDashboardMetric, AdminStatsRange } from "../schemas/admin.js";
 import type { CommentStatus, PostStatus } from "../constants/statuses.js";
 import type { CategoryRef } from "./post.js";
 import type { UserSummary } from "./user.js";
@@ -109,4 +109,35 @@ export interface AdminUserStats {
   byRole: Record<Role, number>;
   /** Đang bị cấm (cấm hết hạn không tính) */
   banned: number;
+}
+
+/** Một ngày (giờ Việt Nam) trên biểu đồ Tổng quan: số tạo mới trong ngày, mọi trạng thái. */
+export interface AdminDashboardDay {
+  /** `YYYY-MM-DD` theo giờ Việt Nam */
+  date: string;
+  /** Bài tạo trong ngày, mọi trạng thái (như thẻ số liệu màn Bài viết) */
+  posts: number;
+  /** Bình luận viết trong ngày, kể cả đã ẩn */
+  comments: number;
+  /** Thành viên tham gia trong ngày */
+  members: number;
+}
+
+/** Tổng của 7 ngày gần nhất (tính cả hôm nay) và 7 ngày liền trước, để thẻ số liệu so "tăng"/"giảm". */
+export interface AdminDashboardTrend {
+  current: number;
+  previous: number;
+}
+
+/**
+ * `GET /admin/dashboard`: màn Tổng quan (pages/admin.md mục "Thẻ số liệu"). `daily` có đúng 30 ngày, cũ trước,
+ * ngày cuối là hôm nay; `recent` cộng từ chính `daily` nên số trên thẻ khớp với cột trên biểu đồ.
+ */
+export interface AdminDashboard {
+  /** ISO 8601, lúc tính số liệu ("Cập nhật lúc 14:05") */
+  generatedAt: string;
+  /** Đang ẩn: bài `ARCHIVED`, bình luận `HIDDEN`, mọi lúc */
+  hidden: { posts: number; comments: number };
+  recent: Record<AdminDashboardMetric, AdminDashboardTrend>;
+  daily: AdminDashboardDay[];
 }

@@ -75,6 +75,26 @@ export const ADMIN_STATS_RANGE_DAYS: Record<AdminStatsRange, number | null> = {
   all: null,
 };
 
+/**
+ * Màn Tổng quan (`GET /admin/dashboard`): biểu đồ cột `ADMIN_DASHBOARD_DAYS` ngày (tính cả hôm nay), thẻ số liệu
+ * so `ADMIN_DASHBOARD_RECENT_DAYS` ngày gần nhất với chừng ấy ngày liền trước. Ngày tính theo giờ Việt Nam.
+ */
+export const ADMIN_DASHBOARD_DAYS = 30;
+export const ADMIN_DASHBOARD_RECENT_DAYS = 7;
+
+/** Ba số liệu theo ngày của màn Tổng quan: bài viết, bình luận, thành viên mới. */
+export const ADMIN_DASHBOARD_METRICS = {
+  POSTS: "posts",
+  COMMENTS: "comments",
+  MEMBERS: "members",
+} as const;
+export type AdminDashboardMetric =
+  (typeof ADMIN_DASHBOARD_METRICS)[keyof typeof ADMIN_DASHBOARD_METRICS];
+export const ADMIN_DASHBOARD_METRIC_VALUES = Object.values(ADMIN_DASHBOARD_METRICS) as [
+  AdminDashboardMetric,
+  ...AdminDashboardMetric[],
+];
+
 const statsRange = z.enum(ADMIN_STATS_RANGE_VALUES, { error: "Khoảng thời gian không hợp lệ" });
 
 /**
