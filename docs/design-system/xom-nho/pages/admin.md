@@ -94,6 +94,21 @@ Chủ dự án chốt 2026-11-13. Backend đã có (`GET /admin/posts/stats`, `G
 - Dưới 768px bảng xếp hạng chỉ còn tên bài và **cột đang xếp**; đổi cột bằng ô chọn "Xếp theo" dưới bảng (không có tiêu đề cột để bấm). Ẩn cố định một cột thì xếp theo đúng cột đó là mất số.
 - Nhóm nút chọn một (khoảng thời gian, số bài) là `Segmented` (`aria-pressed`, nút cao 40px vì nằm ngoài dòng bảng), không dùng tab: đổi lựa chọn chỉ lọc lại dữ liệu bên dưới.
 
+## Bình luận
+
+- Tab Tất cả / Đang hiện / Đã ẩn (không có số đếm: backend chưa có thống kê bình luận), ô tìm trong nội dung, bảng mới nhất trước.
+- Cột: Bình luận (trả lời có mũi tên `↳`), Người viết, Bài, Trạng thái, Lúc. Dòng đã ẩn mờ đi. Dưới 768px chỉ còn nội dung, trạng thái và nút thao tác.
+- Menu dòng: "Mở bài gốc", "Ẩn" hoặc "Hiện lại", "Xóa…" (hỏi lại). Chọn nhiều để ẩn, hiện, xóa cùng lúc; đổi tab hay từ khóa thì bỏ chọn.
+- Ẩn bình luận không cần lý do (khác ẩn bài): toast "Đã ẩn bình luận" có "Hoàn tác".
+
+## Thành viên
+
+- Đầu trang: "N thành viên · M người mới trong 7 ngày". Tab Tất cả / Hàng xóm / Cây bút / Trưởng xóm / Đang bị cấm, mỗi tab có số.
+- Cột: Thành viên (avatar, tên, `@username · email`), Vai trò, Tình trạng (badge "Cấm đến …" hoặc "Cấm vĩnh viễn" kèm lý do một dòng), Bài viết, Bình luận, Tham gia. Cột số ẩn dần dưới 1280px và 1024px; dưới 640px chỉ còn tên, `@username`, vai trò và nút thao tác (email ẩn, khối tên giới hạn bề ngang để email dài không đẩy mất nút).
+- Dòng của mình: "(bạn)", avatar nền `accent`, nút thao tác khóa kèm `title` giải thích.
+- Menu dòng: chọn vai trò (radio), "Cấm…" hoặc "Bỏ cấm". Trưởng xóm khác: "Cấm… (hạ vai trò trước)" bị khóa. Đổi vai trò dính tới trưởng xóm (nâng lên, hạ xuống) thì hỏi lại; giữa hàng xóm và cây bút thì đổi luôn, toast có "Hoàn tác".
+- Hộp cấm: thời hạn `Segmented` 1 ngày / 7 ngày (mặc định) / 30 ngày / Vĩnh viễn, ghi "Hết cấm lúc …" hoặc "Không tự hết hạn: phải bỏ cấm bằng tay."; lý do bắt buộc (người bị cấm thấy khi đăng nhập lại). Hạn tính lúc bấm nút, không phải lúc mở hộp.
+
 ## Thẻ số liệu (dashboard)
 
 - Thẻ `Card`: con số lớn (`text-3xl`, tabular-nums), nhãn `text-sm` `muted-foreground`, so với 7 ngày trước (mũi tên + phần trăm, kèm chữ "tăng"/"giảm", không chỉ dựa vào màu).

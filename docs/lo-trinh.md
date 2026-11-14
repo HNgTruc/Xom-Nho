@@ -112,9 +112,9 @@ Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kí
 - [ ] Tổng quan số liệu
 - [x] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt: danh sách 360px + xem bài, phím J/K/H/O, "Đã xem", mốc lưu theo máy chỉ dời khi "Đánh dấu đã xem hết", số chưa xem trên sidebar, khung tác giả (Đợt 3, 2026-11-14)
 - [x] Màn Bài viết: thống kê theo khoảng, bảng xếp hạng 20/30 bài theo cột, bảng mọi bài (tab trạng thái có số, tìm, lọc danh mục, chọn nhiều để ẩn/hiện/xóa, ẩn bài kèm lý do chọn nhanh, toast có Hoàn tác) (Đợt 2, 2026-11-14)
-- [ ] Màn Bình luận
+- [x] Màn Bình luận: tab Tất cả / Đang hiện / Đã ẩn, tìm trong nội dung, chọn nhiều để ẩn/hiện/xóa, mở bài gốc, ẩn có Hoàn tác (Đợt 4, 2026-11-14)
 - [ ] Danh mục, tag
-- [ ] Thành viên: đổi vai trò, cấm
+- [x] Thành viên: tab vai trò và "Đang bị cấm" có số, tìm theo tên/email, đổi vai trò (hỏi lại khi dính tới trưởng xóm), cấm 1/7/30 ngày hoặc vĩnh viễn kèm lý do, bỏ cấm, toast có Hoàn tác; dòng của mình bị khóa (Đợt 4, 2026-11-14)
 
 ## Giai đoạn 6: Mobile app
 

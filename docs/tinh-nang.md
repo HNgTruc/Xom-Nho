@@ -231,6 +231,7 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Bảng bài: lọc theo trạng thái, danh mục, tác giả; tìm theo tiêu đề; sửa, xóa, ẩn.
 - Bảng bình luận: ẩn / hiện, xem bài gốc.
+- [x] Bảng bình luận: tab theo trạng thái, tìm trong nội dung, chọn nhiều để ẩn/hiện/xóa, "Mở bài gốc", ẩn xong có "Hoàn tác" (2026-11-14)
 - Thống kê (chốt 2026-11-13, `pages/admin.md` mục "Thống kê ở màn Bài viết"): khoảng 7 ngày, 30 ngày, tất cả; số bài đăng trong khoảng so với khoảng trước; bảng xếp hạng 20 hoặc 30 bài theo Thích, Không thích, Bình luận, Lượt xem, cao xuống thấp, đảo chiều được.
 - [ ] Thống kê đúng theo khoảng, bảng xếp hạng đúng thứ tự cả hai chiều (backend: xong 2026-11-13, `admin-moderation.e2e-spec.ts`; màn admin: xong 2026-11-14)
 
@@ -243,6 +244,7 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Danh sách, tìm theo tên/email, đổi vai trò, cấm / bỏ cấm (kèm lý do).
 - Số trên các tab (theo vai trò, đang bị cấm) và dòng tóm tắt "N thành viên · M người mới trong 7 ngày" (backend: xong 2026-11-14, `GET /admin/users/stats`).
+- [x] Màn Thành viên: tab có số, tìm, đổi vai trò, cấm có thời hạn kèm lý do bắt buộc, bỏ cấm; không đổi vai trò hay cấm chính mình, không cấm trưởng xóm khác (hạ vai trò trước) (2026-11-14)
 
 Tiêu chí chung cho admin:
 
