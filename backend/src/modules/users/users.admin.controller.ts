@@ -12,7 +12,9 @@ import {
 import {
   type AdminListUsersQuery,
   adminListUsersQuerySchema,
+  type AdminUserDetail,
   type AdminUserListItem,
+  type AdminUserStats,
   type BanUserInput,
   banUserSchema,
   ROLES,
@@ -40,6 +42,17 @@ export class UsersAdminController {
     @Query(new ZodValidationPipe(adminListUsersQuerySchema)) query: AdminListUsersQuery,
   ): Promise<Paginated<AdminUserListItem>> {
     return this.usersService.adminList(query);
+  }
+
+  /** Khai báo trước `:id` để `stats` không bị hiểu là id. */
+  @Get("stats")
+  stats(): Promise<AdminUserStats> {
+    return this.usersService.adminStats();
+  }
+
+  @Get(":id")
+  get(@Param("id") id: string): Promise<AdminUserDetail> {
+    return this.usersService.adminGet(id);
   }
 
   @Patch(":id/role")

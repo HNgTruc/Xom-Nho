@@ -2,12 +2,16 @@ import { Injectable } from "@nestjs/common";
 import {
   ADMIN_MESSAGES,
   type AdminListUsersQuery,
+  type AdminUserDetail,
   type AdminUserListItem,
+  type AdminUserStats,
   type BanUserInput,
   pathIdSchema,
   pathUsernameSchema,
   POST_STATUSES,
   type PublicProfile,
+  type Role,
+  ROLE_VALUES,
   type SetUserRoleInput,
 } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
@@ -18,6 +22,7 @@ import { UsersPolicy } from "./users.policy.js";
 import { type AdminUserRow, UsersRepository } from "./users.repository.js";
 
 const USER_NOT_FOUND = "Không tìm thấy hàng xóm này. Bạn kiểm tra lại đường dẫn nhé.";
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class UsersService {
@@ -52,6 +57,26 @@ export class UsersService {
       page,
       pageSize,
     );
+  }
+
+  /** Một thành viên kèm số bài, bình luận đang bị ẩn (khung tác giả ở màn Bài mới). Không có: NOT_FOUND. */
+  async adminGet(id: string): Promise<AdminUserDetail> {
+    const row = await this.findTarget(id);
+    const hidden = await this.usersRepository.countHidden(id);
+    return {
+      ...toAdminUserListItem(row),
+      hiddenPostCount: hidden.posts,
+      hiddenCommentCount: hidden.comments,
+    };
+  }
+
+  /** Số liệu màn Thành viên. Vai trò lạ trong DB tính như hàng xóm thường (`toRole`), như ở mọi chỗ khác. */
+  async adminStats(): Promise<AdminUserStats> {
+    const now = new Date();
+    const stats = await this.usersRepository.stats(now, new Date(now.getTime() - 7 * DAY_MS));
+    const byRole = Object.fromEntries(ROLE_VALUES.map((role) => [role, 0])) as Record<Role, number>;
+    for (const row of stats.byRole) byRole[toRole(row.role)] += row.count;
+    return { total: stats.total, newLast7Days: stats.newCount, byRole, banned: stats.banned };
   }
 
   /** Đổi vai trò. Không tự đổi của mình (FORBIDDEN). Có hiệu lực ngay ở request sau (phiên đọc lại `user`). */

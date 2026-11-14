@@ -91,6 +91,49 @@ export class UsersRepository {
     ]);
   }
 
+  /**
+   * Số bài đang ẩn (`ARCHIVED`), bình luận đang ẩn (`HIDDEN`) của một người, đếm qua quan hệ của `user`. Truy vấn
+   * riêng vì `_count` không chọn được cùng một quan hệ hai lần (một lần đếm hết, một lần có điều kiện).
+   */
+  async countHidden(id: string): Promise<{ posts: number; comments: number }> {
+    const row = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        _count: {
+          select: {
+            posts: { where: { status: "ARCHIVED" } },
+            comments: { where: { status: "HIDDEN" } },
+          },
+        },
+      },
+    });
+    return row?._count ?? { posts: 0, comments: 0 };
+  }
+
+  /** Số liệu màn Thành viên: tổng, mới từ `newSince`, theo vai trò, đang bị cấm tính tới `now`. */
+  async stats(
+    now: Date,
+    newSince: Date,
+  ): Promise<{
+    total: number;
+    newCount: number;
+    banned: number;
+    byRole: { role: string; count: number }[];
+  }> {
+    const [total, newCount, banned, roles] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.user.count({ where: { createdAt: { gte: newSince } } }),
+      this.prisma.user.count({ where: bannedWhere(true, now) }),
+      this.prisma.user.groupBy({ by: ["role"], _count: { _all: true } }),
+    ]);
+    return {
+      total,
+      newCount,
+      banned,
+      byRole: roles.map((row) => ({ role: row.role, count: row._count._all })),
+    };
+  }
+
   findAdminRow(id: string): Promise<AdminUserRow | null> {
     return this.prisma.user.findUnique({ where: { id }, select: adminUserSelect });
   }

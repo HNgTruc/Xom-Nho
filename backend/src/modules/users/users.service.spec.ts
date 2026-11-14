@@ -229,6 +229,55 @@ describe("UsersService (route admin)", () => {
     expect(repository.unban).toHaveBeenCalledWith("u1");
   });
 
+  it("adminGet: kèm số bài, bình luận đang bị ẩn", async () => {
+    const { service, repository } = adminSetup();
+    Object.assign(repository, {
+      countHidden: vi.fn().mockResolvedValue({ posts: 2, comments: 5 }),
+    });
+
+    const detail = await service.adminGet("u1");
+
+    expect(detail).toMatchObject({
+      id: "u1",
+      email: "lan@x.vn",
+      postCount: 3,
+      hiddenPostCount: 2,
+      hiddenCommentCount: 5,
+    });
+  });
+
+  it("adminStats: đủ ba vai trò, vai trò lạ tính như hàng xóm, mốc người mới 7 ngày", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-14T00:00:00.000Z"));
+    try {
+      const { service, repository } = adminSetup();
+      const stats = vi.fn().mockResolvedValue({
+        total: 10,
+        newCount: 2,
+        banned: 1,
+        byRole: [
+          { role: "user", count: 6 },
+          { role: "admin", count: 1 },
+          { role: "superuser", count: 3 },
+        ],
+      });
+      Object.assign(repository, { stats });
+
+      await expect(service.adminStats()).resolves.toEqual({
+        total: 10,
+        newLast7Days: 2,
+        byRole: { user: 9, author: 0, admin: 1 },
+        banned: 1,
+      });
+      expect(stats).toHaveBeenCalledWith(
+        new Date("2026-11-14T00:00:00.000Z"),
+        new Date("2026-11-07T00:00:00.000Z"),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it.each(["khong-co", "../u1"])("thành viên %j không có thì NOT_FOUND", async (id) => {
     const { service } = adminSetup(null);
     const notFound = { code: "NOT_FOUND", message: ADMIN_MESSAGES.USER_NOT_FOUND };

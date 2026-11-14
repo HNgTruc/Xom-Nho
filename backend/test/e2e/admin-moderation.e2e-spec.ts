@@ -2,6 +2,8 @@ import type { NestExpressApplication } from "@nestjs/platform-express";
 import { ADMIN_MESSAGES } from "@xom-nho/api";
 import request from "supertest";
 import type { PrismaClient } from "../../src/generated/prisma/client.js";
+import { AUTH } from "../../src/infrastructure/auth/auth.module.js";
+import { type Auth, DISABLED_ADMIN_PATHS } from "../../src/infrastructure/auth/create-auth.js";
 import { createTestApp } from "../fixtures/app.js";
 import { createTestPrisma, resetDatabase } from "../fixtures/database.js";
 import { signUp } from "../fixtures/session.js";
@@ -60,6 +62,43 @@ describe("Quản trị: bài viết, bình luận, thành viên (/api/v1/admin)"
     await app.close();
   });
 
+  describe("route admin có sẵn của Better Auth (/api/auth/admin/*) đã tắt", () => {
+    it("trưởng xóm gọi bằng GET hay POST đều nhận 404, kể cả tự hạ vai trò", async () => {
+      for (const path of DISABLED_ADMIN_PATHS) {
+        await http().get(`/api/auth${path}`).set("Cookie", admin.cookie).expect(404);
+        await http()
+          .post(`/api/auth${path}`)
+          .set("Cookie", admin.cookie)
+          .set("Origin", "http://localhost:3000")
+          .send({ userId: admin.id, role: "user" })
+          .expect(404);
+      }
+      const me = await prisma.user.findUniqueOrThrow({ where: { id: admin.id } });
+      expect(me.role).toBe("admin");
+    });
+
+    it("danh sách tắt gồm mọi route /admin/* của plugin (nâng bản Better Auth thì so lại)", () => {
+      const endpoints = Object.values(app.get<Auth>(AUTH).api) as { path?: string }[];
+      const pluginPaths = endpoints
+        .map((endpoint) => endpoint.path)
+        .filter((path): path is string => typeof path === "string" && path.startsWith("/admin/"));
+
+      expect(pluginPaths.length).toBeGreaterThan(0);
+      expect([...new Set(pluginPaths)].sort()).toEqual([...DISABLED_ADMIN_PATHS].sort());
+    });
+
+    it("hook của plugin vẫn chạy: người bị cấm không đăng nhập được", async () => {
+      await call(admin, "post", `/admin/users/${lan.id}/ban`, { reason: "Spam" }).expect(200);
+
+      const res = await http()
+        .post("/api/auth/sign-in/email")
+        .set("Origin", "http://localhost:3000")
+        .send({ email: "lan@test.local", password: "matkhau123" });
+
+      expect(res.status).toBe(403);
+    });
+  });
+
   describe("chỉ trưởng xóm gọi được", () => {
     const routes: [Method, string, object?][] = [
       ["get", "/admin/posts"],
@@ -72,6 +111,8 @@ describe("Quản trị: bài viết, bình luận, thành viên (/api/v1/admin)"
       ["post", "/admin/comments/c1/show"],
       ["delete", "/admin/comments/c1"],
       ["get", "/admin/users"],
+      ["get", "/admin/users/stats"],
+      ["get", "/admin/users/u1"],
       ["patch", "/admin/users/u1/role", { role: "admin" }],
       ["post", "/admin/users/u1/ban", { reason: "Spam" }],
       ["post", "/admin/users/u1/unban"],
@@ -321,6 +362,45 @@ describe("Quản trị: bài viết, bình luận, thành viên (/api/v1/admin)"
 
       const authors = await call(admin, "get", "/admin/users?role=author").expect(200);
       expect(authors.body.data.map((u: { id: string }) => u.id)).toEqual([author.id]);
+    });
+
+    it("chi tiết một thành viên: số bài, bình luận, số đang bị ẩn; không có thì 404", async () => {
+      const post = await createPost(lan, "Bài của Lan");
+      const other = await createPost(lan, "Bài thứ hai");
+      const c = await comment(lan, post.id, "Tự bình luận");
+      await call(admin, "post", `/admin/posts/${other.id}/archive`, { reason: "Spam" }).expect(200);
+      await call(admin, "post", `/admin/comments/${c.id}/hide`).expect(200);
+
+      const res = await call(admin, "get", `/admin/users/${lan.id}`).expect(200);
+
+      expect(res.body.data).toMatchObject({
+        id: lan.id,
+        email: "lan@test.local",
+        role: "user",
+        postCount: 2,
+        commentCount: 1,
+        hiddenPostCount: 1,
+        hiddenCommentCount: 1,
+      });
+      await call(admin, "get", "/admin/users/khong-co").expect(404);
+    });
+
+    it("số liệu: tổng, người mới 7 ngày, theo vai trò, đang bị cấm", async () => {
+      await prisma.user.update({
+        where: { id: minh.id },
+        data: { createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+      });
+      await call(admin, "post", `/admin/users/${lan.id}/ban`, { reason: "Spam" }).expect(200);
+
+      const res = await call(admin, "get", "/admin/users/stats").expect(200);
+
+      // lan, minh (user), caybut (author), admin
+      expect(res.body.data).toEqual({
+        total: 4,
+        newLast7Days: 3,
+        byRole: { user: 2, author: 1, admin: 1 },
+        banned: 1,
+      });
     });
 
     it("đổi vai trò có hiệu lực ngay ở request sau", async () => {
