@@ -24,8 +24,8 @@ src/
 │   ├── tags/                   gộp, xóa
 │   └── users/                  đổi vai trò, cấm
 ├── components/
-│   ├── data-table/             DataTable dùng chung (TanStack Table): phân trang, sắp xếp, lọc
-│   └── common/                 PageHeader, ConfirmDialog, StatusBadge, EmptyState
+│   ├── data-table/             DataTable dùng chung (TanStack Table **bản 9**: `useTable`, `tableFeatures`), cột chọn dòng, tiêu đề sắp xếp, phân trang; sắp xếp, lọc, trang do server làm, nằm trên URL
+│   └── common/                 PageHeader, ConfirmDialog, StatusBadge/RoleBadge, EmptyState/ErrorState, AdminBackdrop, ComingSoon
 ├── lib/
 │   ├── api.ts                  api-client (credentials: include, baseUrl từ VITE_API_URL)
 │   ├── auth-client.ts

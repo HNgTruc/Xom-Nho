@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router";
 
 export { meQuery } from "./api/me.queries";
 export { SignOutButton } from "./components/sign-out-button";
+export { useSignOut } from "./hooks/use-sign-out";
 
 export const authRoutes: RouteObject[] = [
   {
