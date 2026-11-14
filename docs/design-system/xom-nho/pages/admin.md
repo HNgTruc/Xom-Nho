@@ -86,6 +86,8 @@ Chủ dự án chốt 2026-11-13. Backend đã có (`GET /admin/posts/stats`, `G
 - **Thẻ số liệu**: số bài đăng trong khoảng, so với khoảng liền trước (mũi tên + "tăng"/"giảm", như mục "Thẻ số liệu"); "Tất cả" thì không so. Số trên các tab trạng thái lấy từ `byStatus`.
 - **Bảng xếp hạng** 20 bài, chọn được 30: cột Thích, Không thích, Bình luận, Lượt xem **hiện riêng**, không gộp thành một con số; bấm tiêu đề cột để xếp theo cột đó (`aria-sort` trên `<th>`), mặc định cao xuống thấp, có nút đảo chiều. Trùng số thì bài mới hơn đứng trước.
 - Số Không thích hiện như số khác (không tô đỏ): màu chỉ dành cho trạng thái và việc không đảo ngược được.
+- Dưới 768px bảng xếp hạng chỉ còn tên bài và **cột đang xếp**; đổi cột bằng ô chọn "Xếp theo" dưới bảng (không có tiêu đề cột để bấm). Ẩn cố định một cột thì xếp theo đúng cột đó là mất số.
+- Nhóm nút chọn một (khoảng thời gian, số bài) là `Segmented` (`aria-pressed`, nút cao 40px vì nằm ngoài dòng bảng), không dùng tab: đổi lựa chọn chỉ lọc lại dữ liệu bên dưới.
 
 ## Thẻ số liệu (dashboard)
 

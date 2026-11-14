@@ -111,7 +111,8 @@ Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kí
 - [x] Admin: layout (sidebar 240/64px, ngăn kéo dưới 1024px, topbar, kính mờ trên ảnh nền), `DataTable` dùng chung (TanStack Table 9), hộp xác nhận, badge trạng thái/vai trò, toast; trang đăng nhập kính (Đợt 1, 2026-11-14). Các màn còn là trang "đang làm"
 - [ ] Tổng quan số liệu
 - [ ] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt
-- [ ] Quản lý bài, bình luận
+- [x] Màn Bài viết: thống kê theo khoảng, bảng xếp hạng 20/30 bài theo cột, bảng mọi bài (tab trạng thái có số, tìm, lọc danh mục, chọn nhiều để ẩn/hiện/xóa, ẩn bài kèm lý do chọn nhanh, toast có Hoàn tác) (Đợt 2, 2026-11-14)
+- [ ] Màn Bình luận
 - [ ] Danh mục, tag
 - [ ] Thành viên: đổi vai trò, cấm
 
