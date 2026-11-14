@@ -71,6 +71,11 @@ Thay cho "Hàng chờ duyệt" (chốt 2026-11-13): từ ADR 0008 bài đăng th
 - Bố cục hai cột trên màn hình rộng: danh sách bài (trái, 360px) + xem trước nội dung đầy đủ (phải), có khung nhỏ thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa). Nút "Ẩn bài" (nút viền) và "Bài tiếp theo" cố định ở đáy vùng xem trước.
 - Phím tắt (có ghi chú trên giao diện): `J`/`K` chuyển bài, `H` mở hộp ẩn bài, `O` mở bài trên Xóm Nhỏ. Không kích hoạt khi đang gõ trong ô nhập.
 - Hết bài: "Đã xem hết bài mới." kèm nút về Tổng quan.
+- Đầu trang ghi "33 bài từ lần xem trước · đã mở 3" (cùng con số gốc với số trên sidebar), không trừ số đã mở: trừ đi thì hai chỗ lệch số, trông như lỗi.
+- Bộ lọc "Lần xem trước / 24 giờ / 7 ngày" (nhãn ngắn để vừa điện thoại), giờ của mốc ghi riêng một dòng chữ phụ.
+- Thanh "Ẩn bài / Bài tiếp theo" dính đáy vùng xem bài là `glass-bar` (có làm mờ, che chữ phía sau khi cuộn). Dưới 640px "Mở trên Xóm Nhỏ" chỉ còn biểu tượng.
+- Dưới 1024px: danh sách trước, chọn bài thì sang xem bài, có nút "Danh sách bài" để quay lại.
+- Bài cũ dạng Markdown hiện nguyên văn (có ký tự `##`, `**`): admin chưa có bộ hiển thị Markdown; hiện nguyên văn an toàn và đúng những gì tác giả gõ.
 
 ## Ẩn bài
 

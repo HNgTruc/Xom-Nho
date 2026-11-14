@@ -110,7 +110,7 @@ Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kí
 - [ ] Backend còn lại: `modules/dashboard`, danh mục, tag, `PATCH /admin/posts/:id`
 - [x] Admin: layout (sidebar 240/64px, ngăn kéo dưới 1024px, topbar, kính mờ trên ảnh nền), `DataTable` dùng chung (TanStack Table 9), hộp xác nhận, badge trạng thái/vai trò, toast; trang đăng nhập kính (Đợt 1, 2026-11-14). Các màn còn là trang "đang làm"
 - [ ] Tổng quan số liệu
-- [ ] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt
+- [x] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt: danh sách 360px + xem bài, phím J/K/H/O, "Đã xem", mốc lưu theo máy chỉ dời khi "Đánh dấu đã xem hết", số chưa xem trên sidebar, khung tác giả (Đợt 3, 2026-11-14)
 - [x] Màn Bài viết: thống kê theo khoảng, bảng xếp hạng 20/30 bài theo cột, bảng mọi bài (tab trạng thái có số, tìm, lọc danh mục, chọn nhiều để ẩn/hiện/xóa, ẩn bài kèm lý do chọn nhanh, toast có Hoàn tác) (Đợt 2, 2026-11-14)
 - [ ] Màn Bình luận
 - [ ] Danh mục, tag
