@@ -5,12 +5,13 @@ import { ExternalLink, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 import { useSignOut } from "@/features/auth";
+import { UnseenCount } from "@/features/moderation";
 import { WEB_URL } from "@/lib/env";
 import { NAV_GROUPS } from "./nav";
 
 /** Mục điều hướng: viên thuốc cao 40px, mục đang chọn là `glass-primary` (MASTER 2.4). */
 const itemClass =
-  "flex h-10 w-full cursor-pointer items-center gap-3 rounded-full px-3 text-sm font-medium text-foreground transition-colors duration-120 outline-none hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:size-5 [&_svg]:shrink-0";
+  "relative flex h-10 w-full cursor-pointer items-center gap-3 rounded-full px-3 text-sm font-medium text-foreground transition-colors duration-120 outline-none hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:size-5 [&_svg]:shrink-0";
 
 const activeClass =
   "aria-[current=page]:glass-primary aria-[current=page]:text-primary-foreground aria-[current=page]:hover:bg-glass-primary-hover";
@@ -88,6 +89,7 @@ export function Sidebar({
                     >
                       <item.icon aria-hidden="true" />
                       {label(item.label)}
+                      {item.badge === "unseen-posts" && <UnseenCount collapsed={collapsed} />}
                     </NavLink>
                   </WithTooltip>
                 </li>

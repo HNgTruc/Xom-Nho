@@ -18,7 +18,8 @@ export function Segmented<T extends string | number>({
   onChange: (value: T) => void;
 }) {
   return (
-    <fieldset className="glass-button m-0 inline-flex w-fit min-w-0 items-center gap-1 rounded-full border border-glass-border-hover p-1">
+    // `max-w-full overflow-x-auto`: hẹp quá thì cuộn ngang trong chính nhóm nút, không đẩy cả trang tràn ra
+    <fieldset className="glass-button m-0 inline-flex w-fit max-w-full min-w-0 items-center gap-1 overflow-x-auto rounded-full border border-glass-border-hover p-1">
       <legend className="sr-only">{label}</legend>
       {options.map((option) => {
         const active = option.value === value;
@@ -30,7 +31,7 @@ export function Segmented<T extends string | number>({
             onClick={() => onChange(option.value)}
             className={cn(
               // Cao 40px: ngoài dòng bảng vẫn theo MASTER (≥ 40px), chỉ nút trong dòng bảng được 32px (admin.md)
-              "inline-flex h-10 cursor-pointer items-center rounded-full px-4 text-sm font-medium whitespace-nowrap transition-colors duration-120 outline-none hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "inline-flex h-10 shrink-0 cursor-pointer items-center rounded-full px-4 text-sm font-medium whitespace-nowrap transition-colors duration-120 outline-none hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
               // Màu chữ chỉ đặt một lần theo trạng thái: để `text-foreground` chung thì nó đè chữ của `glass-primary`
               active
                 ? "glass-primary text-primary-foreground hover:bg-glass-primary-hover"

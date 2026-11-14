@@ -13,6 +13,8 @@ export interface NavItem {
   label: string;
   to: string;
   icon: LucideIcon;
+  /** Số đếm cạnh mục: số bài chưa xem của màn Bài mới */
+  badge?: "unseen-posts";
 }
 
 export interface NavGroup {
@@ -27,7 +29,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Kiểm duyệt",
     items: [
-      { label: "Bài mới", to: "/bai-moi", icon: Inbox },
+      { label: "Bài mới", to: "/bai-moi", icon: Inbox, badge: "unseen-posts" },
       { label: "Bài viết", to: "/bai-viet", icon: FileText },
       { label: "Bình luận", to: "/binh-luan", icon: MessageSquare },
     ],
