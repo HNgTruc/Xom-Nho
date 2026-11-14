@@ -1,5 +1,5 @@
 import type { AdminListUsersQuery, BanUserInput, SetUserRoleInput } from "../../schemas/admin.js";
-import type { AdminUserListItem } from "../../types/admin.js";
+import type { AdminUserDetail, AdminUserListItem, AdminUserStats } from "../../types/admin.js";
 import type { ApiResponse, PaginatedResponse } from "../../types/api-response.js";
 import type { RequestFn } from "../client.js";
 
@@ -11,6 +11,14 @@ export function adminUsersApi(request: RequestFn) {
     /** `GET /admin/users`: tìm theo tên, email; lọc vai trò, đang bị cấm; mới tham gia trước. */
     list: (query: Partial<AdminListUsersQuery> = {}, signal?: AbortSignal) =>
       request<PaginatedResponse<AdminUserListItem>>("/admin/users", { query, signal }),
+
+    /** `GET /admin/users/stats`: tổng, người mới 7 ngày, số theo vai trò, số đang bị cấm. */
+    stats: (signal?: AbortSignal) =>
+      request<ApiResponse<AdminUserStats>>("/admin/users/stats", { signal }),
+
+    /** `GET /admin/users/:id`: một thành viên kèm số bài, bình luận đang bị ẩn. Không có: ApiError 404. */
+    get: (id: string, signal?: AbortSignal) =>
+      request<ApiResponse<AdminUserDetail>>(`/admin/users/${encodeURIComponent(id)}`, { signal }),
 
     /** `PATCH /admin/users/:id/role`: đổi vai trò. Đổi của chính mình: ApiError 403. */
     setRole: (id: string, input: SetUserRoleInput) =>

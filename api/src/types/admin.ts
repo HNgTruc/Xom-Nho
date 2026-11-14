@@ -91,3 +91,22 @@ export interface AdminUserListItem extends UserSummary {
   postCount: number;
   commentCount: number;
 }
+
+/**
+ * `GET /admin/users/:id`: một thành viên, cho khung tác giả ở màn Bài mới và trang thành viên. Số bị ẩn là số
+ * **đang** ẩn: bài đã hiện lại không còn tính (chưa có lịch sử kiểm duyệt).
+ */
+export interface AdminUserDetail extends AdminUserListItem {
+  hiddenPostCount: number;
+  hiddenCommentCount: number;
+}
+
+/** `GET /admin/users/stats`: số trên các tab và dòng tóm tắt của màn Thành viên. */
+export interface AdminUserStats {
+  total: number;
+  /** Tham gia trong 7 ngày gần nhất */
+  newLast7Days: number;
+  byRole: Record<Role, number>;
+  /** Đang bị cấm (cấm hết hạn không tính) */
+  banned: number;
+}
