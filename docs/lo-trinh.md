@@ -108,7 +108,7 @@ Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kí
 - [x] Web: hiện lý do ẩn cho tác giả trên trang bài (`archivedNote`, hộp `destructive` nhạt, 2026-11-14)
 - [x] Backend: `GET /admin/users/:id` (số bài, bình luận đang ẩn), `GET /admin/users/stats`; tắt route `/api/auth/admin/*` của Better Auth (2026-11-14)
 - [ ] Backend còn lại: `modules/dashboard`, danh mục, tag, `PATCH /admin/posts/:id`
-- [ ] Admin: layout (sidebar, topbar), `DataTable` dùng chung
+- [x] Admin: layout (sidebar 240/64px, ngăn kéo dưới 1024px, topbar, kính mờ trên ảnh nền), `DataTable` dùng chung (TanStack Table 9), hộp xác nhận, badge trạng thái/vai trò, toast; trang đăng nhập kính (Đợt 1, 2026-11-14). Các màn còn là trang "đang làm"
 - [ ] Tổng quan số liệu
 - [ ] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt
 - [ ] Quản lý bài, bình luận

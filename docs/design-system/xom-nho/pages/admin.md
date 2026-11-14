@@ -130,4 +130,4 @@ Quyết định rút ra từ bản demo (2026-11-13), áp dụng khi làm giai �
 - **Ẩn bài bắt buộc lý do, tác giả thấy được**: xem mục "Ẩn bài" ở trên.
 - **Mật độ trong bảng** (badge 12px, biểu tượng 14px, nút trong dòng 32px): xem mục "Chữ" ở trên.
 
-Còn mở, quyết khi làm màn Bài mới: mốc "lần xem trước" lưu ở đâu. Cách gọn nhất là admin giữ mốc trong `localStorage` và gửi `since` lên API (không cần migration, nhưng mỗi máy một mốc). Nếu cần mốc theo tài khoản thì thêm cột cho `User` bằng migration mới.
+Mốc "lần xem trước" (chốt 2026-11-14): lưu `localStorage` của app admin, gửi lên `GET /admin/posts?since=`; mỗi máy một mốc, không cần migration. Chưa có mốc (máy mới) thì mặc định 24 giờ qua.
