@@ -116,6 +116,7 @@ Chủ dự án chốt 2026-11-13. Backend đã có (`GET /admin/posts/stats`, `G
 - Biểu đồ 30 ngày là **biểu đồ cột** (đổi từ đường, 2026-11-13): cột mọc từ đáy lần lượt (`scaleY`, 520ms, trễ 10ms mỗi cột), đổi số liệu (Bài viết / Bình luận / Thành viên) thì chạy lại. 7 ngày gần nhất màu `primary`, 23 ngày trước `primary` 42%, có chú thích. Rê chuột vào cột hiện số của cột; cột hôm nay luôn hiện số. Có nhãn trục và nút "Xem bảng số liệu" thay thế cho trình đọc màn hình.
 - Chuyển động chỉ dùng `transform`, `opacity`; tắt hết khi `prefers-reduced-motion` (số hiện ngay giá trị cuối).
 - Ghi rõ thời điểm cập nhật số liệu ("Cập nhật lúc 14:05"); không gắn nhãn "trực tiếp" nếu không thật sự cập nhật thời gian thực.
+- Đã làm (2026-11-15), quyết định khi code: thẻ số liệu xếp 2 cột dưới 1280px (4 thẻ chồng một cột đẩy biểu đồ xuống gần 600px trên điện thoại), 4 cột từ 1280px; cột nhỏ 7 ngày ẩn dưới 640px (chỉ để trang trí, số đã có trên thẻ). Tuần trước bằng 0 thì ghi "7 ngày trước chưa có" thay vì phần trăm. Số liệu đang chọn và chế độ bảng nằm trên URL (`?metric=comments&table=1`). Dưới biểu đồ: "Bài mới chưa xem" (5 bài, cùng mốc với màn Bài mới) và "Thành viên mới" (5 người, bấm mở màn Thành viên lọc theo email).
 
 ## Hộp thoại xác nhận
 

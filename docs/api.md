@@ -197,15 +197,24 @@ Mã lỗi Better Auth → câu tiếng Việt: `authErrorMessage()` trong `api/s
 
 ## Dành cho admin (`/api/v1/admin`, tất cả 🛡️)
 
-Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với controller công khai. Khách nhận 401, người không phải `admin` nhận 403 ở mọi route dưới đây. Client: `api.admin.posts`, `api.admin.comments`, `api.admin.users` (`api/src/api-client/admin/`).
+Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với controller công khai. Khách nhận 401, người không phải `admin` nhận 403 ở mọi route dưới đây. Client: `api.admin.dashboard`, `api.admin.posts`, `api.admin.comments`, `api.admin.users` (`api/src/api-client/admin/`).
 
-Đã làm (2026-11-13): bài viết, bình luận, thành viên, trừ các dòng ghi "Chưa làm". Danh sách mặc định 20 dòng mỗi trang, tối đa 100 (`?pageSize=`).
+Đã làm (2026-11-13): bài viết, bình luận, thành viên, trừ các dòng ghi "Chưa làm". Tổng quan: 2026-11-15. Danh sách mặc định 20 dòng mỗi trang, tối đa 100 (`?pageSize=`).
 
 ### Tổng quan (`modules/dashboard`)
 
 | Method | Đường dẫn          | Mô tả                                                                                   |
 | ------ | ------------------ | --------------------------------------------------------------------------------------- |
 | GET    | `/admin/dashboard` | Số đang ẩn (bài, bình luận), bài/bình luận/thành viên mới trong 7 ngày, biểu đồ 30 ngày |
+
+Kiểu trả về `AdminDashboard` (`api/src/types/admin.ts`):
+
+- `daily`: đúng 30 ngày, cũ trước, ngày cuối là hôm nay. Mỗi ngày `{ date: "YYYY-MM-DD", posts, comments, members }`, số **tạo** trong ngày (bài mọi trạng thái, bình luận kể cả đã ẩn). Ngày tính theo **giờ Việt Nam** (UTC+7); ngày không có gì vẫn có mặt với số 0.
+- `recent`: `{ posts, comments, members }`, mỗi mục `{ current, previous }` là tổng 7 ngày cuối của `daily` và 7 ngày liền trước. Cộng từ chính `daily` nên số trên thẻ khớp với cột biểu đồ.
+- `hidden`: `{ posts, comments }` đang ẩn mọi lúc (bài `ARCHIVED`, bình luận `HIDDEN`).
+- `generatedAt`: ISO 8601, lúc tính số liệu.
+
+Màn Tổng quan lấy thêm "Bài mới chưa xem" bằng `GET /admin/posts?since=&sort=newest&pageSize=5` và "Thành viên mới" bằng `GET /admin/users?pageSize=5`, không cần endpoint riêng.
 
 ### Bài viết
 

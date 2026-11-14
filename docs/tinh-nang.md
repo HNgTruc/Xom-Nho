@@ -215,6 +215,7 @@ Tiêu chí:
 ### 4.1 Tổng quan
 
 - Số liệu: đang ẩn (bài, bình luận), bài/bình luận mới trong 7 ngày, thành viên mới, biểu đồ 30 ngày.
+- [x] Thẻ số liệu so 7 ngày gần nhất với 7 ngày trước đó, ngày tính theo giờ Việt Nam; biểu đồ cột 30 ngày đổi được Bài viết / Bình luận / Thành viên, có bảng số liệu thay thế; 5 bài mới chưa xem (cùng mốc với màn Bài mới) và 5 thành viên mới (2026-11-15)
 
 ### 4.2 Bài mới
 
@@ -222,7 +223,7 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Xem lần lượt bài đăng từ lần xem trước, bài cũ nhất trước; số bài chưa xem hiện ở sidebar.
 - Xem trước nội dung đầy đủ, thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa); "Ẩn bài", "Bài tiếp theo"; phím `J`/`K`/`H`/`O`.
-- [ ] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài (backend: xong 2026-11-13; web hiện lý do trong hộp `destructive` nhạt: xong 2026-11-14, `PostStatusNote`; màn admin Bài viết, Bài mới: xong 2026-11-14)
+- [x] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài (backend: xong 2026-11-13; web hiện lý do trong hộp `destructive` nhạt: xong 2026-11-14, `PostStatusNote`; màn admin Bài viết, Bài mới: xong 2026-11-14)
 - [ ] Khung tác giả: ngày tham gia, số bài, số bài đang bị ẩn (backend: xong 2026-11-14, `GET /admin/users/:id`; "đã từng bị ẩn" cần lịch sử kiểm duyệt, chưa có)
 - [x] Hiện lại bài thì xóa lý do (backend 2026-11-13, màn admin 2026-11-14: "Hiện lại" và toast "Hoàn tác")
 - [x] Hết bài mới thì báo "Đã xem hết bài mới." (2026-11-14)
@@ -233,7 +234,7 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 - Bảng bình luận: ẩn / hiện, xem bài gốc.
 - [x] Bảng bình luận: tab theo trạng thái, tìm trong nội dung, chọn nhiều để ẩn/hiện/xóa, "Mở bài gốc", ẩn xong có "Hoàn tác" (2026-11-14)
 - Thống kê (chốt 2026-11-13, `pages/admin.md` mục "Thống kê ở màn Bài viết"): khoảng 7 ngày, 30 ngày, tất cả; số bài đăng trong khoảng so với khoảng trước; bảng xếp hạng 20 hoặc 30 bài theo Thích, Không thích, Bình luận, Lượt xem, cao xuống thấp, đảo chiều được.
-- [ ] Thống kê đúng theo khoảng, bảng xếp hạng đúng thứ tự cả hai chiều (backend: xong 2026-11-13, `admin-moderation.e2e-spec.ts`; màn admin: xong 2026-11-14)
+- [x] Thống kê đúng theo khoảng, bảng xếp hạng đúng thứ tự cả hai chiều (backend: xong 2026-11-13, `admin-moderation.e2e-spec.ts`; màn admin: xong 2026-11-14)
 
 ### 4.4 Danh mục, tag
 
