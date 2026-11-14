@@ -52,6 +52,30 @@ export function trustedOriginsFor(env: AuthEnv): string[] {
 }
 
 /**
+ * Route HTTP của plugin admin (better-auth 1.7, `dist/plugins/admin/routes.mjs`), tắt hết: trả 404. Quản trị đi
+ * qua `/api/v1/admin/*` (có policy: không tự hạ vai trò, không cấm trưởng xóm khác, bắt buộc lý do, docs/api.md).
+ * Các route này bỏ qua những quy tắc đó, và có cả xóa thành viên, đặt lại mật khẩu, đóng vai người khác. Plugin
+ * vẫn bật cho cột `role`, `banned` và hook chặn người bị cấm đăng nhập. Nâng bản Better Auth thì so lại danh sách.
+ */
+export const DISABLED_ADMIN_PATHS = [
+  "/admin/ban-user",
+  "/admin/create-user",
+  "/admin/get-user",
+  "/admin/has-permission",
+  "/admin/impersonate-user",
+  "/admin/list-user-sessions",
+  "/admin/list-users",
+  "/admin/remove-user",
+  "/admin/revoke-user-session",
+  "/admin/revoke-user-sessions",
+  "/admin/set-role",
+  "/admin/set-user-password",
+  "/admin/stop-impersonating",
+  "/admin/unban-user",
+  "/admin/update-user",
+];
+
+/**
  * Better Auth của Xóm Nhỏ, gắn ở /api/auth/* (main.ts qua setupApp).
  * Email + mật khẩu, Google/GitHub (nếu có khóa), plugin admin (vai trò, cấm), plugin Expo (app).
  */
@@ -63,6 +87,7 @@ export function createAuth(prisma: PrismaClient, env: AuthEnv) {
     trustedOrigins: trustedOriginsFor(env),
     database: prismaAdapter(prisma, { provider: "mysql" }),
     telemetry: { enabled: false },
+    disabledPaths: DISABLED_ADMIN_PATHS,
     advanced: {
       // Better Auth tự tắt kiểm tra origin (chống CSRF) khi NODE_ENV=test; bật rõ để test chạy như production
       disableOriginCheck: false,
