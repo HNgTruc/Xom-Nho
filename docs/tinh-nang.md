@@ -222,7 +222,8 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Xem lần lượt bài đăng từ lần xem trước, bài cũ nhất trước; số bài chưa xem hiện ở sidebar.
 - Xem trước nội dung đầy đủ, thông tin tác giả (ngày tham gia, số bài, đã từng bị ẩn bài chưa); "Ẩn bài", "Bài tiếp theo"; phím `J`/`K`/`H`/`O`.
-- [ ] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài (backend: xong 2026-11-13, `POST /admin/posts/:id/archive`, `PostDetail.rejectReason`; web hiện lý do, màn admin: chưa)
+- [ ] Ẩn bài bắt buộc lý do (chọn nhanh hoặc tự ghi); tác giả thấy lý do trên bài của mình, người khác không thấy bài (backend: xong 2026-11-13; web hiện lý do trong hộp `destructive` nhạt: xong 2026-11-14, `PostStatusNote`; màn admin: chưa)
+- [ ] Khung tác giả: ngày tham gia, số bài, số bài đang bị ẩn (backend: xong 2026-11-14, `GET /admin/users/:id`; "đã từng bị ẩn" cần lịch sử kiểm duyệt, chưa có)
 - [ ] Hiện lại bài thì xóa lý do (backend: xong 2026-11-13; màn admin: chưa)
 - [ ] Hết bài mới thì báo "Đã xem hết bài mới."
 
@@ -241,6 +242,7 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 ### 4.5 Thành viên
 
 - Danh sách, tìm theo tên/email, đổi vai trò, cấm / bỏ cấm (kèm lý do).
+- Số trên các tab (theo vai trò, đang bị cấm) và dòng tóm tắt "N thành viên · M người mới trong 7 ngày" (backend: xong 2026-11-14, `GET /admin/users/stats`).
 
 Tiêu chí chung cho admin:
 

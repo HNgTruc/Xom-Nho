@@ -81,7 +81,8 @@ Theo `users.policy.ts` (chốt 2026-11-13):
 - Không cấm trưởng xóm khác (403), nhưng hạ vai trò họ thì được. Muốn cấm thì hạ vai trò trước, để không cấm nhầm.
 - Cấm bắt buộc có lý do, hạn tùy chọn (bỏ trống là vĩnh viễn). Cấm xong thì mọi phiên của người đó bị xóa: họ bị đăng xuất ngay, đăng nhập lại nhận 403 kèm lý do. Hết hạn thì tự mở, không cần bỏ cấm.
 - Đổi vai trò có hiệu lực ngay ở request sau (phiên đọc lại bảng `user`, không có cookie cache).
-- `GET /admin/users` là **route duy nhất trả `email` của người khác**, để trưởng xóm tìm thành viên theo email. Mọi route khác chỉ trả `UserSummary` (không email).
+- Route quản trị có sẵn của Better Auth (`/api/auth/admin/*`) đã tắt (404): mọi thao tác quản trị đi qua `/api/v1/admin/*` để qua được các quy tắc trên.
+- `GET /admin/users` (và `GET /admin/users/:id`) là **các route duy nhất trả `email` của người khác**, để trưởng xóm tìm thành viên theo email. Mọi route khác chỉ trả `UserSummary` (không email).
 
 Chỉ bài `PUBLISHED` hiện cho người khác. Tác giả luôn xem được bài của mình ở mọi trạng thái.
 
