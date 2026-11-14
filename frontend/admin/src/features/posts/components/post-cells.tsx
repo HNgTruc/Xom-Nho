@@ -1,8 +1,6 @@
-import type { AdminPostListItem, UserSummary } from "@xom-nho/api";
-import { avatarUrl } from "@xom-nho/api/api-client";
-import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
+import type { AdminPostListItem } from "@xom-nho/api";
 import { Images } from "lucide-react";
-import { API_URL, WEB_URL } from "@/lib/env";
+import { WEB_URL } from "@/lib/env";
 
 /**
  * Tên bài trong bảng (pages/admin.md "Bảng Bài viết"): bài có tiêu đề in đậm 600; bài không tiêu đề (ADR 0008) hiện
@@ -29,25 +27,5 @@ export function PostTitleCell({ post }: { post: AdminPostListItem }) {
         </span>
       )}
     </div>
-  );
-}
-
-function initial(name: string): string {
-  return (name.trim().split(/\s+/).at(-1)?.[0] ?? "?").toUpperCase();
-}
-
-/** Tác giả: avatar 24px nền `muted` (avatar người khác, pages/admin.md) và tên. */
-export function AuthorCell({ author }: { author: UserSummary }) {
-  const src = avatarUrl(API_URL, author);
-  return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <Avatar className="size-6">
-        {src && <AvatarImage src={src} alt="" />}
-        <AvatarFallback className="bg-muted text-xs text-foreground">
-          {initial(author.name)}
-        </AvatarFallback>
-      </Avatar>
-      {author.name}
-    </span>
   );
 }

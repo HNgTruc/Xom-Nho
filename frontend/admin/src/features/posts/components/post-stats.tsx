@@ -27,7 +27,8 @@ import {
 import { DataTable } from "@/components/data-table/data-table";
 import { SortHeader } from "@/components/data-table/sort-header";
 import { adminPostStatsQuery, adminPostsListQuery } from "../api/posts.queries";
-import { AuthorCell, PostTitleCell } from "./post-cells";
+import { AuthorCell } from "@/components/common/author-cell";
+import { PostTitleCell } from "./post-cells";
 
 const numberFormat = new Intl.NumberFormat("vi-VN");
 const RANGE_OPTIONS: { value: AdminStatsRange; label: string }[] = [

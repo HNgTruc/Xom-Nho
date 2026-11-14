@@ -51,7 +51,8 @@ import { WEB_URL } from "@/lib/env";
 import { adminPostStatsQuery, adminPostsListQuery, categoriesQuery } from "../api/posts.queries";
 import { usePostActions } from "../hooks/use-post-actions";
 import { HidePostDialog } from "./hide-post-dialog";
-import { AuthorCell, PostTitleCell } from "./post-cells";
+import { AuthorCell } from "@/components/common/author-cell";
+import { PostTitleCell } from "./post-cells";
 
 const numberFormat = new Intl.NumberFormat("vi-VN");
 const ALL = "ALL";
