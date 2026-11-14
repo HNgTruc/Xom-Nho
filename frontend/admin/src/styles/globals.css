@@ -1,2 +1,29 @@
 /* Theme Xóm Nhỏ (đã gồm Tailwind). Màu, chữ: docs/design-system/xom-nho/MASTER.md + pages/admin.md */
 @import "@xom-nho/ui/styles/theme.css";
+
+/*
+ * Biểu đồ và thẻ số liệu màn Tổng quan (pages/admin.md "Thẻ số liệu"): cột mọc từ đáy, thanh chạy ngang. Chỉ
+ * `transform`; trễ từng cột đặt bằng `animation-delay` trên phần tử. Bớt chuyển động: theme.css đã tắt mọi
+ * animation (cả `prefers-reduced-motion` lẫn `data-motion="reduce"`), cột hiện ngay chiều cao cuối.
+ */
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@utility animate-grow-y {
+  transform-origin: bottom;
+  animation: grow-y 520ms var(--ease-enter) backwards;
+}
+
+@utility animate-grow-x {
+  transform-origin: left;
+  animation: grow-x 600ms var(--ease-enter) backwards;
+}
