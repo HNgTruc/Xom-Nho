@@ -2,7 +2,7 @@ import type { CategoryRef } from "@xom-nho/api";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { cn } from "@xom-nho/ui/lib/utils";
 import Link from "next/link";
-import { categoryBadgeClass } from "../lib/category-color";
+import { categoryBadgeClass } from "@xom-nho/ui/components/category-mark";
 
 /** Badge danh mục: màu chỉ là tín hiệu phụ, luôn có tên bằng chữ (MASTER mục 2.2). Bấm vào mở trang danh mục. */
 export function CategoryBadge({

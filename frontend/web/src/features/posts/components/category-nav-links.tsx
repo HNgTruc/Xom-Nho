@@ -14,7 +14,7 @@ import { cn } from "@xom-nho/ui/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type PointerEvent, useRef, useState } from "react";
-import { CategoryMark } from "./category-mark";
+import { CategoryMark } from "@xom-nho/ui/components/category-mark";
 
 export interface CategoryNavItem {
   href: string;

@@ -6,7 +6,7 @@ import { requireUser } from "@/features/auth";
 import type { RawSearchParams } from "@/lib/search-params";
 import { getCategory } from "../api/get-category";
 import { ArchiveHeader, ArchiveHeaderSkeleton } from "./archive-header";
-import { CategoryMark } from "./category-mark";
+import { CategoryMark } from "@xom-nho/ui/components/category-mark";
 import { PostFeed } from "./post-feed";
 import { PostListSkeleton } from "./post-list-skeleton";
 
