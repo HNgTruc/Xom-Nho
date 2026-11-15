@@ -12,6 +12,10 @@ const profile: PublicProfile = {
   role: "author",
   createdAt: "2026-10-01T00:00:00.000Z",
   postCount: 4,
+  coverId: null,
+  location: null,
+  friendCount: 0,
+  relationship: { status: "none", blockedByMe: false, canRequest: true },
 };
 
 describe("profileMetadata", () => {

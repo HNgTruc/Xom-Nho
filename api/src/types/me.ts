@@ -13,6 +13,10 @@ export interface Me {
   bio: string | null;
   role: Role;
   createdAt: string;
+  /** Ảnh bìa hồ sơ (`PUT /me/cover`). `null`: chưa có, hồ sơ hiện nền mặc định */
+  coverId: string | null;
+  /** Nơi ở, chữ tự do. `null`: chưa ghi */
+  location: string | null;
 }
 
 /** `GET /api/v1/auth/providers`: cách đăng nhập đang bật, để frontend ẩn nút không dùng được. */

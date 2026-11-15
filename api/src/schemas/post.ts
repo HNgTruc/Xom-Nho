@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { LIMITS } from "../constants/limits.js";
 import { POST_SORTS, POST_SORT_VALUES } from "../constants/post-sorts.js";
+import { POST_STATUS_VALUES } from "../constants/statuses.js";
 import { optionalSlugFilter, optionalUsernameFilter, pathIdSchema, slugSchema } from "./common.js";
 import { paginationQuerySchema } from "./pagination.js";
 
@@ -16,6 +17,16 @@ export const listPostsQuerySchema = paginationQuerySchema.extend({
 });
 
 export type ListPostsQuery = z.infer<typeof listPostsQuerySchema>;
+
+/** Query của `GET /me/posts`: bài của mình, mọi trạng thái; `status` để trống (kể cả `?status=`) là lấy hết. */
+export const listMyPostsQuerySchema = paginationQuerySchema.extend({
+  status: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.enum(POST_STATUS_VALUES, { error: "Trạng thái bài không hợp lệ" }).optional(),
+  ),
+});
+
+export type ListMyPostsQuery = z.infer<typeof listMyPostsQuerySchema>;
 
 /** Bài không có chữ lẫn ảnh, video (lúc đăng, hoặc sửa xong còn trống). Backend dùng cùng câu khi kiểm tra sau sửa. */
 export const EMPTY_POST_MESSAGE = "Viết vài dòng hoặc thêm ảnh, video cho bài nhé.";

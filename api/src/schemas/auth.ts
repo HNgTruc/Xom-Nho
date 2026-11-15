@@ -47,9 +47,16 @@ export const profileFieldsSchema = z.object({
     .transform((value) => value || null)
     .nullable(),
   image: z.union([z.literal("").transform(() => null), httpUrl]).nullable(),
+  /** Nơi ở, chữ tự do ("Quận 3, TP.HCM"). Rỗng thì xóa (`null`) */
+  location: z
+    .string()
+    .trim()
+    .max(LIMITS.USER_LOCATION_MAX, `Nơi ở tối đa ${LIMITS.USER_LOCATION_MAX} ký tự`)
+    .transform((value) => value || null)
+    .nullable(),
 });
 
-/** `PATCH /api/v1/me`: sửa tên, giới thiệu, ảnh đại diện (ảnh qua URL ở giai đoạn đầu). */
+/** `PATCH /api/v1/me`: sửa tên, giới thiệu, nơi ở, ảnh đại diện (ảnh qua URL ở giai đoạn đầu). */
 export const updateMeSchema = profileFieldsSchema
   .partial()
   .refine((value) => Object.keys(value).length > 0, "Bạn chưa thay đổi gì");

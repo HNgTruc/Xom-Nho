@@ -1,8 +1,10 @@
 import { adminApi } from "./admin/index.js";
+import { blocksApi } from "./blocks.js";
 import { categoriesApi } from "./categories.js";
 import { commentsApi } from "./comments.js";
 import { type ClientOptions, createRequest } from "./client.js";
 import { filesApi } from "./files.js";
+import { friendsApi } from "./friends.js";
 import { healthApi } from "./health.js";
 import { authApi, meApi } from "./me.js";
 import { postsApi } from "./posts.js";
@@ -27,6 +29,8 @@ export function createClient(options: ClientOptions) {
     files: filesApi(request),
     tags: tagsApi(request),
     users: usersApi(request),
+    friends: friendsApi(request),
+    blocks: blocksApi(request),
     search: searchApi(request),
     me: meApi(request),
     auth: authApi(request),

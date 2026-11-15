@@ -1,4 +1,5 @@
 import type { Role } from "../constants/roles.js";
+import type { Relationship } from "./friend.js";
 
 /**
  * Người viết bài, bình luận: đủ để hiện tên, ảnh, liên kết `/u/<username>`.
@@ -26,4 +27,12 @@ export interface PublicProfile extends UserSummary {
   createdAt: string;
   /** Số bài đã đăng */
   postCount: number;
+  /** Ảnh bìa (`GET /files/:id`, dùng `fileUrl`). `null`: hiện nền mặc định */
+  coverId: string | null;
+  /** Nơi ở, chữ tự do. `null`: không hiện */
+  location: string | null;
+  /** Số bạn bè đã chấp nhận (lời mời đang chờ không tính) */
+  friendCount: number;
+  /** Quan hệ với người đang xem: nút Kết bạn, Hủy lời mời, Bạn bè, Bỏ chặn */
+  relationship: Relationship;
 }

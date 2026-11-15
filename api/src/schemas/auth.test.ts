@@ -51,6 +51,23 @@ describe("updateMeSchema", () => {
     expect(updateMeSchema.safeParse({ image: "https://anh.vn/a.png" }).success).toBe(true);
   });
 
+  it("nơi ở cắt khoảng trắng hai đầu, giữ nguyên dấu tiếng Việt", () => {
+    expect(updateMeSchema.parse({ location: "  Quận 3, TP.HCM  " })).toEqual({
+      location: "Quận 3, TP.HCM",
+    });
+    expect(updateMeSchema.parse({ location: "Đà Lạt" })).toEqual({ location: "Đà Lạt" });
+  });
+
+  it("nơi ở rỗng hay null nghĩa là xóa", () => {
+    expect(updateMeSchema.parse({ location: "   " })).toEqual({ location: null });
+    expect(updateMeSchema.parse({ location: null })).toEqual({ location: null });
+  });
+
+  it("nơi ở quá 100 ký tự thì báo lỗi", () => {
+    const result = updateMeSchema.safeParse({ location: "a".repeat(101) });
+    expect(result.error?.issues[0]?.message).toBe("Nơi ở tối đa 100 ký tự");
+  });
+
   it("không gửi gì thì báo chưa thay đổi", () => {
     expect(updateMeSchema.safeParse({}).error?.issues[0]?.message).toBe("Bạn chưa thay đổi gì");
   });

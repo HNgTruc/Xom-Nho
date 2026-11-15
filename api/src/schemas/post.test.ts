@@ -10,6 +10,7 @@ import {
 import {
   createPostSchema,
   EMPTY_POST_MESSAGE,
+  listMyPostsQuerySchema,
   listPostsQuerySchema,
   updatePostSchema,
 } from "./post.js";
@@ -209,5 +210,17 @@ describe("updatePostSchema", () => {
     ).toEqual({
       content: "Mới",
     });
+  });
+});
+
+describe("listMyPostsQuerySchema", () => {
+  it("không có status (hoặc status rỗng từ URL) là lấy mọi trạng thái", () => {
+    expect(listMyPostsQuerySchema.parse({})).toEqual({ page: 1, pageSize: 10 });
+    expect(listMyPostsQuerySchema.parse({ status: "" }).status).toBeUndefined();
+  });
+
+  it("lọc theo một trạng thái, từ chối trạng thái lạ", () => {
+    expect(listMyPostsQuerySchema.parse({ status: "ARCHIVED" }).status).toBe("ARCHIVED");
+    expect(listMyPostsQuerySchema.safeParse({ status: "archived" }).success).toBe(false);
   });
 });

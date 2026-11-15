@@ -13,6 +13,10 @@ export const LIMITS = {
   USER_NAME_MIN: 2,
   USER_NAME_MAX: 50,
   USER_BIO_MAX: 500,
+  /** Nơi ở, chữ tự do: cột `user.location` (VARCHAR 100) */
+  USER_LOCATION_MAX: 100,
+  /** Một trang bạn bè, lời mời, người đã chặn */
+  FRIENDS_PAGE_SIZE: 20,
   /** Username tự sinh từ tên: chỉ a-z, 0-9 */
   USERNAME_MAX: 20,
   URL_MAX: 500,

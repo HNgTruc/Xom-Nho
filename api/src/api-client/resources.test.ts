@@ -230,3 +230,71 @@ describe("api.posts sửa, xóa", () => {
     expect(del.calledInit().method).toBe("DELETE");
   });
 });
+
+describe("api.me ảnh bìa, bài của tôi", () => {
+  it("uploadCover gửi PUT multipart trường file tới /me/cover", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+
+    await api.me.uploadCover(new Blob(["x"]), "bia.jpg");
+
+    expect(calledUrl()).toBe("http://x/api/v1/me/cover");
+    expect(calledInit().method).toBe("PUT");
+    expect(((calledInit().body as FormData).get("file") as File).name).toBe("bia.jpg");
+  });
+
+  it("removeCover gửi DELETE /me/cover", async () => {
+    const { api, calledUrl, calledInit } = setup({ data: {} });
+
+    await api.me.removeCover();
+
+    expect(calledUrl()).toBe("http://x/api/v1/me/cover");
+    expect(calledInit().method).toBe("DELETE");
+  });
+
+  it("posts gửi bộ lọc trạng thái lên query", async () => {
+    const { api, calledUrl } = setup();
+
+    await api.me.posts({ status: "ARCHIVED", page: 2 });
+
+    expect(calledUrl()).toBe("http://x/api/v1/me/posts?status=ARCHIVED&page=2");
+  });
+});
+
+describe("api.friends, api.blocks", () => {
+  it("friends.list và requests gửi trang, chiều lời mời", async () => {
+    const list = setup();
+    await list.api.friends.list({ page: 2 });
+    expect(list.calledUrl()).toBe("http://x/api/v1/friends?page=2");
+
+    const requests = setup();
+    await requests.api.friends.requests({ direction: "outgoing" });
+    expect(requests.calledUrl()).toBe("http://x/api/v1/friends/requests?direction=outgoing");
+  });
+
+  it("friends.add gửi PUT, remove gửi DELETE, mã hóa id", async () => {
+    const add = setup({ data: {} });
+    await add.api.friends.add("a/b");
+    expect(add.calledUrl()).toBe("http://x/api/v1/friends/a%2Fb");
+    expect(add.calledInit().method).toBe("PUT");
+
+    const remove = setup({ data: {} });
+    await remove.api.friends.remove("u1");
+    expect(remove.calledUrl()).toBe("http://x/api/v1/friends/u1");
+    expect(remove.calledInit().method).toBe("DELETE");
+  });
+
+  it("blocks.block gửi PUT, unblock gửi DELETE, list gọi /blocks", async () => {
+    const block = setup({ data: {} });
+    await block.api.blocks.block("u1");
+    expect(block.calledUrl()).toBe("http://x/api/v1/blocks/u1");
+    expect(block.calledInit().method).toBe("PUT");
+
+    const unblock = setup({ data: {} });
+    await unblock.api.blocks.unblock("u1");
+    expect(unblock.calledInit().method).toBe("DELETE");
+
+    const list = setup();
+    await list.api.blocks.list();
+    expect(list.calledUrl()).toBe("http://x/api/v1/blocks");
+  });
+});

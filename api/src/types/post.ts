@@ -85,3 +85,15 @@ export interface PostDetail extends Omit<PostListItem, "latestComments"> {
   /** ISO 8601 */
   updatedAt: string;
 }
+
+/**
+ * `GET /me/posts`: bài của chính mình, mọi trạng thái (trang hồ sơ của mình). Như thẻ bài, thêm trạng thái để
+ * hiện nhãn "Đã ẩn", "Bản nháp" và lý do ẩn.
+ */
+export interface MyPostListItem extends PostListItem {
+  status: PostStatus;
+  /** Như `PostDetail.rejectReason`: chỉ có khi bài bị từ chối hoặc bị trưởng xóm ẩn */
+  rejectReason: string | null;
+  /** ISO 8601. Bài chưa đăng không có `publishedAt`, nên danh sách xếp theo cột này */
+  createdAt: string;
+}

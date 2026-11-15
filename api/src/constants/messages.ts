@@ -116,6 +116,20 @@ export const FILE_MESSAGES = {
   NOT_ATTACHABLE: "Có ảnh, video không dùng được nữa. Bạn gỡ ra rồi thêm lại nhé.",
   /** Chọn video (hay file không phải ảnh) làm ảnh đại diện */
   AVATAR_NOT_IMAGE: "Ảnh đại diện phải là ảnh JPG, PNG hoặc WebP.",
+  /** Chọn video (hay file không phải ảnh) làm ảnh bìa hồ sơ */
+  COVER_NOT_IMAGE: "Ảnh bìa phải là ảnh JPG, PNG hoặc WebP.",
+} as const;
+
+/**
+ * Kết bạn, chặn (docs/tinh-nang.md mục 1.5, docs/api.md mục "Bạn bè, chặn"), dùng chung backend, web, mobile.
+ * `CANNOT_REQUEST` là một câu cho mọi trường hợp bị từ chối (bị chặn, đã chặn, người kia bị cấm): không lộ lý do.
+ */
+export const FRIEND_MESSAGES = {
+  USER_NOT_FOUND: "Không tìm thấy hàng xóm này. Có thể tài khoản không còn nữa.",
+  SELF: "Bạn không kết bạn với chính mình được.",
+  CANNOT_REQUEST: "Không gửi được lời mời kết bạn cho người này.",
+  RATE_LIMITED: "Bạn gửi nhiều lời mời quá, nghỉ tay vài phút rồi gửi tiếp nhé.",
+  BLOCK_SELF: "Bạn không chặn chính mình được.",
 } as const;
 
 /** Bình luận (docs/tinh-nang.md mục 3), dùng chung backend, web, mobile. */
