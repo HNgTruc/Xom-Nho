@@ -187,6 +187,10 @@ describe("Tag, hồ sơ, tìm kiếm (/api/v1)", () => {
         role: "author",
         createdAt: new Date(base).toISOString(),
         postCount: 2,
+        coverId: null,
+        location: null,
+        friendCount: 0,
+        relationship: { status: "none", blockedByMe: false, canRequest: true },
       });
     });
 

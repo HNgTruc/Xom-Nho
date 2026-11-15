@@ -13,6 +13,7 @@ describe("isStorageKey", () => {
     `images/${UUID}.webp`,
     `videos/${UUID}.mp4`,
     `avatars/${UUID}.jpg`,
+    `covers/${UUID}.webp`,
   ])("nhận khóa đúng dạng: %s", (key) => {
     expect(isStorageKey(key)).toBe(true);
   });
@@ -21,6 +22,7 @@ describe("isStorageKey", () => {
     [`${UUID}.png`, "thiếu thư mục (dạng cũ)"],
     [`videos/${UUID}.png`, "ảnh trong thư mục video"],
     [`images/${UUID}.mp4`, "video trong thư mục ảnh"],
+    [`covers/${UUID}.mp4`, "video trong thư mục ảnh bìa"],
     [`docs/${UUID}.png`, "thư mục lạ"],
     [`images/../${UUID}.png`, "có .."],
     [`images\\${UUID}.png`, "dấu \\"],

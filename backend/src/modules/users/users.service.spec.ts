@@ -1,5 +1,6 @@
 import { ADMIN_MESSAGES } from "@xom-nho/api";
 import type { SessionUser } from "../../common/types/session-user.js";
+import type { FriendsService } from "../friends/friends.service.js";
 import type { AdminUserRow, ProfileRow, UsersRepository } from "./users.repository.js";
 import { UsersService } from "./users.service.js";
 
@@ -10,25 +11,39 @@ function profileRow(overrides: Partial<ProfileRow> = {}): ProfileRow {
     username: "lananh",
     image: null,
     avatarId: null,
+    coverId: "bia1",
+    location: "Quận 3, TP.HCM",
     bio: "Thích nấu ăn",
     role: "author",
+    banned: false,
+    banExpires: null,
     createdAt: new Date("2026-10-01T00:00:00.000Z"),
     _count: { posts: 4 },
     ...overrides,
   };
 }
 
+const viewer = { id: "minh", role: "user", name: "Minh", email: "minh@test.local" } as SessionUser;
+const relationship = { status: "friends" as const, blockedByMe: false, canRequest: false };
+
 function setup(row: ProfileRow | null = profileRow()) {
   const repository = { findProfile: vi.fn().mockResolvedValue(row) };
-  const service = new UsersService(repository as unknown as UsersRepository);
-  return { service, repository };
+  const friends = {
+    friendCount: vi.fn().mockResolvedValue(3),
+    relationshipFor: vi.fn().mockResolvedValue(relationship),
+  };
+  const service = new UsersService(
+    repository as unknown as UsersRepository,
+    friends as unknown as FriendsService,
+  );
+  return { service, repository, friends };
 }
 
 describe("UsersService.getProfile", () => {
-  it("trả hồ sơ công khai, số bài chỉ đếm bài đã đăng", async () => {
-    const { service, repository } = setup();
+  it("trả hồ sơ công khai, số bài chỉ đếm bài đã đăng, kèm số bạn và quan hệ với người xem", async () => {
+    const { service, repository, friends } = setup();
 
-    const profile = await service.getProfile("lananh");
+    const profile = await service.getProfile(viewer, "lananh");
 
     expect(repository.findProfile).toHaveBeenCalledWith("lananh", "PUBLISHED");
     expect(profile).toEqual({
@@ -41,28 +56,45 @@ describe("UsersService.getProfile", () => {
       role: "author",
       createdAt: "2026-10-01T00:00:00.000Z",
       postCount: 4,
+      coverId: "bia1",
+      location: "Quận 3, TP.HCM",
+      friendCount: 3,
+      relationship,
     });
+    expect(friends.friendCount).toHaveBeenCalledWith("u1");
+    expect(friends.relationshipFor).toHaveBeenCalledWith(
+      viewer,
+      expect.objectContaining({ id: "u1" }),
+    );
   });
 
   it("không trả trường thừa dù repository có lấy (email, banned)", async () => {
-    const { service } = setup({ ...profileRow(), email: "lan@x.vn", banned: true } as ProfileRow);
+    const { service } = setup({
+      ...profileRow(),
+      email: "lan@x.vn",
+      banned: true,
+      banExpires: new Date("2099-01-01T00:00:00.000Z"),
+    } as ProfileRow);
 
-    const profile = await service.getProfile("lananh");
+    const profile = await service.getProfile(viewer, "lananh");
 
     expect(profile).not.toHaveProperty("email");
     expect(profile).not.toHaveProperty("banned");
+    expect(profile).not.toHaveProperty("banExpires");
   });
 
   it("vai trò lạ trong database thì coi như hàng xóm thường", async () => {
     const { service } = setup(profileRow({ role: "superuser" }));
 
-    await expect(service.getProfile("lananh")).resolves.toMatchObject({ role: "user" });
+    await expect(service.getProfile(viewer, "lananh")).resolves.toMatchObject({ role: "user" });
   });
 
   it("không có thì NOT_FOUND", async () => {
     const { service } = setup(null);
 
-    await expect(service.getProfile("khongco")).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(service.getProfile(viewer, "khongco")).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
   });
 
   it.each(["LanAnh", "lan-anh", "a".repeat(21)])(
@@ -70,7 +102,9 @@ describe("UsersService.getProfile", () => {
     async (username) => {
       const { service, repository } = setup();
 
-      await expect(service.getProfile(username)).rejects.toMatchObject({ code: "NOT_FOUND" });
+      await expect(service.getProfile(viewer, username)).rejects.toMatchObject({
+        code: "NOT_FOUND",
+      });
       expect(repository.findProfile).not.toHaveBeenCalled();
     },
   );
@@ -121,7 +155,10 @@ describe("UsersService (route admin)", () => {
         ),
       unban: vi.fn().mockResolvedValue(adminRow({ ...target, banned: false })),
     };
-    const service = new UsersService(repository as unknown as UsersRepository);
+    const service = new UsersService(
+      repository as unknown as UsersRepository,
+      {} as FriendsService,
+    );
     return { service, repository };
   }
 

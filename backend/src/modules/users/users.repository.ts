@@ -3,7 +3,10 @@ import type { PostStatus, Role } from "@xom-nho/api";
 import type { Prisma } from "../../generated/prisma/client.js";
 import { PrismaService } from "../../infrastructure/database/prisma.service.js";
 
-/** Cột cho hồ sơ công khai: không có `email`, `banned`, `banReason`. */
+/**
+ * Cột cho hồ sơ công khai: không có `email`, `banReason`. `banned`, `banExpires` chỉ để tính nút Kết bạn
+ * (`relationship.canRequest`), mapper không trả ra ngoài.
+ */
 function profileSelect(postStatus: PostStatus) {
   return {
     id: true,
@@ -11,8 +14,12 @@ function profileSelect(postStatus: PostStatus) {
     username: true,
     image: true,
     avatarId: true,
+    coverId: true,
+    location: true,
     bio: true,
     role: true,
+    banned: true,
+    banExpires: true,
     createdAt: true,
     _count: { select: { posts: { where: { status: postStatus } } } },
   } satisfies Prisma.UserSelect;

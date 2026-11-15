@@ -25,7 +25,7 @@ export class AuthService {
   }
 
   /**
-   * Chỉ sửa tên, giới thiệu, ảnh của chính mình; vai trò, email, username không đổi ở đây.
+   * Chỉ sửa tên, giới thiệu, nơi ở, ảnh của chính mình; vai trò, email, username không đổi ở đây.
    * Gửi `image` (link mới hoặc `null`) thì bỏ luôn ảnh đã tải lên, xóa file khỏi ổ đĩa.
    */
   async updateMe(user: SessionUser, input: UpdateMeInput): Promise<Me> {
@@ -35,10 +35,11 @@ export class AuthService {
     const row = await this.authRepository.updateMe(user.id, {
       name: input.name,
       bio: input.bio,
+      location: input.location,
       image: input.image,
       ...(changesImage && { avatarId: null }),
     });
-    if (oldAvatarId) await this.removeOldAvatar(oldAvatarId);
+    if (oldAvatarId) await this.removeOldImage(oldAvatarId);
     return toMe(row);
   }
 
@@ -57,7 +58,35 @@ export class AuthService {
       await this.filesService.remove(media.id);
       throw error;
     }
-    if (oldAvatarId) await this.removeOldAvatar(oldAvatarId);
+    if (oldAvatarId) await this.removeOldImage(oldAvatarId);
+    return toMe(row);
+  }
+
+  /**
+   * Đổi ảnh bìa hồ sơ (docs/tinh-nang.md mục 1.4), cùng cách với ảnh đại diện: lưu ảnh mới, gán vào hồ sơ, rồi
+   * xóa ảnh cũ khỏi ổ đĩa. Gán lỗi thì xóa ảnh vừa lưu.
+   */
+  async updateCover(user: SessionUser, file: UploadedFileData | undefined): Promise<Me> {
+    const oldCoverId = await this.authRepository.findCoverId(user.id);
+    const media = await this.filesService.uploadCover(user, file);
+
+    let row;
+    try {
+      row = await this.authRepository.updateMe(user.id, { coverId: media.id });
+    } catch (error) {
+      await this.filesService.remove(media.id);
+      throw error;
+    }
+    if (oldCoverId) await this.removeOldImage(oldCoverId);
+    return toMe(row);
+  }
+
+  /** Bỏ ảnh bìa: hồ sơ về nền mặc định, file bị xóa. Chưa có ảnh bìa thì giữ nguyên, không lỗi. */
+  async removeCover(user: SessionUser): Promise<Me> {
+    const oldCoverId = await this.authRepository.findCoverId(user.id);
+    if (!oldCoverId) return this.getMe(user);
+    const row = await this.authRepository.updateMe(user.id, { coverId: null });
+    await this.removeOldImage(oldCoverId);
     return toMe(row);
   }
 
@@ -71,10 +100,12 @@ export class AuthService {
     return { email: true, google: "google" in social, github: "github" in social };
   }
 
-  /** Hồ sơ đã đổi xong; xóa ảnh cũ lỗi thì chỉ ghi log, không làm hỏng việc đổi ảnh. */
-  private async removeOldAvatar(mediaId: string): Promise<void> {
+  /**
+   * Hồ sơ đã đổi xong; xóa ảnh cũ (ảnh đại diện, ảnh bìa) lỗi thì chỉ ghi log, không làm hỏng việc đổi ảnh.
+   */
+  private async removeOldImage(mediaId: string): Promise<void> {
     await this.filesService.remove(mediaId).catch((error: unknown) => {
-      this.logger.warn(`Không xóa được ảnh đại diện cũ ${mediaId}: ${String(error)}`);
+      this.logger.warn(`Không xóa được ảnh cũ ${mediaId}: ${String(error)}`);
     });
   }
 }

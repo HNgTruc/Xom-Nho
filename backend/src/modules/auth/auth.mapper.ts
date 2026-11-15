@@ -12,5 +12,7 @@ export function toMe(row: MeRow): Me {
     bio: row.bio,
     role: ROLE_VALUES.includes(row.role as Role) ? (row.role as Role) : ROLES.USER,
     createdAt: row.createdAt.toISOString(),
+    coverId: row.coverId,
+    location: row.location,
   };
 }

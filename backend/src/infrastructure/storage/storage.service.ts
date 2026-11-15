@@ -9,6 +9,7 @@ const FOLDER_EXTENSIONS = {
   images: ["jpg", "png", "webp"],
   videos: ["mp4", "webm"],
   avatars: ["jpg", "png", "webp"],
+  covers: ["jpg", "png", "webp"],
 } as const satisfies Record<string, readonly string[]>;
 
 export type StorageFolder = keyof typeof FOLDER_EXTENSIONS;
@@ -33,7 +34,8 @@ export function resolveUploadRoot(dir: string): string {
 }
 
 /**
- * Lưu file tải lên trên ổ đĩa (ADR 0005), mặc định ở `media/` gốc repo, chia `images/`, `videos/`, `avatars/`.
+ * Lưu file tải lên trên ổ đĩa (ADR 0005), mặc định ở `media/` gốc repo, chia `images/`, `videos/`, `avatars/`,
+ * `covers/` (ảnh bìa hồ sơ).
  * Mọi chỗ đọc ghi file đi qua lớp này; chuyển sang cloud sau này chỉ cần viết lại nó.
  * Không biết gì về quyền: service gọi nó đã kiểm tra trước.
  */

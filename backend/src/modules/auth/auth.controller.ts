@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Put,
+  UploadedFile,
+  UseInterceptors,
+} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
   type AuthProviders,
@@ -45,6 +54,24 @@ export class AuthController {
     @UploadedFile() file: UploadedFileData | undefined,
   ): Promise<Me> {
     return this.authService.updateAvatar(user, file);
+  }
+
+  /** Đổi ảnh bìa hồ sơ, multipart trường `file`. Cùng giới hạn với ảnh đại diện. */
+  @Put("me/cover")
+  @UseInterceptors(
+    FileInterceptor("file", { limits: { fileSize: LIMITS.VIDEO_MAX_BYTES, files: 1, fields: 0 } }),
+  )
+  updateCover(
+    @CurrentUser() user: SessionUser,
+    @UploadedFile() file: UploadedFileData | undefined,
+  ): Promise<Me> {
+    return this.authService.updateCover(user, file);
+  }
+
+  /** Bỏ ảnh bìa, xóa file. Chưa có ảnh bìa cũng không lỗi. */
+  @Delete("me/cover")
+  removeCover(@CurrentUser() user: SessionUser): Promise<Me> {
+    return this.authService.removeCover(user);
   }
 
   @Public()

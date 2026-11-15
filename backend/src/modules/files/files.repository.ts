@@ -34,7 +34,7 @@ export class FilesRepository {
 
   create(data: {
     kind: MediaKind;
-    purpose?: "POST" | "AVATAR";
+    purpose?: "POST" | "AVATAR" | "COVER";
     mimeType: string;
     sizeBytes: number;
     storageKey: string;

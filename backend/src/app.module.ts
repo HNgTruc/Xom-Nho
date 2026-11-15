@@ -13,6 +13,7 @@ import { CategoriesModule } from "./modules/categories/categories.module.js";
 import { CommentsModule } from "./modules/comments/comments.module.js";
 import { DashboardModule } from "./modules/dashboard/dashboard.module.js";
 import { FilesModule } from "./modules/files/files.module.js";
+import { FriendsModule } from "./modules/friends/friends.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 import { PostsModule } from "./modules/posts/posts.module.js";
 import { SearchModule } from "./modules/search/search.module.js";
@@ -36,6 +37,7 @@ import { UsersModule } from "./modules/users/users.module.js";
     FilesModule,
     TagsModule,
     UsersModule,
+    FriendsModule,
     SearchModule,
     DashboardModule,
   ],

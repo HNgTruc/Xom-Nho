@@ -15,6 +15,7 @@ import {
   type SetUserRoleInput,
 } from "@xom-nho/api";
 import { AppException } from "../../common/exceptions/app-exception.js";
+import { FriendsService } from "../friends/friends.service.js";
 import { paginate, type Paginated } from "../../common/types/paginated.js";
 import type { SessionUser } from "../../common/types/session-user.js";
 import { toAdminUserListItem, toPublicProfile, toRole } from "./users.mapper.js";
@@ -26,19 +27,27 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly friendsService: FriendsService,
+  ) {}
 
   /**
-   * Hồ sơ công khai theo username, ai cũng xem được. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện),
-   * nhưng hồ sơ không cho biết ai bị cấm. Username sai dạng (kể cả viết hoa) coi là không có.
+   * Hồ sơ công khai theo username, mọi thành viên xem được, kèm số bạn bè và quan hệ với người xem. Người bị
+   * cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), nhưng hồ sơ không cho biết ai bị cấm: chỉ thấy không kết bạn
+   * được. Username sai dạng (kể cả viết hoa) coi là không có.
    */
-  async getProfile(username: string): Promise<PublicProfile> {
+  async getProfile(viewer: SessionUser, username: string): Promise<PublicProfile> {
     if (!pathUsernameSchema.safeParse(username).success) {
       throw new AppException("NOT_FOUND", USER_NOT_FOUND);
     }
     const row = await this.usersRepository.findProfile(username, POST_STATUSES.PUBLISHED);
     if (!row) throw new AppException("NOT_FOUND", USER_NOT_FOUND);
-    return toPublicProfile(row);
+    const [friendCount, relationship] = await Promise.all([
+      this.friendsService.friendCount(row.id),
+      this.friendsService.relationshipFor(viewer, row),
+    ]);
+    return toPublicProfile(row, { friendCount, relationship });
   }
 
   // ===== Quản trị (`users.admin.controller.ts`, chỉ trưởng xóm: `@Roles("admin")`) =====

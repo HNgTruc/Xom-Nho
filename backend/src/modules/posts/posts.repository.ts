@@ -34,6 +34,16 @@ export const postDetailSelect = {
 
 export type PostListRow = Prisma.PostGetPayload<{ select: typeof postListSelect }>;
 
+/** Cột cho `GET /me/posts`: như danh sách bài, thêm trạng thái, lý do ẩn, lúc tạo. */
+const myPostListSelect = {
+  ...postListSelect,
+  status: true,
+  rejectReason: true,
+  createdAt: true,
+} satisfies Prisma.PostSelect;
+
+export type MyPostListRow = Prisma.PostGetPayload<{ select: typeof myPostListSelect }>;
+
 /** Cột cho bảng quản trị: mọi trạng thái, có lý do ẩn; đếm cả bình luận đã ẩn. Không lấy `content`. */
 const adminPostListSelect = {
   id: true,
@@ -210,6 +220,29 @@ export class PostsRepository {
         where,
         select: postListSelect,
         orderBy: ORDER_BY[page.sort],
+        skip: page.skip,
+        take: page.take,
+      }),
+      this.prisma.post.count({ where }),
+    ]);
+  }
+
+  /**
+   * Bài của một người, mọi trạng thái (hoặc một trạng thái), mới tạo trước: bài chưa đăng không có
+   * `publishedAt`. Chỉ mục `(authorId, status, publishedAt)` lọc được theo tác giả; sắp theo `createdAt` thì
+   * MySQL sắp lại trong số bài của một người, đủ nhanh.
+   */
+  async findByAuthor(
+    authorId: string,
+    status: PostStatus | undefined,
+    page: { skip: number; take: number },
+  ): Promise<[MyPostListRow[], number]> {
+    const where: Prisma.PostWhereInput = { authorId, status };
+    return Promise.all([
+      this.prisma.post.findMany({
+        where,
+        select: myPostListSelect,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         skip: page.skip,
         take: page.take,
       }),

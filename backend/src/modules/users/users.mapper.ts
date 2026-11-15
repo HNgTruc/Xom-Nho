@@ -1,6 +1,7 @@
 import {
   type AdminUserListItem,
   type PublicProfile,
+  type Relationship,
   type Role,
   ROLE_VALUES,
   ROLES,
@@ -36,7 +37,11 @@ export function toAdminUserListItem(row: AdminUserRow, now = new Date()): AdminU
   };
 }
 
-export function toPublicProfile(row: ProfileRow): PublicProfile {
+/** Hồ sơ công khai. Không trả `banned`, `banExpires` dù dòng có: hồ sơ không cho biết ai bị cấm. */
+export function toPublicProfile(
+  row: ProfileRow,
+  friends: { friendCount: number; relationship: Relationship },
+): PublicProfile {
   return {
     id: row.id,
     name: row.name,
@@ -47,5 +52,9 @@ export function toPublicProfile(row: ProfileRow): PublicProfile {
     role: toRole(row.role),
     createdAt: row.createdAt.toISOString(),
     postCount: row._count.posts,
+    coverId: row.coverId,
+    location: row.location,
+    friendCount: friends.friendCount,
+    relationship: friends.relationship,
   };
 }

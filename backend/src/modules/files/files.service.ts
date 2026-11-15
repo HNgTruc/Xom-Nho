@@ -33,6 +33,14 @@ const FOLDER: Record<MediaKind, StorageFolder> = {
   VIDEO: "videos",
 };
 
+/** Ảnh trên hồ sơ: chỉ nhận ảnh, mỗi loại một thư mục riêng. */
+type ProfileImagePurpose = "AVATAR" | "COVER";
+
+const PROFILE_IMAGE: Record<ProfileImagePurpose, { folder: StorageFolder; notImage: string }> = {
+  AVATAR: { folder: "avatars", notImage: FILE_MESSAGES.AVATAR_NOT_IMAGE },
+  COVER: { folder: "covers", notImage: FILE_MESSAGES.COVER_NOT_IMAGE },
+};
+
 /** 30 file mỗi 10 phút mỗi người: đủ cho vài bài 10 ảnh, chặn ai đó đổ đầy ổ đĩa. */
 const UPLOAD_RATE = { limit: 30, windowMs: 10 * 60 * 1000, message: FILE_MESSAGES.RATE_LIMITED };
 
@@ -72,6 +80,14 @@ export class FilesService {
     return this.store(user, file, "AVATAR");
   }
 
+  /**
+   * Nhận ảnh bìa hồ sơ: như ảnh đại diện (chỉ ảnh đến 5 MB), lưu ở `media/covers`. `AuthService.updateCover` gán
+   * vào hồ sơ rồi xóa ảnh cũ.
+   */
+  uploadCover(user: SessionUser, file: UploadedFileData | undefined): Promise<MediaItem> {
+    return this.store(user, file, "COVER");
+  }
+
   /** Xóa dòng media và file trên đĩa. Xóa file lỗi thì chỉ ghi log: dòng đã mất, file thành rác vô hại. */
   async remove(id: string): Promise<void> {
     const storageKey = await this.filesRepository.delete(id);
@@ -80,7 +96,7 @@ export class FilesService {
 
   /**
    * Dọn file rác (docs/co-so-du-lieu.md, ADR 0005): ảnh, video tải lên cho bài mà quá `ORPHAN_MAX_AGE_MS` chưa gắn
-   * bài nào (bỏ dở hộp soạn, gỡ khỏi hộp trước khi đăng). Không đụng ảnh đại diện. `FilesScheduler` gọi mỗi giờ.
+   * bài nào (bỏ dở hộp soạn, gỡ khỏi hộp trước khi đăng). Không đụng ảnh đại diện, ảnh bìa. `FilesScheduler` gọi mỗi giờ.
    * Xóa dòng trước, rồi chỉ xóa trên đĩa file đã xóa dòng thật: file vừa được gắn bài giữa chừng thì giữ nguyên.
    * Trả số file đã dọn.
    */
@@ -110,7 +126,7 @@ export class FilesService {
   private async store(
     user: SessionUser,
     file: UploadedFileData | undefined,
-    purpose: "POST" | "AVATAR",
+    purpose: ProfileImagePurpose | "POST",
   ): Promise<MediaItem> {
     if (!file || file.size === 0) {
       throw new AppException("VALIDATION_ERROR", FILE_MESSAGES.MISSING, {
@@ -123,10 +139,9 @@ export class FilesService {
         file: FILE_MESSAGES.UNSUPPORTED,
       });
     }
-    if (purpose === "AVATAR" && type.kind !== "IMAGE") {
-      throw new AppException("VALIDATION_ERROR", FILE_MESSAGES.AVATAR_NOT_IMAGE, {
-        file: FILE_MESSAGES.AVATAR_NOT_IMAGE,
-      });
+    if (purpose !== "POST" && type.kind !== "IMAGE") {
+      const message = PROFILE_IMAGE[purpose].notImage;
+      throw new AppException("VALIDATION_ERROR", message, { file: message });
     }
     if (file.size > MAX_BYTES[type.kind]) {
       const message = TOO_LARGE_MESSAGE[type.kind];
@@ -134,7 +149,7 @@ export class FilesService {
     }
     this.rateLimiter.consume(`upload:${user.id}`, UPLOAD_RATE);
 
-    const folder = purpose === "AVATAR" ? "avatars" : FOLDER[type.kind];
+    const folder = purpose === "POST" ? FOLDER[type.kind] : PROFILE_IMAGE[purpose].folder;
     const storageKey = await this.storage.save(file.buffer, type.extension, folder);
     try {
       const row = await this.filesRepository.create({

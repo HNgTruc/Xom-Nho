@@ -18,19 +18,26 @@ function meRow(overrides: Partial<MeRow> = {}): MeRow {
     bio: null,
     role: "user",
     createdAt: new Date("2026-11-01T00:00:00.000Z"),
+    coverId: null,
+    location: null,
     ...overrides,
   };
 }
 
-function setup(currentAvatarId: string | null) {
+function setup(currentAvatarId: string | null, currentCoverId: string | null = null) {
   const repository = {
     findAvatarId: vi.fn().mockResolvedValue(currentAvatarId),
+    findCoverId: vi.fn().mockResolvedValue(currentCoverId),
+    findMe: vi.fn().mockResolvedValue(meRow({ coverId: currentCoverId })),
     updateMe: vi
       .fn()
       .mockImplementation((_id: string, data: Partial<MeRow>) => Promise.resolve(meRow(data))),
   };
   const files = {
     uploadAvatar: vi.fn().mockResolvedValue({ id: "moi", kind: "IMAGE", mimeType: "image/png" }),
+    uploadCover: vi
+      .fn()
+      .mockResolvedValue({ id: "bia-moi", kind: "IMAGE", mimeType: "image/jpeg" }),
     remove: vi.fn().mockResolvedValue(undefined),
   };
   const service = new AuthService(
@@ -98,6 +105,7 @@ describe("AuthService.updateMe", () => {
     expect(repository.updateMe).toHaveBeenCalledWith("lan", {
       name: undefined,
       bio: undefined,
+      location: undefined,
       image: null,
       avatarId: null,
     });
@@ -111,6 +119,59 @@ describe("AuthService.updateMe", () => {
 
     expect(repository.findAvatarId).not.toHaveBeenCalled();
     expect(repository.updateMe.mock.calls[0]?.[1]).not.toHaveProperty("avatarId");
+    expect(files.remove).not.toHaveBeenCalled();
+  });
+
+  it("sửa nơi ở thì ghi đúng cột, không đụng ảnh", async () => {
+    const { service, repository, files } = setup("cu");
+
+    const me = await service.updateMe(lan, { location: "Quận 3, TP.HCM" });
+
+    expect(repository.updateMe.mock.calls[0]?.[1]).toMatchObject({ location: "Quận 3, TP.HCM" });
+    expect(me.location).toBe("Quận 3, TP.HCM");
+    expect(files.remove).not.toHaveBeenCalled();
+  });
+});
+
+describe("AuthService.updateCover, removeCover", () => {
+  it("gán ảnh bìa mới vào hồ sơ rồi xóa ảnh bìa cũ, không đụng ảnh đại diện", async () => {
+    const { service, repository, files } = setup("dai-dien", "bia-cu");
+
+    const me = await service.updateCover(lan, file);
+
+    expect(files.uploadCover).toHaveBeenCalledWith(lan, file);
+    expect(repository.updateMe).toHaveBeenCalledWith("lan", { coverId: "bia-moi" });
+    expect(files.remove).toHaveBeenCalledWith("bia-cu");
+    expect(files.remove).not.toHaveBeenCalledWith("dai-dien");
+    expect(me.coverId).toBe("bia-moi");
+  });
+
+  it("gán vào hồ sơ lỗi thì xóa ảnh bìa vừa tải, giữ ảnh cũ", async () => {
+    const { service, repository, files } = setup(null, "bia-cu");
+    repository.updateMe.mockRejectedValueOnce(new Error("db lỗi"));
+
+    await expect(service.updateCover(lan, file)).rejects.toThrow("db lỗi");
+
+    expect(files.remove).toHaveBeenCalledWith("bia-moi");
+    expect(files.remove).not.toHaveBeenCalledWith("bia-cu");
+  });
+
+  it("bỏ ảnh bìa thì coverId về null, xóa file", async () => {
+    const { service, repository, files } = setup(null, "bia-cu");
+
+    const me = await service.removeCover(lan);
+
+    expect(repository.updateMe).toHaveBeenCalledWith("lan", { coverId: null });
+    expect(files.remove).toHaveBeenCalledWith("bia-cu");
+    expect(me.coverId).toBeNull();
+  });
+
+  it("chưa có ảnh bìa thì bỏ cũng không lỗi, không ghi gì", async () => {
+    const { service, repository, files } = setup(null, null);
+
+    await expect(service.removeCover(lan)).resolves.toMatchObject({ coverId: null });
+
+    expect(repository.updateMe).not.toHaveBeenCalled();
     expect(files.remove).not.toHaveBeenCalled();
   });
 });

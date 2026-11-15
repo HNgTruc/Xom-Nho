@@ -16,7 +16,9 @@ import {
   FILE_MESSAGES,
   LIKE_MESSAGES,
   LIMITS,
+  type ListMyPostsQuery,
   type ListPostsQuery,
+  type MyPostListItem,
   POST_MESSAGES,
   POST_STATUSES,
   POST_STATUS_VALUES,
@@ -36,7 +38,12 @@ import type { SessionUser } from "../../common/types/session-user.js";
 import { RateLimiter } from "../../infrastructure/rate-limit/rate-limiter.js";
 import { StorageService } from "../../infrastructure/storage/storage.service.js";
 import { baseSlug, excerptFromContent } from "./posts.compose.js";
-import { toAdminPostListItem, toPostDetail, toPostListItem } from "./posts.mapper.js";
+import {
+  toAdminPostListItem,
+  toMyPostListItem,
+  toPostDetail,
+  toPostListItem,
+} from "./posts.mapper.js";
 import { type PostAccessTarget, PostsPolicy } from "./posts.policy.js";
 import {
   type CommentPreviewRow,
@@ -225,6 +232,25 @@ export class PostsService {
       { sort, skip: (page - 1) * pageSize, take: pageSize },
     );
     return paginate(await this.toListItems(user, rows), total, page, pageSize);
+  }
+
+  /**
+   * Bài của chính mình, mọi trạng thái (trang hồ sơ của mình, docs/tinh-nang.md mục 1.3): cả bài bị trưởng xóm ẩn
+   * kèm lý do. Chỉ lấy bài của người đang gọi, nên không cần policy.
+   */
+  async listMine(user: SessionUser, query: ListMyPostsQuery): Promise<Paginated<MyPostListItem>> {
+    const { page, pageSize, status } = query;
+    const [rows, total] = await this.postsRepository.findByAuthor(user.id, status, {
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+    const items = await this.toListItems(user, rows);
+    return paginate(
+      items.map((item, i) => toMyPostListItem(item, rows[i]!)),
+      total,
+      page,
+      pageSize,
+    );
   }
 
   /**

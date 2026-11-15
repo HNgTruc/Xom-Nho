@@ -18,7 +18,10 @@ function toRole(role: string | null | undefined): Role {
 }
 
 /** Đang bị cấm: `banned` và chưa tới hạn mở (không có hạn = cấm vĩnh viễn). */
-export function isBanned(user: AuthUserRecord, now = new Date()): boolean {
+export function isBanned(
+  user: Pick<AuthUserRecord, "banned" | "banExpires">,
+  now = new Date(),
+): boolean {
   if (!user.banned) return false;
   if (!user.banExpires) return true;
   return new Date(user.banExpires) > now;

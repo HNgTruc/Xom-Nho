@@ -3,6 +3,7 @@ import {
   type CategoryRef,
   type CommentPreview,
   type MediaItem,
+  type MyPostListItem,
   POST_STATUSES,
   toCategoryColor,
   type PostDetail,
@@ -13,6 +14,7 @@ import {
 import type {
   AdminPostListRow,
   CommentPreviewRow,
+  MyPostListRow,
   PostDetailRow,
   PostListRow,
 } from "./posts.repository.js";
@@ -89,6 +91,16 @@ export function toPostListItem(
   return {
     ...toPostBase(row, viewer),
     latestComments: viewer.latestComments.map(toCommentPreview),
+  };
+}
+
+/** Bài của mình (`GET /me/posts`): thẻ bài thêm trạng thái, lý do ẩn (chỉ khi đang bị từ chối, ẩn). */
+export function toMyPostListItem(item: PostListItem, row: MyPostListRow): MyPostListItem {
+  return {
+    ...item,
+    status: row.status,
+    rejectReason: moderationReason(row),
+    createdAt: row.createdAt.toISOString(),
   };
 }
 
