@@ -27,6 +27,7 @@ export function ConfirmDialog({
   destructive = false,
   reason,
   children,
+  confirmDisabled = false,
   onConfirm,
 }: {
   open: boolean;
@@ -39,6 +40,8 @@ export function ConfirmDialog({
   reason?: { label: string; hint?: string; maxLength?: number };
   /** Phần thêm giữa mô tả và nút (ví dụ chọn thời hạn cấm) */
   children?: ReactNode;
+  /** Khóa nút xác nhận khi phần thêm chưa đủ (ví dụ chưa chọn thẻ đích để gộp) */
+  confirmDisabled?: boolean;
   onConfirm: (reason: string) => Promise<unknown>;
 }) {
   const id = useId();
@@ -58,6 +61,7 @@ export function ConfirmDialog({
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (confirmDisabled) return;
     if (missingReason) {
       setError(`Ghi ${reason.label.toLowerCase()}.`);
       return;
@@ -114,7 +118,7 @@ export function ConfirmDialog({
               type="submit"
               variant={destructive ? "destructive" : "default"}
               loading={pending}
-              disabled={missingReason}
+              disabled={missingReason || confirmDisabled}
             >
               {confirmLabel}
             </Button>
