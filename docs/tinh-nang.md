@@ -240,6 +240,8 @@ Thay cho hàng chờ duyệt (chốt 2026-11-13): từ ADR 0008 bài đăng th�
 
 - Thêm, sửa, sắp xếp danh mục. Gộp tag trùng nghĩa.
 - Khi thêm, sửa danh mục: chọn màu (5 màu) và biểu tượng (5 biểu tượng, hoặc không có thì hiện chấm màu), xem trước ô biểu tượng như trong menu Chủ đề (MASTER mục 6).
+- [x] Thêm, sửa danh mục (đường dẫn giữ nguyên khi đổi tên, tên trùng báo ở ô tên), kéo thả để sắp xếp bằng chuột, ngón tay hoặc bàn phím, xóa khóa khi còn bài (2026-11-15)
+- [x] Gộp tag trùng nghĩa, xóa tag; tìm kiếm của các bài bị ảnh hưởng tính lại trong cùng transaction (2026-11-15)
 
 ### 4.5 Thành viên
 

@@ -108,13 +108,14 @@ Thiết kế: [pages/admin.md](design-system/xom-nho/pages/admin.md), mục "Kí
 - [x] Web: hiện lý do ẩn cho tác giả trên trang bài (`archivedNote`, hộp `destructive` nhạt, 2026-11-14)
 - [x] Backend: `GET /admin/users/:id` (số bài, bình luận đang ẩn), `GET /admin/users/stats`; tắt route `/api/auth/admin/*` của Better Auth (2026-11-14)
 - [x] Backend: `modules/dashboard` (`GET /admin/dashboard`: 30 ngày theo giờ Việt Nam, so 7 ngày, số đang ẩn; test service, e2e) (2026-11-15)
-- [ ] Backend còn lại: danh mục, tag, `PATCH /admin/posts/:id`
-- [x] Admin: layout (sidebar 240/64px, ngăn kéo dưới 1024px, topbar, kính mờ trên ảnh nền), `DataTable` dùng chung (TanStack Table 9), hộp xác nhận, badge trạng thái/vai trò, toast; trang đăng nhập kính (Đợt 1, 2026-11-14). Danh mục và Thẻ còn là trang "đang làm"
+- [x] Backend: danh mục (`GET`/`POST`/`PATCH`/`DELETE /admin/categories`, `PUT /admin/categories/order`), tag (`GET /admin/tags`, gộp, xóa, tính lại `searchText`); test service, e2e (2026-11-15)
+- [ ] Backend còn lại: `PATCH /admin/posts/:id` (sửa bài bất kỳ)
+- [x] Admin: layout (sidebar 240/64px, ngăn kéo dưới 1024px, topbar, kính mờ trên ảnh nền), `DataTable` dùng chung (TanStack Table 9), hộp xác nhận, badge trạng thái/vai trò, toast; trang đăng nhập kính (Đợt 1, 2026-11-14)
 - [x] Tổng quan số liệu: 4 thẻ số liệu đếm lên kèm cột nhỏ 7 ngày, thẻ "Đang ẩn" có thanh chia bài/bình luận, biểu đồ cột 30 ngày (đổi số liệu, rê chuột hiện số, "Xem bảng số liệu", lựa chọn nằm trên URL), Bài mới chưa xem, Thành viên mới, nút Làm mới (Đợt 5, 2026-11-15)
 - [x] Bài mới (xem lần lượt, ẩn bài kèm lý do), thay hàng chờ duyệt: danh sách 360px + xem bài, phím J/K/H/O, "Đã xem", mốc lưu theo máy chỉ dời khi "Đánh dấu đã xem hết", số chưa xem trên sidebar, khung tác giả (Đợt 3, 2026-11-14)
 - [x] Màn Bài viết: thống kê theo khoảng, bảng xếp hạng 20/30 bài theo cột, bảng mọi bài (tab trạng thái có số, tìm, lọc danh mục, chọn nhiều để ẩn/hiện/xóa, ẩn bài kèm lý do chọn nhanh, toast có Hoàn tác) (Đợt 2, 2026-11-14)
 - [x] Màn Bình luận: tab Tất cả / Đang hiện / Đã ẩn, tìm trong nội dung, chọn nhiều để ẩn/hiện/xóa, mở bài gốc, ẩn có Hoàn tác (Đợt 4, 2026-11-14)
-- [ ] Danh mục, tag
+- [x] Danh mục: danh sách kéo thả (`@dnd-kit`, có bàn phím và thông báo cho trình đọc màn hình), khung sửa có màu, biểu tượng, xem trước ba chỗ hiện trên web, ngăn kéo dưới 1024px; Thẻ: tìm, xếp theo số bài hoặc tên, gộp vào thẻ khác (chọn thẻ đích), xóa (Đợt 6, 2026-11-15)
 - [x] Thành viên: tab vai trò và "Đang bị cấm" có số, tìm theo tên/email, đổi vai trò (hỏi lại khi dính tới trưởng xóm), cấm 1/7/30 ngày hoặc vĩnh viễn kèm lý do, bỏ cấm, toast có Hoàn tác; dòng của mình bị khóa (Đợt 4, 2026-11-14)
 
 ## Giai đoạn 6: Mobile app

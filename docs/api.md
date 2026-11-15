@@ -197,9 +197,9 @@ Mã lỗi Better Auth → câu tiếng Việt: `authErrorMessage()` trong `api/s
 
 ## Dành cho admin (`/api/v1/admin`, tất cả 🛡️)
 
-Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với controller công khai. Khách nhận 401, người không phải `admin` nhận 403 ở mọi route dưới đây. Client: `api.admin.dashboard`, `api.admin.posts`, `api.admin.comments`, `api.admin.users` (`api/src/api-client/admin/`).
+Mỗi module có file `*.admin.controller.ts` riêng, dùng chung service với controller công khai. Khách nhận 401, người không phải `admin` nhận 403 ở mọi route dưới đây. Client: `api.admin.dashboard`, `api.admin.posts`, `api.admin.comments`, `api.admin.users`, `api.admin.categories`, `api.admin.tags` (`api/src/api-client/admin/`).
 
-Đã làm (2026-11-13): bài viết, bình luận, thành viên, trừ các dòng ghi "Chưa làm". Tổng quan: 2026-11-15. Danh sách mặc định 20 dòng mỗi trang, tối đa 100 (`?pageSize=`).
+Đã làm (2026-11-13): bài viết, bình luận, thành viên, trừ các dòng ghi "Chưa làm". Tổng quan, danh mục, tag: 2026-11-15. Danh sách mặc định 20 dòng mỗi trang, tối đa 100 (`?pageSize=`).
 
 ### Tổng quan (`modules/dashboard`)
 
@@ -247,15 +247,16 @@ Màn Tổng quan lấy thêm "Bài mới chưa xem" bằng `GET /admin/posts?sin
 
 ### Danh mục, tag
 
-| Method | Đường dẫn                 | Mô tả                                                                                                |
-| ------ | ------------------------- | ---------------------------------------------------------------------------------------------------- |
-| POST   | `/admin/categories`       | Thêm. Body có `color` và `icon` (khóa trong `CATEGORY_COLORS`, `CATEGORY_ICONS`; `icon` được `null`) |
-| PATCH  | `/admin/categories/:id`   | Sửa (cùng các trường như khi thêm)                                                                   |
-| PUT    | `/admin/categories/order` | Sắp xếp lại. Body: `{ ids: string[] }`                                                               |
-| DELETE | `/admin/categories/:id`   | Xóa (chỉ khi không còn bài)                                                                          |
-| GET    | `/admin/tags?q=&page=`    | Danh sách kèm số bài                                                                                 |
-| POST   | `/admin/tags/:id/merge`   | Gộp vào tag khác. Body: `{ targetId }`                                                               |
-| DELETE | `/admin/tags/:id`         | Xóa                                                                                                  |
+| Method | Đường dẫn                    | Mô tả                                                                                                                                                                                                                                                                                           |
+| ------ | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/admin/categories`          | Mọi danh mục theo thứ tự menu Chủ đề, `AdminCategory`: như `Category` thêm `totalPostCount` (mọi bài, mọi trạng thái; `postCount` vẫn chỉ đếm bài đã đăng)                                                                                                                                      |
+| POST   | `/admin/categories`          | Thêm vào cuối menu. Body `categoryInputSchema`: `name`, `description` (rỗng thành `null`), `color`, `icon` (khóa trong `CATEGORY_COLORS`, `CATEGORY_ICONS`; `icon` được `null`). Đường dẫn sinh từ tên, trùng thì thêm `-2`. Tên trùng (kể cả khác dấu, khác hoa thường): 409 kèm `fields.name` |
+| PATCH  | `/admin/categories/:id`      | Sửa, gửi đủ các trường như khi thêm. **Đường dẫn giữ nguyên khi đổi tên** (link cũ không gãy). Tên trùng: 409                                                                                                                                                                                   |
+| PUT    | `/admin/categories/order`    | Sắp xếp lại. Body: `{ ids: string[] }`, đủ mọi danh mục, không trùng; thiếu hay thừa: 409. Trả danh sách mới                                                                                                                                                                                    |
+| DELETE | `/admin/categories/:id`      | Xóa, chỉ khi không còn bài nào (kể cả bài đang ẩn); còn bài: 409. Trả 204                                                                                                                                                                                                                       |
+| GET    | `/admin/tags?q=&sort=&page=` | `AdminTag` (`id, name, slug, postCount, createdAt`). `q` có dấu hay không đều được; `sort=posts` (mặc định, nhiều bài trước) hoặc `name`                                                                                                                                                        |
+| POST   | `/admin/tags/:id/merge`      | Gộp vào tag khác. Body: `{ targetId }`. Bài của tag nguồn chuyển sang tag đích (bài có cả hai không bị lặp), tag nguồn bị xóa, `searchText` tính lại. Trả tag đích. Gộp vào chính nó: 400                                                                                                       |
+| DELETE | `/admin/tags/:id`            | Xóa, gỡ khỏi mọi bài (bài vẫn còn), `searchText` tính lại. Trả 204                                                                                                                                                                                                                              |
 
 ### Thành viên
 
