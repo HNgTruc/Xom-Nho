@@ -17,6 +17,7 @@ describe("FilesPolicy.canView", () => {
     post: { status: "ARCHIVED" as const },
   };
   const avatar = { ownerId: "lan", purpose: "AVATAR" as const, post: null };
+  const cover = { ownerId: "lan", purpose: "COVER" as const, post: null };
 
   it.each(["user", "author", "admin"])("file trong bài đã đăng: %s nào cũng xem được", (role) => {
     expect(FilesPolicy.canView(user("minh", role), published)).toBe(true);
@@ -42,6 +43,13 @@ describe("FilesPolicy.canView", () => {
     "ảnh đại diện của người khác: %s nào cũng xem được",
     (role) => {
       expect(FilesPolicy.canView(user("minh", role), avatar)).toBe(true);
+    },
+  );
+
+  it.each(["user", "author", "admin"])(
+    "ảnh bìa hồ sơ của người khác: %s nào cũng xem được",
+    (role) => {
+      expect(FilesPolicy.canView(user("minh", role), cover)).toBe(true);
     },
   );
 });

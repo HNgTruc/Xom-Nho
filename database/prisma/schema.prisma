@@ -36,10 +36,17 @@ enum MediaKind {
   VIDEO
 }
 
-// File dùng vào việc gì: ảnh, video trong bài hay ảnh đại diện (sau này thêm ảnh bìa, file trong tin nhắn)
+// File dùng vào việc gì: ảnh, video trong bài, ảnh đại diện hay ảnh bìa hồ sơ (sau này thêm file trong tin nhắn)
 enum MediaPurpose {
   POST
   AVATAR
+  COVER
+}
+
+// PENDING: đã gửi lời mời, chờ người kia. ACCEPTED: đã là bạn. Từ chối, hủy lời mời, hủy kết bạn: xóa dòng
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
 }
 
 // Cột lõi theo Better Auth (+ plugin admin: role, banned, banReason, banExpires).
@@ -59,18 +66,28 @@ model User {
   bio           String?   @db.Text
   // Ảnh đại diện tải lên (media purpose AVATAR). Có thì hiện ảnh này, không thì hiện `image` (link Google/GitHub)
   avatarId      String?   @unique
+  // Ảnh bìa hồ sơ tải lên (media purpose COVER). null: giao diện hiện nền mặc định
+  coverId       String?   @unique
+  // Nơi ở, chữ tự do ("Quận 3, TP.HCM"). null hoặc rỗng: không hiện
+  location      String?   @db.VarChar(100)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  avatar        Media?        @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
-  posts         Post[]        @relation("PostAuthor")
-  reviewedPosts Post[]        @relation("PostReviewer")
-  comments      Comment[]
-  media         Media[]       @relation("MediaOwner")
-  postLikes     PostLike[]
-  postDislikes  PostDislike[]
-  sessions      Session[]
-  accounts      Account[]
+  avatar             Media?        @relation("UserAvatar", fields: [avatarId], references: [id], onDelete: SetNull)
+  cover              Media?        @relation("UserCover", fields: [coverId], references: [id], onDelete: SetNull)
+  posts              Post[]        @relation("PostAuthor")
+  reviewedPosts      Post[]        @relation("PostReviewer")
+  comments           Comment[]
+  media              Media[]       @relation("MediaOwner")
+  postLikes          PostLike[]
+  postDislikes       PostDislike[]
+  sessions           Session[]
+  accounts           Account[]
+  friendshipsAsLow   Friendship[]  @relation("FriendshipLow")
+  friendshipsAsHigh  Friendship[]  @relation("FriendshipHigh")
+  friendRequestsSent Friendship[]  @relation("FriendshipRequester")
+  blocking           UserBlock[]   @relation("UserBlocker")
+  blockedBy          UserBlock[]   @relation("UserBlocked")
 
   @@map("user")
 }
@@ -214,8 +231,9 @@ model Media {
   createdAt  DateTime     @default(now())
 
   owner    User  @relation("MediaOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  // Người đang dùng file này làm ảnh đại diện
+  // Người đang dùng file này làm ảnh đại diện, ảnh bìa
   avatarOf User? @relation("UserAvatar")
+  coverOf  User? @relation("UserCover")
   // Xóa bài thì xóa dòng media (file trên đĩa do service dọn)
   post     Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
 
@@ -267,6 +285,46 @@ model PostDislike {
   // Khóa ngoại userId (MySQL cần chỉ mục bắt đầu bằng cột này)
   @@index([userId, createdAt])
   @@map("post_dislike")
+}
+
+// Quan hệ bạn bè giữa hai hàng xóm: MỖI CẶP MỘT DÒNG. userLowId là id nhỏ hơn theo so sánh chuỗi của
+// JavaScript (backend sắp bằng một hàm duy nhất, không dùng collation MySQL vì unicode_ci không phân biệt hoa
+// thường), nên khóa chính tự chặn mời trùng và hai bên mời nhau cùng lúc. requesterId: ai gửi lời mời.
+model Friendship {
+  userLowId   String           @db.VarChar(36)
+  userHighId  String           @db.VarChar(36)
+  requesterId String           @db.VarChar(36)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  // Lúc người nhận chấp nhận; null khi còn PENDING. Danh sách bạn xếp theo cột này
+  acceptedAt  DateTime?
+
+  userLow   User @relation("FriendshipLow", fields: [userLowId], references: [id], onDelete: Cascade)
+  userHigh  User @relation("FriendshipHigh", fields: [userHighId], references: [id], onDelete: Cascade)
+  requester User @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  @@id([userLowId, userHighId])
+  // Bạn bè (xếp theo acceptedAt), lời mời nhận được, số bạn: tìm ở cả hai phía rồi gộp (OR / UNION)
+  @@index([userLowId, status, acceptedAt])
+  @@index([userHighId, status, acceptedAt])
+  // Lời mời đã gửi, mới trước; khóa ngoại requesterId
+  @@index([requesterId, status, createdAt])
+  @@map("friendship")
+}
+
+// blockerId chặn blockedId. Chặn thì xóa quan hệ bạn bè, không ai gửi lời mời cho ai (4b); không nhận tin (4c)
+model UserBlock {
+  blockerId String   @db.VarChar(36)
+  blockedId String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+
+  blocker User @relation("UserBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("UserBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedId])
+  // Ai đã chặn mình (kiểm tra hai chiều khi gửi lời mời); khóa ngoại blockedId
+  @@index([blockedId])
+  @@map("user_block")
 }
 
 model Comment {

@@ -17,12 +17,17 @@ erDiagram
   Comment ||--o{ Comment : "trả lời"
   User ||--o{ Media : "tải lên"
   User |o--o| Media : "ảnh đại diện (avatarId)"
+  User |o--o| Media : "ảnh bìa (coverId)"
   Post ||--o{ Media : "gắn"
   User ||--o{ Post : "duyệt (reviewer)"
   Post ||--o{ PostLike : "được thích"
   User ||--o{ PostLike : "thích"
   Post ||--o{ PostDislike : "bị không thích"
   User ||--o{ PostDislike : "không thích"
+  User ||--o{ Friendship : "userLowId / userHighId"
+  User ||--o{ Friendship : "gửi lời mời (requesterId)"
+  User ||--o{ UserBlock : "chặn (blockerId)"
+  User ||--o{ UserBlock : "bị chặn (blockedId)"
 
   User {
     string id PK
@@ -35,6 +40,8 @@ erDiagram
     string bio
     string username UK
     string avatarId FK,UK "ảnh tự tải lên, null = dùng image"
+    string coverId FK,UK "ảnh bìa hồ sơ, null = nền mặc định"
+    string location "nơi ở, chữ tự do"
     datetime createdAt
   }
   Post {
@@ -58,7 +65,7 @@ erDiagram
   Media {
     string id PK
     enum kind "IMAGE VIDEO"
-    enum purpose "POST AVATAR"
+    enum purpose "POST AVATAR COVER"
     string mimeType
     int sizeBytes
     string storageKey UK "tên file trên đĩa, ngẫu nhiên"
@@ -95,6 +102,19 @@ erDiagram
     string userId PK
     datetime createdAt
   }
+  Friendship {
+    string userLowId PK,FK "id nhỏ hơn của cặp"
+    string userHighId PK,FK "id lớn hơn của cặp"
+    string requesterId FK "ai gửi lời mời"
+    enum status "PENDING ACCEPTED"
+    datetime createdAt
+    datetime acceptedAt "null = chưa chấp nhận"
+  }
+  UserBlock {
+    string blockerId PK,FK
+    string blockedId PK,FK
+    datetime createdAt
+  }
   Comment {
     string id PK
     text content
@@ -118,12 +138,17 @@ Ghi chú cài đặt:
 
 - Tên bảng viết thường, số ít, gạch dưới (`user`, `post`, `post_tag`) qua `@@map`; tên cột giữ camelCase như Better Auth.
 - `Post.contentFormat`: `MARKDOWN` (bài kiểu diễn đàn, có trước) hoặc `PLAIN` (soạn ở trang chủ, ADR 0008). Bài soạn ở trang chủ có thể có `title` rỗng.
-- `Media`: ảnh, video tải lên (ADR 0005). File nằm trên đĩa backend (`UPLOAD_DIR`, mặc định `media/` ở gốc repo), đường dẫn là `storageKey` dạng `<thư mục>/<uuid>.<đuôi>`: thư mục `images` hoặc `videos` theo `kind`, `avatars` cho ảnh đại diện; đuôi do backend chọn theo chữ ký nhị phân. `purpose` cho biết file dùng vào đâu: `POST` (ảnh, video trong bài: tải lên trước với `postId = null`, gắn khi đăng bài) hay `AVATAR` (ảnh đại diện: `postId` luôn `null`, `user.avatarId` trỏ tới). Xóa bài thì xóa dòng media (cascade); gỡ file khỏi bài khi sửa thì xóa dòng. Cả hai trường hợp backend xóa file trên đĩa sau khi transaction xong (`posts.service.ts`). Chỉ gắn được file `purpose = POST` vào bài. Việc dọn file không gắn bài **phải bỏ qua `AVATAR`**: `FilesScheduler` (`@nestjs/schedule`) chạy mỗi giờ, xóa file `purpose = POST`, `postId = null` tạo quá 1 ngày, mỗi lần tối đa 1000 file (10 lô 100). Xóa dòng trước rồi chỉ xóa trên đĩa file đã xóa dòng thật, nên file vừa được gắn bài giữa chừng không bị mất (`files.service.ts`, `files-cleanup.e2e-spec.ts`).
+- `Media`: ảnh, video tải lên (ADR 0005). File nằm trên đĩa backend (`UPLOAD_DIR`, mặc định `media/` ở gốc repo), đường dẫn là `storageKey` dạng `<thư mục>/<uuid>.<đuôi>`: thư mục `images` hoặc `videos` theo `kind`, `avatars` cho ảnh đại diện; đuôi do backend chọn theo chữ ký nhị phân. `purpose` cho biết file dùng vào đâu: `POST` (ảnh, video trong bài: tải lên trước với `postId = null`, gắn khi đăng bài), `AVATAR` (ảnh đại diện: `postId` luôn `null`, `user.avatarId` trỏ tới) hay `COVER` (ảnh bìa hồ sơ, thêm 2026-11-15: như `AVATAR`, lưu ở thư mục `covers`, `user.coverId` trỏ tới). Xóa bài thì xóa dòng media (cascade); gỡ file khỏi bài khi sửa thì xóa dòng. Cả hai trường hợp backend xóa file trên đĩa sau khi transaction xong (`posts.service.ts`). Chỉ gắn được file `purpose = POST` vào bài. Việc dọn file không gắn bài **phải bỏ qua `AVATAR` và `COVER`** (truy vấn chỉ lấy `purpose = POST`): `FilesScheduler` (`@nestjs/schedule`) chạy mỗi giờ, xóa file `purpose = POST`, `postId = null` tạo quá 1 ngày, mỗi lần tối đa 1000 file (10 lô 100). Xóa dòng trước rồi chỉ xóa trên đĩa file đã xóa dòng thật, nên file vừa được gắn bài giữa chừng không bị mất (`files.service.ts`, `files-cleanup.e2e-spec.ts`).
 - `Comment`: trả lời chỉ một cấp, `parentId` luôn trỏ về bình luận gốc. Xóa bình luận gốc thì trả lời bị xóa theo (`onDelete: Cascade`). `editedAt` ghi lần người viết sửa nội dung; không dùng `updatedAt` để hiện "đã sửa" vì trưởng xóm ẩn, hiện bình luận cũng đổi cột đó.
 - `PostLike` (bảng `post_like`): một hàng xóm thích một bài. Khóa chính ghép `(postId, userId)` nên mỗi người thích mỗi bài một lần ngay ở tầng database; backend ghi bằng `createMany({ skipDuplicates: true })` (`INSERT IGNORE`) và bỏ thích bằng `deleteMany`, nên gọi lặp lại hay gửi cùng lúc không làm sai số. Xóa bài hay người dùng thì lượt thích đi theo (`onDelete: Cascade`). Số thích đếm bằng `COUNT` theo khóa chính (`_count.likes`), chưa lưu sẵn cột đếm trong `post`: xem lại ở giai đoạn 7 nếu feed chậm.
 - `PostDislike` (bảng `post_dislike`, ADR 0009): một hàng xóm không thích một bài, giống hệt `PostLike`. Một người chỉ Thích **hoặc** Không thích một bài: backend gỡ dòng ở bảng kia trong cùng transaction, sau khi khóa dòng `post` (`SELECT ... FOR UPDATE`) để các lượt ghi trên cùng bài chạy lần lượt (không khóa thì gap lock của InnoDB gây deadlock khi gửi cùng lúc). Bảng riêng chứ không đổi `PostLike` thành bảng phản ứng có cột loại: không đụng dữ liệu, truy vấn của Thích.
 - Bình luận xem trước trên thẻ bài (`PostListItem.latestComments`): 2 bình luận gốc `VISIBLE` mới nhất của mỗi bài, lấy cho cả trang trong **một** truy vấn `ROW_NUMBER() OVER (PARTITION BY postId ORDER BY createdAt DESC, id DESC)` (`posts.repository.ts`, `findLatestComments`). Không dùng `take` lồng trong `findMany` danh sách bài, vì Prisma có thể tải hết bình luận rồi mới cắt.
 - `User.avatarId`: ảnh đại diện tự tải lên (`PUT /me/avatar`). Có thì hiện ảnh này, không thì hiện `image` (link từ Google, GitHub). Đổi ảnh hay xóa ảnh thì backend xóa dòng media cũ và file trên đĩa; xóa dòng media thì `avatarId` tự về `null` (`ON DELETE SET NULL`).
+- `User.coverId`: ảnh bìa hồ sơ (`PUT /me/cover`), cùng cách làm với `avatarId`: đổi hay xóa thì backend xóa dòng media cũ và file trên đĩa; xóa dòng media thì `coverId` về `null` (`ON DELETE SET NULL`). Chưa có ảnh bìa thì giao diện hiện nền mặc định. `User.location`: nơi ở, chữ tự do tối đa 100 ký tự, không có danh sách tỉnh thành (chốt 2026-11-15).
+- `Friendship` (bảng `friendship`, giai đoạn 4b): quan hệ bạn bè, **mỗi cặp người một dòng** (chốt 2026-11-15). Khóa chính `(userLowId, userHighId)` với `userLowId` là id nhỏ hơn, nên database tự chặn mời trùng và trường hợp hai người mời nhau cùng lúc (người sau vấp khóa chính, backend chuyển thành chấp nhận). `requesterId` là người gửi lời mời; `status` là `PENDING` (chờ người nhận) hoặc `ACCEPTED` (đã là bạn, `acceptedAt` ghi lúc chấp nhận). Từ chối, hủy lời mời, hủy kết bạn đều **xóa dòng**, không giữ lịch sử, nên người bị từ chối mời lại được. Số bạn bè chỉ đếm `ACCEPTED`.
+  - **Thứ tự cặp do backend quyết định**, bằng một hàm duy nhất `orderFriendPair` (`backend/src/modules/friends/friendship-pair.ts`), so sánh `<` của JavaScript. Không dùng `CHECK (userLowId < userHighId)` hay `ORDER BY` của MySQL để sắp: collation `unicode_ci` không phân biệt hoa thường, còn id của Better Auth có cả hai, nên MySQL và JavaScript có thể sắp khác nhau. Seed cũng gọi hàm này.
+  - Tìm quan hệ của một người phải xét cả hai cột (`userLowId = ? OR userHighId = ?`); mỗi phía có chỉ mục `(…Id, status, acceptedAt)` riêng.
+- `UserBlock` (bảng `user_block`, giai đoạn 4b): `blockerId` chặn `blockedId`, khóa chính ghép nên chặn lặp lại không sinh dòng mới. Chặn thì backend xóa dòng `friendship` của cặp đó trong cùng transaction; khi còn một lượt chặn ở **bất kỳ chiều nào**, không ai gửi được lời mời cho ai. Bỏ chặn chỉ xóa dòng `user_block`, quan hệ bạn bè không tự quay lại. Giai đoạn 4c dùng thêm bảng này để chặn tin nhắn. Xóa người dùng thì `friendship` và `user_block` của họ đi theo (`onDelete: Cascade`).
 - `Post.content` là `MEDIUMTEXT` (16 MB): `TEXT` chỉ 64 KB, bài tiếng Việt dài (mỗi chữ có dấu 2-3 byte) dễ vượt.
 - Server MySQL mặc định `utf8mb4_0900_ai_ci`, nhưng Prisma tạo từng bảng với `utf8mb4_unicode_ci` và không theo dõi collation. Giữ nguyên `unicode_ci` cho mọi bảng (không sửa tay migration) để các bảng luôn đồng nhất. Cả hai collation đều không phân biệt dấu khi so sánh, nên cột `UNIQUE` coi "bàn" và "ban" là trùng (hai tag này không cùng tồn tại được). Đây là hành vi mong muốn cho tên tag, danh mục. Tìm kiếm không phụ thuộc collation vì `searchText` đã bỏ dấu sẵn.
 - Kết nối qua driver adapter `@prisma/adapter-mariadb` (Prisma 7 bắt buộc dùng adapter). `DATABASE_URL` khai báo trong `backend/prisma.config.ts` (file này trỏ tới `database/prisma/`), không còn trong `schema.prisma`.
@@ -138,21 +163,27 @@ Ghi chú cài đặt:
 
 ## Chỉ mục
 
-| Bảng        | Chỉ mục                             | Phục vụ                                     |
-| ----------- | ----------------------------------- | ------------------------------------------- |
-| Post        | `(status, publishedAt DESC)`        | Trang chủ: bài mới nhất đã đăng             |
-| Post        | `(categoryId, status, publishedAt)` | Lọc theo danh mục                           |
-| Post        | `(authorId, status, publishedAt)`   | Bài của tôi, hồ sơ (`?author=`)             |
-| Post        | `FULLTEXT(searchText)`              | Tìm kiếm                                    |
-| Media       | `(postId, position)`                | Ảnh, video của bài theo thứ tự              |
-| Media       | `(ownerId, postId, createdAt)`      | File chưa gắn bài (gắn, dọn rác)            |
-| Comment     | `(postId, status, createdAt)`       | Bình luận dưới bài                          |
-| Comment     | `(parentId)`                        | Trả lời                                     |
-| PostTag     | `(tagId)`                           | Lọc theo tag                                |
-| PostLike    | `(postId, userId)` (khóa chính)     | Đếm số thích, người xem đã thích chưa       |
-| PostLike    | `(userId, createdAt)`               | Bài một người đã thích; khóa ngoại `userId` |
-| PostDislike | `(postId, userId)` (khóa chính)     | Đếm số không thích, người xem đã bấm chưa   |
-| PostDislike | `(userId, createdAt)`               | Khóa ngoại `userId`                         |
+| Bảng        | Chỉ mục                                | Phục vụ                                       |
+| ----------- | -------------------------------------- | --------------------------------------------- |
+| Post        | `(status, publishedAt DESC)`           | Trang chủ: bài mới nhất đã đăng               |
+| Post        | `(categoryId, status, publishedAt)`    | Lọc theo danh mục                             |
+| Post        | `(authorId, status, publishedAt)`      | Bài của tôi, hồ sơ (`?author=`)               |
+| Post        | `FULLTEXT(searchText)`                 | Tìm kiếm                                      |
+| Media       | `(postId, position)`                   | Ảnh, video của bài theo thứ tự                |
+| Media       | `(ownerId, postId, createdAt)`         | File chưa gắn bài (gắn, dọn rác)              |
+| Comment     | `(postId, status, createdAt)`          | Bình luận dưới bài                            |
+| Comment     | `(parentId)`                           | Trả lời                                       |
+| PostTag     | `(tagId)`                              | Lọc theo tag                                  |
+| PostLike    | `(postId, userId)` (khóa chính)        | Đếm số thích, người xem đã thích chưa         |
+| PostLike    | `(userId, createdAt)`                  | Bài một người đã thích; khóa ngoại `userId`   |
+| PostDislike | `(postId, userId)` (khóa chính)        | Đếm số không thích, người xem đã bấm chưa     |
+| PostDislike | `(userId, createdAt)`                  | Khóa ngoại `userId`                           |
+| Friendship  | `(userLowId, userHighId)` (khóa chính) | Quan hệ giữa hai người, chặn mời trùng        |
+| Friendship  | `(userLowId, status, acceptedAt)`      | Bạn bè, lời mời nhận được, số bạn (phía thấp) |
+| Friendship  | `(userHighId, status, acceptedAt)`     | Như trên, phía cao                            |
+| Friendship  | `(requesterId, status, createdAt)`     | Lời mời đã gửi; khóa ngoại `requesterId`      |
+| UserBlock   | `(blockerId, blockedId)` (khóa chính)  | Danh sách mình đã chặn, kiểm tra một chiều    |
+| UserBlock   | `(blockedId)`                          | Chiều ngược lại (ai đã chặn mình); khóa ngoại |
 
 Không có index cho `Post.viewCount` (tab "Nhiều người đọc"): cột bị ghi mỗi lượt xem. Đánh đổi có chủ ý, xem lại ở giai đoạn 7 nếu bài nhiều.
 
@@ -195,3 +226,4 @@ Cách làm:
 - 5 danh mục: Đời sống, Công nghệ, Học tập, Góc kể chuyện, Hỏi đáp
 - khoảng 15 tag, 30 bài ở đủ các trạng thái, 100 bình luận có trả lời
 - lượt thích trên bài đã đăng, mỗi bài 1 đến 6 người thích (chạy lại chỉ tạo lại lượt thích của người mẫu)
+- nơi ở cho 5 người (`thutrang` để trống), 4 cặp bạn bè, 3 lời mời đang chờ (`lananh` có 3 bạn và 1 lời mời nhận được), `quochuy` chặn `thutrang`. Chạy lại chỉ tạo lại quan hệ giữa người mẫu với nhau

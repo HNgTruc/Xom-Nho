@@ -7,6 +7,7 @@ import { hashPassword } from "better-auth/crypto";
 import { loadEnv } from "../src/config/load-env.js";
 import { type PostStatus } from "../src/generated/prisma/client.js";
 import { createPrismaClient } from "../src/infrastructure/database/create-prisma-client.js";
+import { orderFriendPair } from "../src/modules/friends/friendship-pair.js";
 import { buildPostSearchText } from "../src/modules/posts/posts.search-text.js";
 
 const env = loadEnv();
@@ -19,14 +20,62 @@ const SEED_PASSWORD = "xomnho123";
 const DAY = 24 * 60 * 60 * 1000;
 const now = Date.now();
 
+// location null: hồ sơ không hiện dòng nơi ở (thử giao diện khi thiếu)
 const users = [
-  { id: "seed-admin", name: "Trưởng Xóm", username: "truongxom", role: "admin" },
-  { id: "seed-author-1", name: "Lan Anh", username: "lananh", role: "author" },
-  { id: "seed-author-2", name: "Minh Khoa", username: "minhkhoa", role: "author" },
-  { id: "seed-user-1", name: "Bảo Ngọc", username: "baongoc", role: "user" },
-  { id: "seed-user-2", name: "Quốc Huy", username: "quochuy", role: "user" },
-  { id: "seed-user-3", name: "Thu Trang", username: "thutrang", role: "user" },
+  {
+    id: "seed-admin",
+    name: "Trưởng Xóm",
+    username: "truongxom",
+    role: "admin",
+    location: "Hoàn Kiếm, Hà Nội",
+  },
+  {
+    id: "seed-author-1",
+    name: "Lan Anh",
+    username: "lananh",
+    role: "author",
+    location: "Quận 3, TP.HCM",
+  },
+  {
+    id: "seed-author-2",
+    name: "Minh Khoa",
+    username: "minhkhoa",
+    role: "author",
+    location: "Hải Châu, Đà Nẵng",
+  },
+  {
+    id: "seed-user-1",
+    name: "Bảo Ngọc",
+    username: "baongoc",
+    role: "user",
+    location: "Ninh Kiều, Cần Thơ",
+  },
+  {
+    id: "seed-user-2",
+    name: "Quốc Huy",
+    username: "quochuy",
+    role: "user",
+    location: "Thủ Đức, TP.HCM",
+  },
+  { id: "seed-user-3", name: "Thu Trang", username: "thutrang", role: "user", location: null },
 ] as const;
+
+type SeedUserId = (typeof users)[number]["id"];
+
+// Bạn bè và lời mời giữa người mẫu: [người gửi, người nhận, đã chấp nhận chưa].
+// lananh có 3 bạn và 1 lời mời nhận được; baongoc có 1 lời mời đã gửi và 1 nhận được.
+const friendships: [SeedUserId, SeedUserId, boolean][] = [
+  ["seed-author-1", "seed-author-2", true],
+  ["seed-user-1", "seed-author-1", true],
+  ["seed-admin", "seed-author-1", true],
+  ["seed-author-2", "seed-user-2", true],
+  ["seed-user-1", "seed-user-2", false],
+  ["seed-user-3", "seed-author-1", false],
+  ["seed-user-3", "seed-user-1", false],
+];
+
+// [người chặn, người bị chặn]: quochuy chặn thutrang (thử nút Bỏ chặn, lời mời bị từ chối)
+const blocks: [SeedUserId, SeedUserId][] = [["seed-user-2", "seed-user-3"]];
 
 const categories = [
   // icon: khóa biểu tượng (api/src/constants/category-icons.ts, MASTER mục 6)
@@ -182,6 +231,7 @@ async function main() {
       username: user.username,
       role: user.role,
       bio: `Xin chào, mình là ${user.name}.`,
+      location: user.location,
     };
     await prisma.user.upsert({
       where: { id: user.id },
@@ -309,8 +359,28 @@ async function main() {
   );
   await prisma.postLike.createMany({ data: likes, skipDuplicates: true });
 
+  // Bạn bè, lời mời, chặn: xóa mọi quan hệ giữa hai người mẫu rồi tạo lại (quan hệ với người dùng thật giữ nguyên)
+  await prisma.friendship.deleteMany({
+    where: { userLowId: { in: authorIds }, userHighId: { in: authorIds } },
+  });
+  await prisma.friendship.createMany({
+    data: friendships.map(([requesterId, addresseeId, accepted], i) => ({
+      ...orderFriendPair(requesterId, addresseeId),
+      requesterId,
+      status: accepted ? ("ACCEPTED" as const) : ("PENDING" as const),
+      createdAt: new Date(now - (20 - i) * DAY),
+      acceptedAt: accepted ? new Date(now - (19 - i) * DAY) : null,
+    })),
+  });
+  await prisma.userBlock.deleteMany({
+    where: { blockerId: { in: authorIds }, blockedId: { in: authorIds } },
+  });
+  await prisma.userBlock.createMany({
+    data: blocks.map(([blockerId, blockedId]) => ({ blockerId, blockedId })),
+  });
+
   console.info(
-    `Seed xong: ${users.length} người dùng, ${categories.length} danh mục, ${tags.length} tag, ${posts.length} bài, ${n} bình luận, ${likes.length} lượt thích.`,
+    `Seed xong: ${users.length} người dùng, ${categories.length} danh mục, ${tags.length} tag, ${posts.length} bài, ${n} bình luận, ${likes.length} lượt thích, ${friendships.length} quan hệ bạn bè và lời mời, ${blocks.length} lượt chặn.`,
   );
   console.info(
     `Đăng nhập: truongxom@xomnho.local (trưởng xóm), lananh@xomnho.local (cây bút), baongoc@xomnho.local (hàng xóm); mật khẩu ${SEED_PASSWORD}`,
