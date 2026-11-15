@@ -78,9 +78,9 @@ Gõ `/tiep-theo` trong Claude Code để được gợi ý việc kế tiếp.
 - [x] `infrastructure/storage` + module `files`: tải ảnh, video, kiểm tra chữ ký nhị phân, giới hạn 5 MB / 25 MB ([ADR 0005](quyet-dinh/0005-luu-file-tren-o-dia-backend.md)); làm sớm ở giai đoạn 4 cho bài viết
 - [x] Ảnh đại diện: `PUT /me/avatar`, `media.purpose`, `user.avatarId`, lưu ở `media/avatars`, đổi hay xóa thì xóa file cũ; phần Ảnh đại diện ở `/cai-dat` (web). Mobile chưa
 - [x] Migration: `user.coverId` (ảnh bìa là `Media` purpose `COVER`, như ảnh đại diện, thay cho cột chữ `coverImage`), `user.location`, bảng `Friendship` (mỗi cặp một dòng), `UserBlock`; seed bạn bè, lời mời, chặn; thiết kế ghi ở `co-so-du-lieu.md`, `api.md` mục "Bạn bè, chặn", `phan-quyen.md` (2026-11-15)
-- [ ] Backend: `modules/friends` (mời, chấp nhận, từ chối, hủy, chặn, bỏ chặn), hồ sơ trả số bạn bè và quan hệ với người xem, `PUT`/`DELETE /me/cover`, `location` trong `PATCH /me`
+- [x] Backend: `modules/friends` (mời, chấp nhận, từ chối, hủy, chặn, bỏ chặn, danh sách bạn, lời mời, người đã chặn), hồ sơ trả số bạn bè và quan hệ với người xem, `PUT`/`DELETE /me/cover`, `location` trong `PATCH /me`, `GET /me/posts`; `api` có schema, kiểu, client; test policy, service, e2e (2026-11-15)
 - [ ] Web: trang hồ sơ có ảnh bìa, ảnh đại diện, nơi ở, số bạn bè, bài viết, ô viết bài
-- [ ] Web: bài của tôi (`GET /me/posts`, mọi trạng thái), chuyển từ giai đoạn 4; làm cùng trang hồ sơ
+- [ ] Web: bài của tôi (dùng `GET /me/posts` đã có, mọi trạng thái), chuyển từ giai đoạn 4; làm cùng trang hồ sơ
 - [ ] Web: trang cài đặt, trang bạn bè
 - [ ] Test phân quyền cho từng vai trò, người bị cấm
 
