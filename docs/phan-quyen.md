@@ -28,6 +28,10 @@ Vai trò lưu ở cột `role` của bảng `user` (plugin admin của Better Au
 | Xem ảnh, video của bài đã đăng          |       |    ✅    |   ✅    |     ✅     |
 | Đổi, xóa ảnh đại diện của mình          |       |    ✅    |   ✅    |     ✅     |
 | Xem ảnh đại diện của người khác         |       |    ✅    |   ✅    |     ✅     |
+| Đổi, xóa ảnh bìa; sửa nơi ở của mình    |       |    ✅    |   ✅    |     ✅     |
+| Xem ảnh bìa của người khác              |       |    ✅    |   ✅    |     ✅     |
+| Mời, chấp nhận, từ chối, hủy kết bạn    |       |    ✅    |   ✅    |     ✅     |
+| Chặn / bỏ chặn hàng xóm                 |       |    ✅    |   ✅    |     ✅     |
 | Sửa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
 | Xóa bài của mình                        |       |    ✅    |   ✅    |     ✅     |
 | Tạo tag mới khi viết bài                |       |          |   ✅    |     ✅     |
@@ -55,7 +59,15 @@ Thích bài (`posts.policy.ts`, `canLike`): mọi thành viên không bị cấm
 
 Không thích bài (`canDislike`, ADR 0009): cùng điều kiện với Thích. Thích và Không thích loại trừ nhau; số Không thích ai cũng thấy.
 
-Ảnh, video (`GET /files/:id`): ảnh đại diện và file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
+Ảnh, video (`GET /files/:id`): ảnh đại diện, ảnh bìa hồ sơ và file trong bài đã đăng thì mọi thành viên xem; file chưa gắn bài hoặc thuộc bài chưa đăng chỉ người tải lên và trưởng xóm xem (`files.policy.ts`).
+
+Bạn bè và chặn (`friends.policy.ts`, giai đoạn 4b, chi tiết ở `api.md` mục "Bạn bè, chặn"):
+
+- Không kết bạn, không chặn chính mình (400).
+- Gửi hay chấp nhận lời mời: người kia không bị cấm, và không có lượt chặn ở chiều nào giữa hai người. Mọi trường hợp bị từ chối trả cùng một lỗi 403, không cho biết ai chặn ai hay ai bị cấm.
+- Gỡ quan hệ (hủy lời mời, từ chối, hủy kết bạn), chặn, bỏ chặn: luôn được, kể cả với người bị cấm hay trưởng xóm.
+- Hồ sơ của người bị cấm vẫn xem được, nhưng `relationship.canRequest` là `false`.
+- Vai trò không ảnh hưởng: hàng xóm, cây bút, trưởng xóm có cùng quyền kết bạn, chặn. Trưởng xóm không xem được danh sách bạn bè hay danh sách chặn của người khác.
 
 ```mermaid
 stateDiagram-v2

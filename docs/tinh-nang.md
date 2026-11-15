@@ -53,12 +53,14 @@ Tiêu chí:
 
 - Gửi lời mời kết bạn, người nhận chấp nhận hoặc từ chối; người gửi hủy được lời mời; hai bên hủy kết bạn được.
 - Trang bạn bè: danh sách bạn, lời mời nhận được, lời mời đã gửi.
+- Chặn một hàng xóm từ hồ sơ của họ (chốt 2026-11-15): mất quan hệ bạn bè, hai bên không gửi lời mời cho nhau được; bỏ chặn ở `/cai-dat`. Trong 4b chặn chưa ẩn bài, bình luận; tác dụng lên tin nhắn ở mục 5.
 
 Tiêu chí:
 
 - [ ] Không gửi được lời mời cho chính mình hay gửi trùng
 - [ ] A mời B trong lúc B cũng mời A thì thành bạn luôn
 - [ ] Người bị cấm không gửi, không nhận lời mời được
+- [ ] Chặn thì mất bạn bè, lời mời; lỗi khi bị chặn không cho biết ai chặn ai
 
 ### 1.6 Hiển thị và trợ năng 🌐
 

@@ -154,26 +154,58 @@ Trả `PostListItem[]` có phân trang, bài liên quan nhất trước (cùng m
 
 ### Danh mục, tag, người dùng
 
-| Method | Đường dẫn          |     | Mô tả                                                                                                                                                                                             |
-| ------ | ------------------ | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/categories`      | 🔒  | Tất cả danh mục, kèm số bài                                                                                                                                                                       |
-| GET    | `/tags?q=`         | 🔒  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất                                                                                             |
-| GET    | `/tags/:slug`      | 🔒  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404                                                                                                         |
-| GET    | `/users/:username` | 🔒  | Hồ sơ (`PublicProfile`: phần mọi thành viên thấy). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404                                                                             |
-| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                                                                                                                    |
-| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, ảnh đại diện. Body: `updateMeSchema`. Gửi `image` (link hoặc `null`) thì bỏ luôn ảnh đã tải lên, xóa file                                                                    |
-| PUT    | `/me/avatar`       | 🔒  | Đổi ảnh đại diện, multipart trường `file`: ảnh JPG/PNG/WebP đến 5 MB (video, file khác: 400). Lưu ở `media/avatars`, xóa ảnh cũ. Trả `Me`. Đếm chung giới hạn 30 file / 10 phút với `POST /files` |
-| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)                                                                                              |
+| Method | Đường dẫn          |     | Mô tả                                                                                                                                                                                                                                                        |
+| ------ | ------------------ | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GET    | `/categories`      | 🔒  | Tất cả danh mục, kèm số bài                                                                                                                                                                                                                                  |
+| GET    | `/tags?q=`         | 🔒  | Gợi ý tag khi gõ (tối đa 10), tên hoặc slug chứa `q`, có dấu hay không. `q` rỗng: tag dùng nhiều nhất                                                                                                                                                        |
+| GET    | `/tags/:slug`      | 🔒  | Một tag (`Tag`), làm tiêu đề trang `/tag/<slug>` kể cả khi tag chưa có bài. Không có: 404                                                                                                                                                                    |
+| GET    | `/users/:username` | 🔒  | Hồ sơ (`PublicProfile`: phần mọi thành viên thấy, kèm số bạn bè và quan hệ với người xem). Bài đã đăng lấy bằng `GET /posts?author=<username>`. Không có: 404                                                                                                |
+| GET    | `/me`              | 🔒  | Thông tin của tôi (gồm `role`)                                                                                                                                                                                                                               |
+| PATCH  | `/me`              | 🔒  | Sửa tên, giới thiệu, nơi ở, ảnh đại diện. Body: `updateMeSchema`. Gửi `image` (link hoặc `null`) thì bỏ luôn ảnh đã tải lên, xóa file. `location` (4b): chữ tự do tối đa `LIMITS.USER_LOCATION_MAX` (100), cắt khoảng trắng hai đầu, rỗng hoặc `null` là xóa |
+| PUT    | `/me/avatar`       | 🔒  | Đổi ảnh đại diện, multipart trường `file`: ảnh JPG/PNG/WebP đến 5 MB (video, file khác: 400). Lưu ở `media/avatars`, xóa ảnh cũ. Trả `Me`. Đếm chung giới hạn 30 file / 10 phút với `POST /files`                                                            |
+| PUT    | `/me/cover`        | 🔒  | (4b) Đổi ảnh bìa hồ sơ, multipart trường `file`: như `PUT /me/avatar` (ảnh JPG/PNG/WebP đến 5 MB, video, file khác: 400). Lưu ở `media/covers`, xóa ảnh cũ. Trả `Me`. Đếm chung giới hạn 30 file / 10 phút với `POST /files`                                 |
+| DELETE | `/me/cover`        | 🔒  | (4b) Bỏ ảnh bìa, xóa file. Trả `Me`. Chưa có ảnh bìa cũng không lỗi                                                                                                                                                                                          |
+| GET    | `/auth/providers`  | 🌐  | `{ email, google, github }`: cách đăng nhập đang bật (thiếu khóa OAuth thì `false`, frontend ẩn nút)                                                                                                                                                         |
 
 `Category`: `id, name, slug, description, color, icon, postCount`. `postCount` chỉ đếm bài đã đăng.
 `Tag`: `id, name, slug`.
 `color` (trong `Category` và `category` của bài) là khóa màu badge: `amber | blue | green | purple | rose` (`CATEGORY_COLORS` trong `api`, MASTER mục 2.2). Sau này có thể thêm màu, nên client gặp giá trị lạ thì dùng `toCategoryColor` để về màu mặc định, không báo lỗi.
 `icon` (chỉ trong `Category`, thêm 2026-11-12) là khóa biểu tượng danh mục: `tea | chip | notebook | moon | question` hoặc `null` (chưa có, frontend hiện chấm màu). `CATEGORY_ICONS` trong `api`, MASTER mục 6. Gặp khóa lạ thì dùng `toCategoryIcon` (trả `null`), không báo lỗi.
 `UserSummary` (tác giả bài): `id, name, username, image, avatarId`. `image` là link ảnh bên ngoài (Google, GitHub), `avatarId` là ảnh tự tải lên (thêm 2026-11-12); frontend hiện ảnh bằng `avatarUrl(baseUrl, user)`: `avatarId` trước, rồi `image`, không có thì chữ cái đầu.
-`PublicProfile`: `id, name, username, image, avatarId, bio, role, createdAt, postCount`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
+`PublicProfile`: `id, name, username, image, avatarId, bio, role, createdAt, postCount` + (4b) `coverId, location, friendCount, relationship`. Không có `email` và thông tin cấm. `postCount` chỉ đếm bài đã đăng. Người bị cấm vẫn có hồ sơ (bài cũ của họ vẫn hiện), hồ sơ không cho biết ai bị cấm.
+
+- `coverId`: ảnh bìa (`GET /files/:id`), `null` thì frontend hiện nền mặc định. `location`: nơi ở hoặc `null`.
+- `friendCount`: số bạn bè đã chấp nhận (lời mời đang chờ không tính).
+- `relationship` (`Relationship`, theo người đang xem): `{ status, blockedByMe, canRequest }`. `status`: `self` (hồ sơ của mình) | `none` | `outgoing` (mình đã mời, chờ người kia) | `incoming` (người kia mời mình) | `friends`. `blockedByMe`: mình đang chặn người này. `canRequest`: nút Kết bạn bấm được, tức `status` là `none` hoặc `incoming`, người kia không bị cấm và không có lượt chặn ở chiều nào. Không có trường "người kia chặn mình": khi đó chỉ thấy `canRequest: false`. Client gặp `status` lạ thì coi như `none` và ẩn nút.
 
 Ràng buộc `username` trong `api` (chỉ a-z, 0-9, tối đa 20 ký tự) hẹp hơn cột `user.username` (50 ký tự). Sau này cho người dùng tự đặt username theo quy tắc rộng hơn thì phải nới schema cùng lúc, nếu không `?author=` và `/users/:username` sẽ từ chối username hợp lệ. Nới ra là được phép trong v1, siết lại thì không.
-`Me`: `id, name, email, username, image, avatarId, bio, role, createdAt`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
+`Me`: `id, name, email, username, image, avatarId, bio, role, createdAt` + (4b) `coverId, location`. Người bị cấm gọi route 🔒 nhận 403 kèm lý do trong `message`.
+
+### Bạn bè, chặn (giai đoạn 4b)
+
+Thiết kế chốt 2026-11-15, docs/tinh-nang.md mục 1.5, bảng `friendship` và `user_block` trong `co-so-du-lieu.md`. `:userId` là `id` của người kia (`PublicProfile.id`, `UserSummary.id`), không dùng username vì username có thể đổi sau này.
+
+| Method | Đường dẫn                                              |     | Mô tả                                                                                                                                                                  |
+| ------ | ------------------------------------------------------ | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/friends?page=`                                       | 🔒  | Bạn bè của tôi, mới kết bạn trước (`acceptedAt` giảm dần), 20 người / trang. `FriendItem[]` + `meta`                                                                   |
+| GET    | `/friends/requests?direction=incoming\|outgoing&page=` | 🔒  | Lời mời nhận được (mặc định) hoặc đã gửi, mới trước, 20 / trang. `FriendRequestItem[]` + `meta`                                                                        |
+| PUT    | `/friends/:userId`                                     | 🔒  | Kết bạn. Chưa có quan hệ: gửi lời mời. Người kia đã mời mình: chấp nhận, thành bạn luôn. Đã mời hay đã là bạn: giữ nguyên. Trả `FriendshipState`. Xem quy tắc bên dưới |
+| DELETE | `/friends/:userId`                                     | 🔒  | Gỡ quan hệ: hủy lời mời đã gửi, từ chối lời mời nhận được, hoặc hủy kết bạn. Chưa có quan hệ cũng không lỗi. Trả 200 + `FriendshipState`                               |
+| GET    | `/blocks?page=`                                        | 🔒  | Người tôi đã chặn, mới trước, 20 / trang (phần Đã chặn ở `/cai-dat`). `BlockedItem[]` + `meta`                                                                         |
+| PUT    | `/blocks/:userId`                                      | 🔒  | Chặn. Xóa quan hệ bạn bè, lời mời giữa hai người trong cùng transaction. Chặn lặp lại không lỗi. Trả `FriendshipState`                                                 |
+| DELETE | `/blocks/:userId`                                      | 🔒  | Bỏ chặn. Quan hệ bạn bè không tự quay lại. Chưa chặn cũng không lỗi. Trả `FriendshipState`                                                                             |
+
+`FriendItem`: `{ user: UserSummary, since }` (`since` = `acceptedAt`). `FriendRequestItem`: `{ user: UserSummary, createdAt }`, `user` là người kia (người gửi với `incoming`, người nhận với `outgoing`). `BlockedItem`: `{ user: UserSummary, blockedAt }`.
+`FriendshipState`: `{ relationship: Relationship, friendCount }`, trạng thái **sau** thao tác, `friendCount` là số bạn của **người kia**, để trang hồ sơ cập nhật nút và số mà không tải lại.
+
+Quy tắc (`friends.policy.ts`, `friends.service.ts`):
+
+- `:userId` là chính mình: 400. Người không có: 404.
+- Gửi lời mời (`PUT /friends/:userId` khi chưa có quan hệ): người kia đang bị cấm, hoặc một trong hai người đã chặn người kia: 403 `FRIEND_MESSAGES.CANNOT_REQUEST` ("Không gửi được lời mời kết bạn cho người này"). Cùng một thông điệp cho mọi trường hợp, để không lộ ai chặn ai hay ai bị cấm. Người đang bị cấm thì không qua được `AuthGuard` nên không gửi được.
+- Chấp nhận (`PUT` khi `status = incoming`): cùng điều kiện và cùng lỗi như gửi. Người gửi bị cấm sau khi mời thì lời mời vẫn nằm trong danh sách nhận được nhưng chưa chấp nhận được (`canRequest: false`) cho tới khi họ hết cấm; người nhận vẫn từ chối được.
+- Hai người mời nhau cùng lúc: người ghi sau vấp khóa chính `(userLowId, userHighId)`, backend đọc lại dòng và chấp nhận luôn, nên cả hai thành bạn, không có lỗi 409.
+- Giới hạn 20 lời mời **mới** / 10 phút / người: 429 `FRIEND_MESSAGES.RATE_LIMITED`. Chấp nhận, gỡ, chặn, gọi lặp không tính.
+- Chặn được mọi người trừ chính mình, kể cả trưởng xóm (chặn không ảnh hưởng việc kiểm duyệt). Trong 4b chặn chỉ tác động lên kết bạn: bài, bình luận của hai bên vẫn hiện với nhau. Giai đoạn 4c thêm tác dụng lên tin nhắn.
 
 ### Đăng nhập (`/api/auth/*`, Better Auth)
 
@@ -280,6 +312,7 @@ Màn Tổng quan lấy thêm "Bài mới chưa xem" bằng `GET /admin/posts?sin
 - Tải file: tối đa 30 file / 10 phút mỗi người (`files.service.ts`).
 - Bình luận: tối đa 1 bình luận / 10 giây / người (`comments.service.ts`). Bình luận bị từ chối vì dữ liệu sai không tính.
 - Thích, bỏ thích: tối đa 60 lần / phút / người, chung một bộ đếm (`posts.service.ts`). Ghi lặp không làm sai số; giới hạn để chặn script bấm liên tục.
+- Lời mời kết bạn (4b): tối đa 20 lời mời mới / 10 phút / người (`friends.service.ts`). Chấp nhận, gỡ, chặn không tính.
 - Lượt xem (`POST /posts/:id/view`): hiện chưa giới hạn, ai gọi lặp cũng tăng được. Khi làm `infrastructure/rate-limit` (giai đoạn 4), giới hạn theo IP + bài (ví dụ 1 lần / 30 phút).
 
 Bộ đếm lưu trong bộ nhớ (`infrastructure/rate-limit/rate-limiter.ts`, cửa sổ trượt theo khóa); khi chạy nhiều instance thì chuyển sang MySQL hoặc Redis.
