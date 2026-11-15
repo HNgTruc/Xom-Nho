@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { CATEGORY_COLOR_VALUES } from "../constants/category-colors.js";
+import { CATEGORY_ICON_VALUES } from "../constants/category-icons.js";
 import { LIMITS } from "../constants/limits.js";
 import { ADMIN_MESSAGES } from "../constants/messages.js";
 import { ROLE_VALUES } from "../constants/roles.js";
@@ -197,3 +199,61 @@ export const banUserSchema = z.object({
 });
 
 export type BanUserInput = z.infer<typeof banUserSchema>;
+
+/**
+ * Body của `POST /admin/categories` và `PATCH /admin/categories/:id` (gửi đủ các trường). Mô tả bỏ trống thì
+ * lưu `null`. Đường dẫn (slug) tự sinh từ tên khi thêm và **giữ nguyên khi đổi tên**, để link cũ không gãy.
+ */
+export const categoryInputSchema = z.object({
+  name: z
+    .string({ error: ADMIN_MESSAGES.CATEGORY_NAME_REQUIRED })
+    .trim()
+    .min(1, ADMIN_MESSAGES.CATEGORY_NAME_REQUIRED)
+    .max(LIMITS.CATEGORY_NAME_MAX, ADMIN_MESSAGES.CATEGORY_NAME_TOO_LONG),
+  description: z
+    .string()
+    .trim()
+    .max(LIMITS.CATEGORY_DESCRIPTION_MAX, ADMIN_MESSAGES.CATEGORY_DESCRIPTION_TOO_LONG)
+    .nullish()
+    .transform((value) => value || null),
+  color: z.enum(CATEGORY_COLOR_VALUES, { error: ADMIN_MESSAGES.CATEGORY_COLOR_INVALID }),
+  icon: z.enum(CATEGORY_ICON_VALUES, { error: ADMIN_MESSAGES.CATEGORY_ICON_INVALID }).nullable(),
+});
+
+export type CategoryInput = z.input<typeof categoryInputSchema>;
+export type CategoryData = z.output<typeof categoryInputSchema>;
+
+/**
+ * Body của `PUT /admin/categories/order`: id của **mọi** danh mục theo thứ tự mới (thứ tự menu Chủ đề), không
+ * trùng. Thiếu hay thừa một danh mục (người khác vừa thêm, xóa) thì backend trả CONFLICT để tải lại.
+ */
+export const reorderCategoriesSchema = z.object({
+  ids: z
+    .array(pathIdSchema, { error: ADMIN_MESSAGES.CATEGORY_ORDER_INVALID })
+    .min(1, ADMIN_MESSAGES.CATEGORY_ORDER_INVALID)
+    .max(LIMITS.CATEGORIES_MAX, ADMIN_MESSAGES.CATEGORY_ORDER_INVALID)
+    .refine((ids) => new Set(ids).size === ids.length, ADMIN_MESSAGES.CATEGORY_ORDER_INVALID),
+});
+
+export type ReorderCategoriesInput = z.infer<typeof reorderCategoriesSchema>;
+
+/** Cách sắp bảng thẻ: `posts` (gắn nhiều bài trước, mặc định), `name` (A đến Z, dễ thấy thẻ trùng nghĩa). */
+export const ADMIN_TAG_SORTS = { POSTS: "posts", NAME: "name" } as const;
+export type AdminTagSort = (typeof ADMIN_TAG_SORTS)[keyof typeof ADMIN_TAG_SORTS];
+
+/** Query của `GET /admin/tags`: tìm theo tên (có dấu hay không đều được), phân trang. */
+export const adminListTagsQuerySchema = adminPaginationQuerySchema.extend({
+  q: adminSearchQuery,
+  sort: z
+    .enum([ADMIN_TAG_SORTS.POSTS, ADMIN_TAG_SORTS.NAME], { error: "Cách sắp xếp không hợp lệ" })
+    .default(ADMIN_TAG_SORTS.POSTS),
+});
+
+export type AdminListTagsQuery = z.infer<typeof adminListTagsQuerySchema>;
+
+/** Body của `POST /admin/tags/:id/merge`: thẻ đích, phải khác thẻ đang gộp. */
+export const mergeTagSchema = z.object({
+  targetId: pathIdSchema,
+});
+
+export type MergeTagInput = z.infer<typeof mergeTagSchema>;

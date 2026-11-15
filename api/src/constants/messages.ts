@@ -270,4 +270,16 @@ export const ADMIN_MESSAGES = {
   BAN_EXPIRES_INVALID: "Thời hạn cấm không hợp lệ.",
   BAN_EXPIRES_PAST: "Thời hạn cấm phải sau thời điểm hiện tại.",
   SINCE_INVALID: "Mốc thời gian không hợp lệ.",
+  CATEGORY_NAME_REQUIRED: "Đặt tên cho danh mục.",
+  CATEGORY_NAME_TOO_LONG: "Tên danh mục tối đa 50 ký tự.",
+  CATEGORY_DESCRIPTION_TOO_LONG: "Mô tả tối đa 300 ký tự.",
+  CATEGORY_COLOR_INVALID: "Chọn một trong 5 màu.",
+  CATEGORY_ICON_INVALID: "Biểu tượng không hợp lệ.",
+  CATEGORY_NAME_TAKEN: "Đã có danh mục tên này. Chọn tên khác.",
+  CATEGORY_NOT_FOUND: "Không tìm thấy danh mục này.",
+  CATEGORY_HAS_POSTS:
+    "Danh mục còn bài viết. Chuyển hoặc xóa hết bài trong danh mục rồi mới xóa được.",
+  CATEGORY_ORDER_INVALID: "Danh sách danh mục đã thay đổi. Tải lại trang rồi sắp xếp lại.",
+  TAG_NOT_FOUND: "Không tìm thấy thẻ này.",
+  TAG_MERGE_SELF: "Chọn một thẻ khác để gộp vào.",
 } as const;

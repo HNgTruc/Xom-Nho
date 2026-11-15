@@ -1,7 +1,9 @@
 import type { Role } from "../constants/roles.js";
 import type { AdminDashboardMetric, AdminStatsRange } from "../schemas/admin.js";
 import type { CommentStatus, PostStatus } from "../constants/statuses.js";
+import type { Category } from "./category.js";
 import type { CategoryRef } from "./post.js";
+import type { Tag } from "./tag.js";
 import type { UserSummary } from "./user.js";
 
 /**
@@ -140,4 +142,19 @@ export interface AdminDashboard {
   hidden: { posts: number; comments: number };
   recent: Record<AdminDashboardMetric, AdminDashboardTrend>;
   daily: AdminDashboardDay[];
+}
+
+/**
+ * Một danh mục ở màn Danh mục (`GET /admin/categories`), theo thứ tự menu Chủ đề. `postCount` đếm bài đã đăng
+ * (như `GET /categories`); `totalPostCount` đếm mọi bài, mọi trạng thái: chỉ xóa được danh mục khi bằng 0.
+ */
+export interface AdminCategory extends Category {
+  totalPostCount: number;
+}
+
+/** Một thẻ ở màn Thẻ (`GET /admin/tags`). `postCount` đếm mọi bài gắn thẻ, mọi trạng thái. */
+export interface AdminTag extends Tag {
+  postCount: number;
+  /** ISO 8601 */
+  createdAt: string;
 }

@@ -5,8 +5,12 @@ import {
   adminListPostsQuerySchema,
   adminListUsersQuerySchema,
   adminPostStatsQuerySchema,
+  adminListTagsQuerySchema,
   archivePostSchema,
   banUserSchema,
+  categoryInputSchema,
+  mergeTagSchema,
+  reorderCategoriesSchema,
   setUserRoleSchema,
 } from "./admin.js";
 
@@ -171,5 +175,81 @@ describe("banUserSchema", () => {
   it("thiếu lý do thì báo ghi lý do cấm", () => {
     const result = banUserSchema.safeParse({ reason: " " });
     expect(result.error?.issues[0]?.message).toBe(ADMIN_MESSAGES.BAN_REASON_REQUIRED);
+  });
+});
+
+describe("categoryInputSchema", () => {
+  const valid = { name: "  Đời sống ", description: "", color: "amber", icon: null };
+
+  it("cắt khoảng trắng tên, mô tả rỗng thành null, biểu tượng được null", () => {
+    expect(categoryInputSchema.parse(valid)).toEqual({
+      name: "Đời sống",
+      description: null,
+      color: "amber",
+      icon: null,
+    });
+  });
+
+  it("không gửi mô tả cũng thành null; mô tả có chữ thì giữ (đã cắt khoảng trắng)", () => {
+    const { description: _, ...withoutDescription } = valid;
+    expect(categoryInputSchema.parse(withoutDescription).description).toBeNull();
+    expect(
+      categoryInputSchema.parse({ ...valid, description: " Chuyện thường ngày " }).description,
+    ).toBe("Chuyện thường ngày");
+  });
+
+  it("tên rỗng hoặc chỉ có khoảng trắng: báo đặt tên", () => {
+    const result = categoryInputSchema.safeParse({ ...valid, name: "   " });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe(ADMIN_MESSAGES.CATEGORY_NAME_REQUIRED);
+  });
+
+  it("tên quá 50 ký tự, mô tả quá 300 ký tự: báo lỗi", () => {
+    expect(
+      categoryInputSchema.safeParse({ ...valid, name: "đ".repeat(51) }).error?.issues[0]?.message,
+    ).toBe(ADMIN_MESSAGES.CATEGORY_NAME_TOO_LONG);
+    expect(
+      categoryInputSchema.safeParse({ ...valid, description: "a".repeat(301) }).error?.issues[0]
+        ?.message,
+    ).toBe(ADMIN_MESSAGES.CATEGORY_DESCRIPTION_TOO_LONG);
+  });
+
+  it("màu, biểu tượng ngoài danh sách: báo lỗi", () => {
+    expect(
+      categoryInputSchema.safeParse({ ...valid, color: "red" }).error?.issues[0]?.message,
+    ).toBe(ADMIN_MESSAGES.CATEGORY_COLOR_INVALID);
+    expect(
+      categoryInputSchema.safeParse({ ...valid, icon: "star" }).error?.issues[0]?.message,
+    ).toBe(ADMIN_MESSAGES.CATEGORY_ICON_INVALID);
+  });
+});
+
+describe("reorderCategoriesSchema", () => {
+  it("nhận danh sách id không trùng", () => {
+    expect(reorderCategoriesSchema.parse({ ids: ["a1", "b2"] })).toEqual({ ids: ["a1", "b2"] });
+  });
+
+  it.each([[[]], [["a1", "a1"]], [["../x"]]])("từ chối %j", (ids) => {
+    expect(reorderCategoriesSchema.safeParse({ ids }).success).toBe(false);
+  });
+});
+
+describe("adminListTagsQuerySchema, mergeTagSchema", () => {
+  it("mặc định trang 1, 20 dòng, nhiều bài trước; ô tìm rỗng bỏ qua", () => {
+    expect(adminListTagsQuerySchema.parse({ q: "" })).toEqual({
+      page: 1,
+      pageSize: 20,
+      sort: "posts",
+    });
+    expect(adminListTagsQuerySchema.parse({ q: " an vat ", sort: "name" })).toMatchObject({
+      q: "an vat",
+      sort: "name",
+    });
+  });
+
+  it("cách sắp lạ: báo lỗi; gộp cần id thẻ đích hợp lệ", () => {
+    expect(adminListTagsQuerySchema.safeParse({ sort: "random" }).success).toBe(false);
+    expect(mergeTagSchema.safeParse({ targetId: "../x" }).success).toBe(false);
+    expect(mergeTagSchema.parse({ targetId: "t1" })).toEqual({ targetId: "t1" });
   });
 });

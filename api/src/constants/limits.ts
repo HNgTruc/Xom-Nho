@@ -38,6 +38,12 @@ export const LIMITS = {
   FEED_LATEST_COMMENTS: 2,
 
   CATEGORY_NAME_MAX: 50,
+  /** Cột `category.description` (VARCHAR 300) */
+  CATEGORY_DESCRIPTION_MAX: 300,
+  /** Cột `category.slug` (VARCHAR 60) */
+  CATEGORY_SLUG_MAX: 60,
+  /** Số danh mục tối đa trong một lần sắp xếp (`PUT /admin/categories/order`) */
+  CATEGORIES_MAX: 100,
   TAG_NAME_MAX: 30,
   /** Số tag gợi ý tối đa khi gõ (`GET /tags?q=`) */
   TAG_SUGGEST_MAX: 10,
