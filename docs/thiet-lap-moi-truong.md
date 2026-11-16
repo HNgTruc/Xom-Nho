@@ -46,7 +46,7 @@ pnpm db:up                 # chạy database/docker-compose.yml với .env ở g
 pnpm db:ps                 # mysql phải "healthy"
 ```
 
-- MySQL: `localhost:3307` (cổng 3307 để không đụng MySQL/XAMPP có sẵn trên máy).
+- MySQL: `127.0.0.1:3307` (cổng 3307 để không đụng MySQL/XAMPP có sẵn trên máy). `DATABASE_URL` ghi `127.0.0.1`, không ghi `localhost`: xem lỗi "pool failed to retrieve a connection" bên dưới.
 - Adminer: http://localhost:8080, Server: `mysql`, user và mật khẩu theo `.env`.
 
 File `database/mysql/init/01-grant-shadow-db.sql` chỉ chạy **lần đầu** tạo container. Nếu đổi `MYSQL_USER` sau đó, phải xóa volume (`pnpm db:compose down -v`, mất dữ liệu) hoặc tự cấp quyền trong Adminer.
@@ -55,6 +55,7 @@ Lỗi hay gặp:
 
 - `port is already allocated`: có chương trình khác dùng cổng 3307 hoặc 8080. Đổi số bên trái trong `ports` ở `database/docker-compose.yml` và sửa `DATABASE_URL`.
 - Prisma báo không tạo được shadow database: user thiếu quyền, xem lại bước trên.
+- Backend khởi động được nhưng mọi request trả 500, log có `pool failed to retrieve a connection from pool (active=0 idle=0)`, dù `docker ps` báo MySQL `healthy` và lệnh `prisma migrate` vẫn chạy: `DATABASE_URL` đang ghi `localhost`. Node (driver `mariadb`) thử IPv6 `::1` trước; trên Windows có WSL, `wslrelay.exe` có thể giữ cổng `[::1]:3307` mà không chuyển tới container, nên kết nối treo tới hết hạn. Kiểm tra bằng `netstat -ano | findstr :3307` (thấy PID của `wslrelay.exe`). Sửa: đổi `localhost` thành `127.0.0.1` trong `DATABASE_URL` ở `.env` và `backend/.env`, rồi chạy lại backend. Gặp lần đầu 2026-11-15.
 
 ## 4. Chạy backend, web, admin
 
