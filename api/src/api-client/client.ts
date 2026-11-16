@@ -77,10 +77,11 @@ export function createRequest(options: ClientOptions): RequestFn {
       });
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") throw error;
-      throw new ApiError(0, {
-        code: ERROR_CODES.INTERNAL_ERROR,
-        message: ERROR_MESSAGES.INTERNAL_ERROR,
-      });
+      throw new ApiError(
+        0,
+        { code: ERROR_CODES.INTERNAL_ERROR, message: ERROR_MESSAGES.INTERNAL_ERROR },
+        { cause: error },
+      );
     }
 
     if (response.status === 204) return undefined as T;

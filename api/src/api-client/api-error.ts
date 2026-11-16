@@ -7,8 +7,9 @@ export class ApiError extends Error {
   readonly status: number;
   readonly fields: Record<string, string> | undefined;
 
-  constructor(status: number, body: ApiErrorBody["error"]) {
-    super(body.message);
+  /** `options.cause`: lỗi gốc khi không gọi được backend, để log server còn thấy nguyên nhân thật. */
+  constructor(status: number, body: ApiErrorBody["error"], options?: ErrorOptions) {
+    super(body.message, options);
     this.name = "ApiError";
     this.status = status;
     this.code = body.code;

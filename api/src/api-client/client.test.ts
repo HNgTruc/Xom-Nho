@@ -77,4 +77,12 @@ describe("createClient", () => {
 
     await expect(api.health.check()).rejects.toMatchObject({ status: 0, code: "INTERNAL_ERROR" });
   });
+
+  it("lỗi mạng giữ lỗi gốc trong cause để còn biết vì sao không gọi được backend", async () => {
+    const networkError = new TypeError("fetch failed");
+    const fetchMock = vi.fn().mockRejectedValue(networkError);
+    const api = createClient({ baseUrl: "http://x", fetch: fetchMock });
+
+    await expect(api.health.check()).rejects.toMatchObject({ cause: networkError });
+  });
 });
