@@ -17,14 +17,11 @@ import { PostStatusBadge, RoleBadge } from "@/components/common/status-badge";
 import { useNow } from "@/hooks/use-now";
 import { api } from "@/lib/api";
 import { API_URL } from "@/lib/env";
+import { initials } from "@/lib/initials";
 import { authorQuery, postCommentsQuery, postDetailQuery } from "../api/moderation.queries";
 
 const numberFormat = new Intl.NumberFormat("vi-VN");
 const LATEST_COMMENTS = 3;
-
-function initial(name: string): string {
-  return (name.trim().split(/\s+/).at(-1)?.[0] ?? "?").toUpperCase();
-}
 
 /** Khung tác giả (pages/admin.md "Bài mới"): vai trò, ngày tham gia, số bài, số bài đang bị ẩn. */
 function AuthorBox({ post }: { post: AdminPostListItem }) {
@@ -37,7 +34,7 @@ function AuthorBox({ post }: { post: AdminPostListItem }) {
       <Avatar className="size-10">
         {src && <AvatarImage src={src} alt="" />}
         <AvatarFallback className="bg-muted text-foreground">
-          {initial(post.author.name)}
+          {initials(post.author.name)}
         </AvatarFallback>
       </Avatar>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">

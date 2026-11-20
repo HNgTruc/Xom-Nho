@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@xom-nho/ui/components/dropdown-menu";
-import { Input } from "@xom-nho/ui/components/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@xom-nho/ui/components/tabs";
 import {
   CornerDownRight,
@@ -22,12 +21,11 @@ import {
   EyeOff,
   MessageSquareOff,
   MoreHorizontal,
-  Search,
   SquareArrowOutUpRight,
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AuthorCell } from "@/components/common/author-cell";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/state-message";
@@ -39,8 +37,9 @@ import {
 } from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
 import { Pagination } from "@/components/data-table/pagination";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { TableSearch } from "@/components/data-table/table-search";
 import { useNow } from "@/hooks/use-now";
+import { useTableSearch } from "@/hooks/use-table-search";
 import { WEB_URL } from "@/lib/env";
 import { adminCommentsListQuery } from "../api/comments.queries";
 import { useCommentActions } from "../hooks/use-comment-actions";
@@ -66,19 +65,12 @@ export function CommentsTable({
     opts?: { resetPage?: boolean },
   ) => void;
 }) {
-  const id = useId();
   const now = useNow();
   const list = useQuery(adminCommentsListQuery(query));
   const actions = useCommentActions();
   const [selection, setSelection] = useState<RowSelectionState>({});
   const [toDelete, setToDelete] = useState<AdminCommentListItem[] | null>(null);
-
-  const [search, setSearch] = useState(query.q ?? "");
-  const debouncedSearch = useDebouncedValue(search);
-  useEffect(() => {
-    if ((query.q ?? "") !== debouncedSearch.trim())
-      onChange({ q: debouncedSearch.trim() || undefined });
-  }, [debouncedSearch, query.q, onChange]);
+  const [search, setSearch] = useTableSearch(query.q, onChange);
 
   // Đổi trang, bộ lọc thì bỏ chọn (dòng đã chọn không còn trên màn hình); giữ selection theo khóa query
   const queryKey = JSON.stringify(query);
@@ -256,23 +248,12 @@ export function CommentsTable({
           </div>
         ) : (
           <div className="glass flex min-h-14 items-center gap-2 rounded-xl px-3 py-2">
-            <div className="relative flex-1">
-              <Search
-                aria-hidden="true"
-                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-              />
-              <label htmlFor={`${id}-search`} className="sr-only">
-                Tìm bình luận
-              </label>
-              <Input
-                id={`${id}-search`}
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Tìm trong nội dung bình luận"
-                className="pl-9"
-              />
-            </div>
+            <TableSearch
+              label="Tìm bình luận"
+              placeholder="Tìm trong nội dung bình luận"
+              value={search}
+              onValueChange={setSearch}
+            />
           </div>
         )}
 

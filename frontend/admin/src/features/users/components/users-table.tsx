@@ -22,19 +22,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@xom-nho/ui/components/dropdown-menu";
-import { Input } from "@xom-nho/ui/components/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@xom-nho/ui/components/tabs";
-import { Ban, MoreHorizontal, Search, ShieldCheck, UserX } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { Ban, MoreHorizontal, ShieldCheck, UserX } from "lucide-react";
+import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/state-message";
 import { RoleBadge } from "@/components/common/status-badge";
 import { type AdminColumnDef, adminColumnHelper } from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
 import { Pagination } from "@/components/data-table/pagination";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { TableSearch } from "@/components/data-table/table-search";
 import { useNow } from "@/hooks/use-now";
+import { useTableSearch } from "@/hooks/use-table-search";
 import { API_URL } from "@/lib/env";
+import { initials } from "@/lib/initials";
 import { adminUsersListQuery, adminUsersStatsQuery } from "../api/users.queries";
 import { useUserActions } from "../hooks/use-user-actions";
 import { BanDialog } from "./ban-dialog";
@@ -44,10 +45,6 @@ const BANNED = "BANNED";
 const emptyRows: AdminUserListItem[] = [];
 const numberFormat = new Intl.NumberFormat("vi-VN");
 const rowButton = "size-8 max-lg:size-10";
-
-function initial(name: string): string {
-  return (name.trim().split(/\s+/).at(-1)?.[0] ?? "?").toUpperCase();
-}
 
 /** Đổi vai trò có dính tới trưởng xóm (nâng lên hay hạ xuống) thì hỏi lại; đổi giữa hàng xóm và cây bút thì làm luôn. */
 type RoleChange = { user: AdminUserListItem; role: Role } | null;
@@ -65,24 +62,17 @@ export function UsersTable({
   query: AdminListUsersQuery;
   meId: string | undefined;
   onChange: (
-    values: Record<string, string | number | undefined>,
+    values: Partial<Record<keyof AdminListUsersQuery, string | number | undefined>>,
     opts?: { resetPage?: boolean },
   ) => void;
 }) {
-  const id = useId();
   const now = useNow();
   const list = useQuery(adminUsersListQuery(query));
   const stats = useQuery(adminUsersStatsQuery);
   const actions = useUserActions();
   const [banTarget, setBanTarget] = useState<AdminUserListItem | null>(null);
   const [roleChange, setRoleChange] = useState<RoleChange>(null);
-
-  const [search, setSearch] = useState(query.q ?? "");
-  const debouncedSearch = useDebouncedValue(search);
-  useEffect(() => {
-    if ((query.q ?? "") !== debouncedSearch.trim())
-      onChange({ q: debouncedSearch.trim() || undefined });
-  }, [debouncedSearch, query.q, onChange]);
+  const [search, setSearch] = useTableSearch(query.q, onChange);
 
   const columns = useMemo<AdminColumnDef<AdminUserListItem>[]>(() => {
     const helper = adminColumnHelper<AdminUserListItem>();
@@ -106,7 +96,7 @@ export function UsersTable({
                 <AvatarFallback
                   className={isMe ? "bg-accent text-accent-foreground" : "bg-muted text-foreground"}
                 >
-                  {initial(user.name)}
+                  {initials(user.name)}
                 </AvatarFallback>
               </Avatar>
               {/* Giới hạn bề ngang để email dài không đẩy mất cột vai trò, nút thao tác trên điện thoại */}
@@ -294,23 +284,12 @@ export function UsersTable({
 
       <TabsContent value={activeTab} className="flex flex-col gap-3">
         <div className="glass flex min-h-14 items-center gap-2 rounded-xl px-3 py-2">
-          <div className="relative flex-1">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            />
-            <label htmlFor={`${id}-search`} className="sr-only">
-              Tìm thành viên
-            </label>
-            <Input
-              id={`${id}-search`}
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Tìm theo tên hoặc email"
-              className="pl-9"
-            />
-          </div>
+          <TableSearch
+            label="Tìm thành viên"
+            placeholder="Tìm theo tên hoặc email"
+            value={search}
+            onValueChange={setSearch}
+          />
         </div>
 
         <DataTable

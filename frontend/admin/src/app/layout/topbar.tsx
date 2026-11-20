@@ -16,6 +16,7 @@ import { LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-r
 import { useSyncExternalStore } from "react";
 import { meQuery, useSignOut } from "@/features/auth";
 import { API_URL } from "@/lib/env";
+import { initials } from "@/lib/initials";
 
 /** Chế độ tối đang hiện (class `dark` trên `<html>`, do tùy chọn hiển thị đặt), theo dõi để đổi biểu tượng nút. */
 function useIsDark(): boolean {
@@ -27,11 +28,6 @@ function useIsDark(): boolean {
     },
     () => document.documentElement.classList.contains("dark"),
   );
-}
-
-function initials(name: string): string {
-  const words = name.trim().split(/\s+/);
-  return (words.at(-1)?.[0] ?? "?").toUpperCase();
 }
 
 /**

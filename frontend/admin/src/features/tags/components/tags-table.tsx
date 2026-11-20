@@ -8,17 +8,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@xom-nho/ui/components/dropdown-menu";
-import { Input } from "@xom-nho/ui/components/input";
-import { Combine, ExternalLink, MoreHorizontal, Search, Tags, Trash2 } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { Combine, ExternalLink, MoreHorizontal, Tags, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { Segmented } from "@/components/common/segmented";
 import { EmptyState } from "@/components/common/state-message";
 import { type AdminColumnDef, adminColumnHelper } from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
 import { Pagination } from "@/components/data-table/pagination";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { TableSearch } from "@/components/data-table/table-search";
 import { useNow } from "@/hooks/use-now";
+import { useTableSearch } from "@/hooks/use-table-search";
 import { WEB_URL } from "@/lib/env";
 import { adminTagsListQuery } from "../api/tags.queries";
 import { useTagActions } from "../hooks/use-tag-actions";
@@ -48,24 +48,17 @@ export function TagsTable({
 }: {
   query: AdminListTagsQuery;
   onChange: (
-    values: Record<string, string | number | undefined>,
+    values: Partial<Record<keyof AdminListTagsQuery, string | number | undefined>>,
     opts?: { resetPage?: boolean },
   ) => void;
 }) {
-  const id = useId();
   const now = useNow();
   const list = useQuery(adminTagsListQuery(query));
   const actions = useTagActions();
   const [merging, setMerging] = useState<AdminTag | null>(null);
   const [target, setTarget] = useState<AdminTag | null>(null);
   const [deleting, setDeleting] = useState<AdminTag | null>(null);
-
-  const [search, setSearch] = useState(query.q ?? "");
-  const debouncedSearch = useDebouncedValue(search);
-  useEffect(() => {
-    if ((query.q ?? "") !== debouncedSearch.trim())
-      onChange({ q: debouncedSearch.trim() || undefined });
-  }, [debouncedSearch, query.q, onChange]);
+  const [search, setSearch] = useTableSearch(query.q, onChange);
 
   const columns = useMemo<AdminColumnDef<AdminTag>[]>(() => {
     const helper = adminColumnHelper<AdminTag>();
@@ -154,23 +147,13 @@ export function TagsTable({
   return (
     <div className="flex flex-col gap-3">
       <div className="glass flex min-h-14 flex-wrap items-center gap-2 rounded-xl px-3 py-2">
-        <div className="relative min-w-48 flex-1">
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <label htmlFor={`${id}-search`} className="sr-only">
-            Tìm thẻ
-          </label>
-          <Input
-            id={`${id}-search`}
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Tìm theo tên thẻ"
-            className="pl-9"
-          />
-        </div>
+        <TableSearch
+          label="Tìm thẻ"
+          placeholder="Tìm theo tên thẻ"
+          value={search}
+          onValueChange={setSearch}
+          className="min-w-48"
+        />
         <Segmented
           label="Xếp theo"
           value={query.sort}

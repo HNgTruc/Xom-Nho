@@ -13,12 +13,9 @@ import { PostStatusBadge } from "@/components/common/status-badge";
 import { useLastSeen } from "@/features/moderation";
 import { useNow } from "@/hooks/use-now";
 import { API_URL } from "@/lib/env";
+import { initials } from "@/lib/initials";
 import { newMembersQuery, unseenPostsPreviewQuery } from "../api/dashboard.queries";
 import { numberFormat } from "../lib/format";
-
-function initial(name: string): string {
-  return (name.trim().split(/\s+/).at(-1)?.[0] ?? "?").toUpperCase();
-}
 
 /** Avatar 32px nền `muted` (avatar người khác, pages/admin.md). */
 function PersonAvatar({ user }: { user: UserSummary }) {
@@ -27,7 +24,7 @@ function PersonAvatar({ user }: { user: UserSummary }) {
     <Avatar className="size-8 shrink-0">
       {src && <AvatarImage src={src} alt="" />}
       <AvatarFallback className="bg-muted text-sm font-semibold text-foreground">
-        {initial(user.name)}
+        {initials(user.name)}
       </AvatarFallback>
     </Avatar>
   );

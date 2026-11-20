@@ -4,7 +4,7 @@ import { Button } from "@xom-nho/ui/components/button";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
-import { meQuery } from "@/features/auth/api/me.queries";
+import { meQuery } from "@/features/auth";
 import { authClient } from "@/lib/auth-client";
 
 /**
