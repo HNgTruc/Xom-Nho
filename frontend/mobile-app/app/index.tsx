@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AppButton } from "@/components/app-button";
 import { BackendStatus } from "@/components/backend-status";
-import { useMe } from "@/features/auth";
+import { ME_QUERY_KEY, useMe } from "@/features/auth";
 import { authClient } from "@/lib/auth-client";
 import { layout, space, text, weight } from "@/theme";
 import { useTheme } from "@/theme/use-theme";
@@ -20,7 +20,7 @@ export default function HomeScreen() {
   async function signOut() {
     setSigningOut(true);
     await authClient.signOut();
-    queryClient.removeQueries({ queryKey: ["me"] });
+    queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
     setSigningOut(false);
   }
 

@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { text, weight } from "@/theme";
 import { useTheme } from "@/theme/use-theme";
 import { useForm } from "../hooks/use-form";
+import { ME_QUERY_KEY } from "../hooks/use-me";
 import { AuthScreen } from "./auth-screen";
 import { FormAlert } from "./form-alert";
 import { SocialButtons } from "./social-buttons";
@@ -26,13 +27,14 @@ export function SignUpScreen() {
 
     setPending(true);
     setFormError(null);
-    const { error } = await authClient.signUp.email(input);
+    // Mất mạng ("Network request failed") thì Better Auth ném lỗi thay vì trả `error`: báo câu chung
+    const result = await authClient.signUp.email(input).catch(() => null);
     setPending(false);
-    if (error) {
-      setFormError(authErrorMessage(error));
+    if (!result || result.error) {
+      setFormError(authErrorMessage(result?.error));
       return;
     }
-    await queryClient.invalidateQueries({ queryKey: ["me"] });
+    await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
     router.replace("/");
   }
 
@@ -75,7 +77,7 @@ export function SignUpScreen() {
       <AppButton label="Đăng ký" onPress={onSubmit} loading={pending} />
       <SocialButtons
         onError={setFormError}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["me"] })}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY })}
       />
       <Link
         href="/dang-nhap"

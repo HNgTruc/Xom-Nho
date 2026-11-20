@@ -36,9 +36,10 @@ export function SocialButtons({
 
   async function signIn(provider: SocialProvider) {
     setPending(provider);
-    const { error } = await authClient.signIn.social({ provider, callbackURL: "/" });
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: báo như lỗi đăng nhập, mở lại nút
+    const result = await authClient.signIn.social({ provider, callbackURL: "/" }).catch(() => null);
     setPending(null);
-    if (error) {
+    if (!result || result.error) {
       onError("Chưa đăng nhập được bằng tài khoản này. Bạn thử lại hoặc dùng email nhé.");
       return;
     }

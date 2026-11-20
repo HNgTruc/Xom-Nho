@@ -4,6 +4,9 @@ import { isApiError } from "@xom-nho/api/api-client";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
+/** Gốc query key của người đang đăng nhập: đăng nhập, đăng xuất thì làm mới hoặc xóa theo khóa này. */
+export const ME_QUERY_KEY = ["me"] as const;
+
 /**
  * Người đang đăng nhập. Phiên lấy từ bộ nhớ an toàn của plugin Expo (mở lại app vẫn còn),
  * thông tin chi tiết (vai trò, username) lấy từ `GET /api/v1/me`.
@@ -13,7 +16,7 @@ export function useMe() {
   const signedIn = Boolean(session.data?.user);
 
   const me = useQuery({
-    queryKey: ["me", session.data?.user.id],
+    queryKey: [...ME_QUERY_KEY, session.data?.user.id],
     enabled: signedIn,
     queryFn: async ({ signal }): Promise<Me | null> => {
       try {
