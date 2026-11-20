@@ -1,4 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { SIGN_OUT_FAILED_MESSAGE } from "@xom-nho/api";
+import { toast } from "@xom-nho/ui/components/toaster";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { authClient } from "@/lib/auth-client";
@@ -11,7 +13,13 @@ export function useSignOut() {
 
   async function run() {
     setPending(true);
-    await authClient.signOut();
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: phiên vẫn còn, giữ nguyên trang và báo lỗi
+    const result = await authClient.signOut().catch(() => null);
+    if (!result || result.error) {
+      toast.error(SIGN_OUT_FAILED_MESSAGE);
+      setPending(false);
+      return;
+    }
     queryClient.clear();
     navigate("/dang-nhap", { replace: true });
   }

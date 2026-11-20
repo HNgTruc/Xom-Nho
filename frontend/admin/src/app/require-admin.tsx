@@ -19,7 +19,11 @@ export function RequireAdmin() {
 
   useEffect(() => {
     if (!notAdmin) return;
-    void authClient.signOut().then(() => queryClient.setQueryData(meQuery.queryKey, null));
+    // Đăng xuất lỗi (mất mạng) vẫn về trang đăng nhập: người này không vào được gì, backend chặn mọi route admin
+    void authClient
+      .signOut()
+      .catch(() => null)
+      .then(() => queryClient.setQueryData(meQuery.queryKey, null));
   }, [notAdmin, queryClient]);
 
   if (me.isPending) {

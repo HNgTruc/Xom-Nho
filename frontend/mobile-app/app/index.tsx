@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SIGN_OUT_FAILED_MESSAGE } from "@xom-nho/api";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AppButton } from "@/components/app-button";
 import { BackendStatus } from "@/components/backend-status";
 import { ME_QUERY_KEY, useMe } from "@/features/auth";
@@ -19,9 +20,14 @@ export default function HomeScreen() {
 
   async function signOut() {
     setSigningOut(true);
-    await authClient.signOut();
-    queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: phiên vẫn còn, báo lỗi để bấm lại
+    const result = await authClient.signOut().catch(() => null);
     setSigningOut(false);
+    if (!result || result.error) {
+      Alert.alert(SIGN_OUT_FAILED_MESSAGE);
+      return;
+    }
+    queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
   }
 
   return (

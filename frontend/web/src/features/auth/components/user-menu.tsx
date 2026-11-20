@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@xom-nho/ui/components/dropdown-menu";
+import { SIGN_OUT_FAILED_MESSAGE, initials } from "@xom-nho/api";
 import { useDisplayPreferences } from "@xom-nho/ui/hooks/use-display-preferences";
 import type { DisplayPreferences } from "@xom-nho/ui/lib/display-preferences";
 import { ArrowLeft, ChevronRight, LogOut, Moon, Settings, UserRound } from "lucide-react";
@@ -18,7 +19,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { initials } from "@/lib/initials";
 
 export interface UserMenuUser {
   name: string;
@@ -77,6 +77,7 @@ const DISPLAY_OPTIONS = [
 export function UserMenu({ user }: { user: UserMenuUser }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
   const [view, setView] = useState<View>("main");
   const contentRef = useRef<HTMLDivElement>(null);
   const { preferences, update } = useDisplayPreferences();
@@ -90,14 +91,28 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
 
   async function signOut() {
     setPending(true);
-    await authClient.signOut();
+    setSignOutError(null);
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: phiên vẫn còn, báo lỗi để bấm lại
+    const result = await authClient.signOut().catch(() => null);
+    if (!result || result.error) {
+      setSignOutError(SIGN_OUT_FAILED_MESSAGE);
+      setPending(false);
+      return;
+    }
     router.refresh();
     setPending(false);
   }
 
   return (
     // Không khóa cuộn trang khi mở (modal=false): khóa cuộn làm thanh cuộn biến mất, cả trang giật một cái
-    <DropdownMenu modal={false} onOpenChange={(open) => !open && setView("main")}>
+    <DropdownMenu
+      modal={false}
+      onOpenChange={(open) => {
+        if (open) return;
+        setView("main");
+        setSignOutError(null);
+      }}
+    >
       <DropdownMenuTrigger
         aria-label={`Tài khoản của ${user.name}`}
         className="glass-button flex h-10 items-center gap-2 rounded-full py-1 pr-1 pl-3 text-sm font-medium transition-colors duration-200 hover:bg-glass-button-hover focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-[state=open]:bg-glass-button-hover"
@@ -157,6 +172,11 @@ export function UserMenu({ user }: { user: UserMenuUser }) {
               <LogOut aria-hidden="true" />
               {pending ? "Đang đăng xuất…" : "Đăng xuất"}
             </DropdownMenuItem>
+            {signOutError && (
+              <p role="alert" className="px-2 py-1.5 text-sm font-medium text-destructive">
+                {signOutError}
+              </p>
+            )}
           </>
         ) : (
           <>
