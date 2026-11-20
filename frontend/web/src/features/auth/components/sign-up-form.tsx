@@ -27,10 +27,11 @@ export function SignUpForm({ next, providers }: { next: string; providers: AuthP
 
     setPending(true);
     setFormError(null);
-    // Vai trò mặc định "user" do backend đặt; form không gửi vai trò
-    const { error } = await authClient.signUp.email(input);
-    if (error) {
-      setFormError(authErrorMessage(error));
+    // Vai trò mặc định "user" do backend đặt; form không gửi vai trò.
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: báo câu chung, không để nút quay mãi
+    const result = await authClient.signUp.email(input).catch(() => null);
+    if (!result || result.error) {
+      setFormError(authErrorMessage(result?.error));
       setPending(false);
       return;
     }

@@ -35,9 +35,10 @@ export function SignInForm({
 
     setPending(true);
     setFormError(null);
-    const { error } = await authClient.signIn.email(input);
-    if (error) {
-      setFormError(authErrorMessage(error));
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: báo câu chung, không để nút quay mãi
+    const result = await authClient.signIn.email(input).catch(() => null);
+    if (!result || result.error) {
+      setFormError(authErrorMessage(result?.error));
       setPending(false);
       return;
     }

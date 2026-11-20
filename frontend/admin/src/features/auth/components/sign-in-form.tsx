@@ -30,22 +30,28 @@ export function SignInForm({ next, initialError }: { next: string; initialError:
 
     setPending(true);
     setFormError(null);
-    const { error } = await authClient.signIn.email(input);
-    if (error) {
-      setFormError(authErrorMessage(error));
-      setPending(false);
-      return;
-    }
+    try {
+      const { error } = await authClient.signIn.email(input);
+      if (error) {
+        setFormError(authErrorMessage(error));
+        setPending(false);
+        return;
+      }
 
-    const me = await queryClient.fetchQuery({ ...meQuery, staleTime: 0 });
-    if (me?.role !== ROLES.ADMIN) {
-      await authClient.signOut();
-      queryClient.setQueryData(meQuery.queryKey, null);
-      setFormError(NOT_ADMIN_MESSAGE);
+      const me = await queryClient.fetchQuery({ ...meQuery, staleTime: 0 });
+      if (me?.role !== ROLES.ADMIN) {
+        await authClient.signOut();
+        queryClient.setQueryData(meQuery.queryKey, null);
+        setFormError(NOT_ADMIN_MESSAGE);
+        setPending(false);
+        return;
+      }
+      navigate(next, { replace: true });
+    } catch {
+      // Mất mạng thì Better Auth (và GET /me) ném lỗi thay vì trả `error`: báo câu chung, không để nút quay mãi
+      setFormError(authErrorMessage(null));
       setPending(false);
-      return;
     }
-    navigate(next, { replace: true });
   }
 
   return (

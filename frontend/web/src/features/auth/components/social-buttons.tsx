@@ -22,12 +22,15 @@ export function SocialButtons({ providers, next }: { providers: AuthProviders; n
   async function signIn(provider: SocialProvider) {
     setPending(provider);
     // Better Auth chuyển hướng sang Google/GitHub rồi quay về trang này (origin web đã có trong trustedOrigins)
-    const { error } = await authClient.signIn.social({
-      provider,
-      callbackURL: new URL(next, window.location.origin).href,
-      errorCallbackURL: new URL("/dang-nhap?loi=oauth", window.location.origin).href,
-    });
-    if (error) setPending(null);
+    // Mất mạng thì Better Auth ném lỗi thay vì trả `error`: mở lại nút để bấm lại được
+    const result = await authClient.signIn
+      .social({
+        provider,
+        callbackURL: new URL(next, window.location.origin).href,
+        errorCallbackURL: new URL("/dang-nhap?loi=oauth", window.location.origin).href,
+      })
+      .catch(() => null);
+    if (!result || result.error) setPending(null);
   }
 
   return (
