@@ -18,6 +18,9 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
 
 export const AUTH_FALLBACK_MESSAGE = "Chưa đăng nhập được. Bạn thử lại sau ít phút nhé.";
 
+/** Đăng xuất lỗi (thường do mất mạng): phiên vẫn còn, người dùng bấm lại được. */
+export const SIGN_OUT_FAILED_MESSAGE = "Chưa đăng xuất được. Bạn kiểm tra mạng rồi thử lại nhé.";
+
 /**
  * Câu báo lỗi cho người dùng từ lỗi của Better Auth client.
  * Bị cấm: Better Auth đã gửi kèm câu có lý do (cấu hình `bannedUserMessage` ở backend) nên dùng luôn câu đó.
