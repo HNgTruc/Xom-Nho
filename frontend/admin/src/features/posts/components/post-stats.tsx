@@ -26,11 +26,11 @@ import {
 } from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
 import { SortHeader } from "@/components/data-table/sort-header";
+import { numberFormat } from "@/lib/format";
 import { adminPostStatsQuery, adminPostsListQuery } from "../api/posts.queries";
 import { AuthorCell } from "@/components/common/author-cell";
 import { PostTitleCell } from "./post-cells";
 
-const numberFormat = new Intl.NumberFormat("vi-VN");
 const RANGE_OPTIONS: { value: AdminStatsRange; label: string }[] = [
   { value: ADMIN_STATS_RANGES.WEEK, label: "7 ngày" },
   { value: ADMIN_STATS_RANGES.MONTH, label: "30 ngày" },

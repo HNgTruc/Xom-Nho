@@ -33,6 +33,7 @@ import { CommentStatusBadge } from "@/components/common/status-badge";
 import {
   type AdminColumnDef,
   adminColumnHelper,
+  rowActionButton,
   selectColumn,
 } from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
@@ -46,7 +47,6 @@ import { useCommentActions } from "../hooks/use-comment-actions";
 
 const ALL = "ALL";
 const emptyRows: AdminCommentListItem[] = [];
-const rowButton = "size-8 max-lg:size-10";
 const postHref = (comment: AdminCommentListItem) =>
   `${WEB_URL}/bai-viet/${comment.post.slug}#binh-luan`;
 
@@ -153,7 +153,7 @@ export function CommentsTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={rowButton}
+                  className={rowActionButton}
                   aria-label={`Thao tác với bình luận của ${comment.author.name}`}
                 >
                   <MoreHorizontal aria-hidden="true" className="size-4" />

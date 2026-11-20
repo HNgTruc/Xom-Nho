@@ -13,20 +13,23 @@ import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { Segmented } from "@/components/common/segmented";
 import { EmptyState } from "@/components/common/state-message";
-import { type AdminColumnDef, adminColumnHelper } from "@/components/data-table/columns";
+import {
+  type AdminColumnDef,
+  adminColumnHelper,
+  rowActionButton,
+} from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
 import { Pagination } from "@/components/data-table/pagination";
 import { TableSearch } from "@/components/data-table/table-search";
 import { useNow } from "@/hooks/use-now";
 import { useTableSearch } from "@/hooks/use-table-search";
 import { WEB_URL } from "@/lib/env";
+import { numberFormat } from "@/lib/format";
 import { adminTagsListQuery } from "../api/tags.queries";
 import { useTagActions } from "../hooks/use-tag-actions";
 import { MergeTargetPicker } from "./merge-target-picker";
 
 const emptyRows: AdminTag[] = [];
-const numberFormat = new Intl.NumberFormat("vi-VN");
-const rowButton = "size-8 max-lg:size-10";
 const SORT_OPTIONS = [
   { value: ADMIN_TAG_SORTS.POSTS, label: "Nhiều bài" },
   { value: ADMIN_TAG_SORTS.NAME, label: "Tên A đến Z" },
@@ -103,7 +106,7 @@ export function TagsTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={rowButton}
+                  className={rowActionButton}
                   aria-label={`Thao tác với thẻ ${tag.name}`}
                 >
                   <MoreHorizontal aria-hidden="true" className="size-4" />

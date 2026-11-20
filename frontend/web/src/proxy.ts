@@ -1,5 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
+// Import thẳng file thay vì `@/features/auth`: barrel kéo theo `server-api` (cookies của next/headers) và component
+// client, không chạy được trong proxy. `guest-access` là hàm thuần, không phụ thuộc gì.
 import { guestAccess } from "@/features/auth/lib/guest-access";
 
 /**

@@ -16,9 +16,8 @@ import { Heart, MessageCircle, Share2, ThumbsDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { browserApi } from "@/lib/browser-api";
+import { numberFormat } from "@/lib/format";
 import { likeErrorText, sameLikeState, toggledDislike, toggledLike } from "../lib/like-state";
-
-const numberFormat = new Intl.NumberFormat("vi-VN");
 
 type Notice = { tone: "info" | "error"; text: string };
 

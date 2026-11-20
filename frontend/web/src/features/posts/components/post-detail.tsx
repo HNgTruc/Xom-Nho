@@ -1,4 +1,4 @@
-import { CONTENT_FORMATS, formatDateTime, POST_STATUSES } from "@xom-nho/api";
+import { CONTENT_FORMATS, formatDateTime, POST_STATUSES, initials } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Badge } from "@xom-nho/ui/components/badge";
 import { notFound } from "next/navigation";
@@ -7,9 +7,9 @@ import { Suspense } from "react";
 import { requireUser } from "@/features/auth";
 import { CommentSection, CommentSectionSkeleton } from "@/features/comments";
 import { MarkdownContent, renderMarkdown } from "@/lib/markdown";
+import { numberFormat } from "@/lib/format";
 import { getCategories } from "../api/get-category";
 import { getPost } from "../api/get-post";
-import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 import { requestTime } from "@/lib/request-time";
 import { CategoryBadge } from "./category-badge";
@@ -20,8 +20,6 @@ import { PostMediaGallery } from "./post-media";
 import { PostStatusNote } from "./post-status-note";
 import { TableOfContents } from "./table-of-contents";
 import { ViewTracker } from "./view-tracker";
-
-const numberFormat = new Intl.NumberFormat("vi-VN");
 
 /**
  * Trang bài viết (MASTER mục 7, thread view): danh mục, tiêu đề, tác giả và ngày, mục lục nếu bài dài,

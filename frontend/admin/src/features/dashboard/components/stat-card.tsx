@@ -3,8 +3,8 @@ import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import { cn } from "@xom-nho/ui/lib/utils";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
+import { numberFormat } from "@/lib/format";
 import { useCountUp } from "../hooks/use-count-up";
-import { numberFormat } from "../lib/format";
 
 /**
  * So với 7 ngày trước (pages/admin.md "Thẻ số liệu"): mũi tên kèm chữ "tăng"/"giảm" và phần trăm, nền `muted`,

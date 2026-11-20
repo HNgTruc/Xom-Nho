@@ -1,11 +1,9 @@
-import { formatDate, type PublicProfile, ROLE_LABELS } from "@xom-nho/api";
+import { formatDate, type PublicProfile, ROLE_LABELS, initials } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import type { ReactNode } from "react";
-import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
-
-const numberFormat = new Intl.NumberFormat("vi-VN");
+import { numberFormat } from "@/lib/format";
 
 /**
  * Đầu trang hồ sơ (docs/tinh-nang.md mục 1.3): ảnh bìa, ảnh đại diện, tên, vai trò, giới thiệu, ngày tham gia,

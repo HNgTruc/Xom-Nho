@@ -11,7 +11,8 @@ import { cn } from "@xom-nho/ui/lib/utils";
 import { ChartColumn, Table2 } from "lucide-react";
 import { type CSSProperties, useState } from "react";
 import { Segmented } from "@/components/common/segmented";
-import { numberFormat, shortDate } from "../lib/format";
+import { numberFormat } from "@/lib/format";
+import { shortDate } from "../lib/format";
 
 /** Tên trên nút chọn và đơn vị trong câu ("Số bình luận mỗi ngày"). */
 const METRICS: Record<AdminDashboardMetric, { label: string; unit: string }> = {

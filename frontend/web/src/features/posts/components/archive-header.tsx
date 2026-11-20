@@ -1,7 +1,6 @@
 import { Skeleton } from "@xom-nho/ui/components/skeleton";
 import type { ReactNode } from "react";
-
-const numberFormat = new Intl.NumberFormat("vi-VN");
+import { numberFormat } from "@/lib/format";
 
 /**
  * Đầu trang danh mục / thẻ: nhãn nhỏ cho biết đang xem gì ("Danh mục", "Thẻ"), tên làm `h1`,

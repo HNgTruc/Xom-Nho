@@ -40,6 +40,7 @@ import { PostStatusBadge } from "@/components/common/status-badge";
 import {
   type AdminColumnDef,
   adminColumnHelper,
+  rowActionButton,
   selectColumn,
 } from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
@@ -48,21 +49,18 @@ import { TableSearch } from "@/components/data-table/table-search";
 import { useNow } from "@/hooks/use-now";
 import { useTableSearch } from "@/hooks/use-table-search";
 import { WEB_URL } from "@/lib/env";
+import { numberFormat } from "@/lib/format";
 import { adminPostStatsQuery, adminPostsListQuery, categoriesQuery } from "../api/posts.queries";
 import { usePostActions } from "../hooks/use-post-actions";
 import { HidePostDialog } from "./hide-post-dialog";
 import { AuthorCell } from "@/components/common/author-cell";
 import { PostTitleCell } from "./post-cells";
 
-const numberFormat = new Intl.NumberFormat("vi-VN");
 const ALL = "ALL";
 const emptyRows: AdminPostListItem[] = [];
 /** Luôn hiện: Tất cả, Đã đăng, Đã ẩn. Trạng thái cũ (nháp, chờ duyệt, bị từ chối) chỉ hiện khi còn bài (ADR 0008). */
 const MAIN_STATUSES: PostStatus[] = ["PUBLISHED", "ARCHIVED"];
 const LEGACY_STATUSES: PostStatus[] = ["DRAFT", "PENDING", "REJECTED"];
-
-/** Nút thao tác trong dòng bảng: 32px trên máy tính, 40px trên màn cảm ứng (admin.md "Chữ"). */
-const rowButton = "size-8 max-lg:size-10";
 
 type Dialog =
   | { kind: "hide"; posts: AdminPostListItem[] }
@@ -179,7 +177,7 @@ export function PostsTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={rowButton}
+                  className={rowActionButton}
                   aria-label={`Thao tác với bài ${post.title || post.excerpt}`}
                 >
                   <MoreHorizontal aria-hidden="true" className="size-4" />

@@ -5,6 +5,7 @@ import {
   formatDate,
   formatDateTime,
   formatRelativeTime,
+  initials,
 } from "@xom-nho/api";
 import { avatarUrl, fileUrl } from "@xom-nho/api/api-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
@@ -17,10 +18,9 @@ import { PostStatusBadge, RoleBadge } from "@/components/common/status-badge";
 import { useNow } from "@/hooks/use-now";
 import { api } from "@/lib/api";
 import { API_URL } from "@/lib/env";
-import { initials } from "@/lib/initials";
+import { numberFormat } from "@/lib/format";
 import { authorQuery, postCommentsQuery, postDetailQuery } from "../api/moderation.queries";
 
-const numberFormat = new Intl.NumberFormat("vi-VN");
 const LATEST_COMMENTS = 3;
 
 /** Khung tác giả (pages/admin.md "Bài mới"): vai trò, ngày tham gia, số bài, số bài đang bị ẩn. */

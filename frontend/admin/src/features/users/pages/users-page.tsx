@@ -3,11 +3,11 @@ import { type AdminListUsersQuery, adminListUsersQuerySchema } from "@xom-nho/ap
 import { PageHeader } from "@/components/common/page-header";
 import { meQuery } from "@/features/auth";
 import { useUrlState } from "@/hooks/use-url-state";
+import { numberFormat } from "@/lib/format";
 import { adminUsersStatsQuery } from "../api/users.queries";
 import { UsersTable } from "../components/users-table";
 
 const DEFAULT = adminListUsersQuerySchema.parse({});
-const numberFormat = new Intl.NumberFormat("vi-VN");
 
 /** Đọc bộ lọc từ URL; giá trị sai (sửa tay URL) thì về mặc định thay vì vỡ trang. */
 function parse(params: Record<string, string>): AdminListUsersQuery {

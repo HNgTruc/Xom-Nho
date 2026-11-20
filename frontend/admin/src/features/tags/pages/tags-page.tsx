@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { type AdminListTagsQuery, adminListTagsQuerySchema } from "@xom-nho/api";
 import { PageHeader } from "@/components/common/page-header";
 import { useUrlState } from "@/hooks/use-url-state";
+import { numberFormat } from "@/lib/format";
 import { adminTagsListQuery } from "../api/tags.queries";
 import { TagsTable } from "../components/tags-table";
 
 const DEFAULT = adminListTagsQuerySchema.parse({});
-const numberFormat = new Intl.NumberFormat("vi-VN");
 
 /** Đọc bộ lọc từ URL; giá trị sai (sửa tay URL) thì về mặc định thay vì vỡ trang. */
 function parse(params: Record<string, string>): AdminListTagsQuery {

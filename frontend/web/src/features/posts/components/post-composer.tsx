@@ -1,13 +1,18 @@
 "use client";
 
-import { type Category, COMPOSER_MESSAGES, composerPrompt, createPostSchema } from "@xom-nho/api";
+import {
+  type Category,
+  COMPOSER_MESSAGES,
+  composerPrompt,
+  createPostSchema,
+  initials,
+} from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Button } from "@xom-nho/ui/components/button";
 import { ImagePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 import { browserApi } from "@/lib/browser-api";
-import { initials } from "@/lib/initials";
 import { usePostEditor } from "../hooks/use-post-editor";
 import { PostEditorDialog } from "./post-editor-dialog";
 

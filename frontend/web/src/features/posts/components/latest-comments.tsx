@@ -1,7 +1,6 @@
-import { type CommentPreview, formatDate, formatRelativeTime } from "@xom-nho/api";
+import { type CommentPreview, formatDate, formatRelativeTime, initials } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import Link from "next/link";
-import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 
 /**

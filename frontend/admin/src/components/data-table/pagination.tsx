@@ -9,9 +9,9 @@ import {
 } from "@xom-nho/ui/components/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useId } from "react";
+import { numberFormat } from "@/lib/format";
 
 const PAGE_SIZES = [20, 50, 100];
-const numberFormat = new Intl.NumberFormat("vi-VN");
 
 /**
  * Phân trang dưới bảng (pages/admin.md "Bảng dữ liệu"): tổng số ("Hiển thị 1–20 trong 128 bài"), chọn số dòng mỗi

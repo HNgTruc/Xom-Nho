@@ -7,6 +7,9 @@ import {
 } from "@tanstack/react-table";
 import { Checkbox } from "@xom-nho/ui/components/checkbox";
 
+/** Nút thao tác trong dòng bảng: 32px trên máy tính, 40px trên màn cảm ứng (admin.md "Chữ"). */
+export const rowActionButton = "size-8 max-lg:size-10";
+
 /**
  * Tính năng TanStack Table (bản 9) mọi bảng admin dùng: chỉ chọn dòng. Phân trang, sắp xếp, lọc do server làm và
  * nằm trên URL (`useUrlState`), không để Table xử lý. Khai báo một lần ở cấp module (Table yêu cầu ổn định).

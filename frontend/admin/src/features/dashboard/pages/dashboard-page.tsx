@@ -11,11 +11,11 @@ import { RefreshCw } from "lucide-react";
 import { PageHeader } from "@/components/common/page-header";
 import { ErrorState } from "@/components/common/state-message";
 import { useUrlState } from "@/hooks/use-url-state";
+import { numberFormat } from "@/lib/format";
 import { dashboardQuery } from "../api/dashboard.queries";
 import { ActivityChart } from "../components/activity-chart";
 import { NewMembersCard, UnseenPostsCard } from "../components/recent-lists";
 import { StatCard } from "../components/stat-card";
-import { numberFormat } from "../lib/format";
 
 const timeFormat = new Intl.DateTimeFormat("vi-VN", {
   hour: "2-digit",

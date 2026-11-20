@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { initials } from "@xom-nho/api";
 import { avatarUrl } from "@xom-nho/api/api-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Button } from "@xom-nho/ui/components/button";
@@ -16,7 +17,6 @@ import { LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-r
 import { useSyncExternalStore } from "react";
 import { meQuery, useSignOut } from "@/features/auth";
 import { API_URL } from "@/lib/env";
-import { initials } from "@/lib/initials";
 
 /** Chế độ tối đang hiện (class `dark` trên `<html>`, do tùy chọn hiển thị đặt), theo dõi để đổi biểu tượng nút. */
 function useIsDark(): boolean {

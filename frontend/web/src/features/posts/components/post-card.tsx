@@ -1,7 +1,6 @@
-import { type Category, formatDateTime, type PostListItem } from "@xom-nho/api";
+import { type Category, formatDateTime, type PostListItem, initials } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import Link from "next/link";
-import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 import { CategoryBadge } from "./category-badge";
 import { LatestComments } from "./latest-comments";

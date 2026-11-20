@@ -5,11 +5,11 @@ import {
   type CommentItem,
   type CommentThread,
   commentReplyLabel,
+  initials,
 } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { useMemo, useState } from "react";
 import { browserApi } from "@/lib/browser-api";
-import { initials } from "@/lib/initials";
 import { commentErrorText } from "../lib/error-text";
 import {
   addComment,

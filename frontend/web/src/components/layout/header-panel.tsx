@@ -9,8 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@xom-nho/ui/components/dropdown-menu";
 import type { ReactNode } from "react";
-
-const numberFormat = new Intl.NumberFormat("vi-VN");
+import { numberFormat } from "@/lib/format";
 
 /**
  * Nút tròn ở header mở một bảng kính (Thông báo, Tin nhắn), đặt cạnh ảnh đại diện (MASTER mục 8).

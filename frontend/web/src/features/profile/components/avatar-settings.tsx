@@ -6,6 +6,7 @@ import {
   IMAGE_MIME_TYPES,
   LIMITS,
   SETTINGS_MESSAGES,
+  initials,
 } from "@xom-nho/api";
 import { isApiError } from "@xom-nho/api/api-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
@@ -23,7 +24,6 @@ import { ImagePlus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ChangeEvent, useRef, useState } from "react";
 import { browserApi } from "@/lib/browser-api";
-import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 
 const ACCEPT = IMAGE_MIME_TYPES.join(",");

@@ -1,8 +1,7 @@
-import type { UserSummary } from "@xom-nho/api";
+import { initials, type UserSummary } from "@xom-nho/api";
 import { avatarUrl } from "@xom-nho/api/api-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { API_URL } from "@/lib/env";
-import { initials } from "@/lib/initials";
 
 /** Tác giả: avatar 24px nền `muted` (avatar người khác, pages/admin.md) và tên. */
 export function AuthorCell({ author }: { author: UserSummary }) {

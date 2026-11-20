@@ -6,9 +6,9 @@ import { cn } from "@xom-nho/ui/lib/utils";
 import { Search } from "lucide-react";
 import { useId, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { numberFormat } from "@/lib/format";
 import { adminTagsListQuery } from "../api/tags.queries";
 
-const numberFormat = new Intl.NumberFormat("vi-VN");
 const PICKER_SIZE = 8;
 
 /**

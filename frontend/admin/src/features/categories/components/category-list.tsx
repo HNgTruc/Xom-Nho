@@ -24,8 +24,7 @@ import { CategoryMark } from "@xom-nho/ui/components/category-mark";
 import { cn } from "@xom-nho/ui/lib/utils";
 import { GripVertical } from "lucide-react";
 import type { CSSProperties } from "react";
-
-const numberFormat = new Intl.NumberFormat("vi-VN");
+import { numberFormat } from "@/lib/format";
 
 /** Chỉ kéo theo chiều dọc: danh sách một cột, kéo lệch sang ngang không có nghĩa gì. */
 const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });

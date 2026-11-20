@@ -7,6 +7,7 @@ import {
   MEDIA_KINDS,
   MEDIA_MIME_TYPES,
   POST_MESSAGES,
+  initials,
 } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Button } from "@xom-nho/ui/components/button";
@@ -25,7 +26,6 @@ import { Textarea } from "@xom-nho/ui/components/textarea";
 import { cn } from "@xom-nho/ui/lib/utils";
 import { AlertCircle, ImagePlus, Loader2, Play, X } from "lucide-react";
 import { type FormEvent, useEffect, useId, useRef } from "react";
-import { initials } from "@/lib/initials";
 import type { PostEditor } from "../hooks/use-post-editor";
 
 const ACCEPT = MEDIA_MIME_TYPES.join(",");

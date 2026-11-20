@@ -7,6 +7,7 @@ import {
   ROLE_LABELS,
   ROLE_VALUES,
   type Role,
+  initials,
 } from "@xom-nho/api";
 import { avatarUrl } from "@xom-nho/api/api-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
@@ -28,14 +29,18 @@ import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/state-message";
 import { RoleBadge } from "@/components/common/status-badge";
-import { type AdminColumnDef, adminColumnHelper } from "@/components/data-table/columns";
+import {
+  type AdminColumnDef,
+  adminColumnHelper,
+  rowActionButton,
+} from "@/components/data-table/columns";
 import { DataTable } from "@/components/data-table/data-table";
 import { Pagination } from "@/components/data-table/pagination";
 import { TableSearch } from "@/components/data-table/table-search";
 import { useNow } from "@/hooks/use-now";
 import { useTableSearch } from "@/hooks/use-table-search";
 import { API_URL } from "@/lib/env";
-import { initials } from "@/lib/initials";
+import { numberFormat } from "@/lib/format";
 import { adminUsersListQuery, adminUsersStatsQuery } from "../api/users.queries";
 import { useUserActions } from "../hooks/use-user-actions";
 import { BanDialog } from "./ban-dialog";
@@ -43,8 +48,6 @@ import { BanDialog } from "./ban-dialog";
 const ALL = "ALL";
 const BANNED = "BANNED";
 const emptyRows: AdminUserListItem[] = [];
-const numberFormat = new Intl.NumberFormat("vi-VN");
-const rowButton = "size-8 max-lg:size-10";
 
 /** Đổi vai trò có dính tới trưởng xóm (nâng lên hay hạ xuống) thì hỏi lại; đổi giữa hàng xóm và cây bút thì làm luôn. */
 type RoleChange = { user: AdminUserListItem; role: Role } | null;
@@ -187,7 +190,7 @@ export function UsersTable({
               <Button
                 variant="ghost"
                 size="icon"
-                className={rowButton}
+                className={rowActionButton}
                 disabled
                 title="Không đổi được vai trò hay cấm chính mình"
                 aria-label="Không có thao tác với tài khoản của bạn"
@@ -202,7 +205,7 @@ export function UsersTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={rowButton}
+                  className={rowActionButton}
                   aria-label={`Thao tác với ${user.name}`}
                 >
                   <MoreHorizontal aria-hidden="true" className="size-4" />

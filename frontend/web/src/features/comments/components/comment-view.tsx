@@ -7,6 +7,7 @@ import {
   type CommentItem,
   formatDate,
   formatRelativeTime,
+  initials,
 } from "@xom-nho/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@xom-nho/ui/components/avatar";
 import { Badge } from "@xom-nho/ui/components/badge";
@@ -25,7 +26,6 @@ import { Pencil, Reply, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { browserApi } from "@/lib/browser-api";
-import { initials } from "@/lib/initials";
 import { userAvatarSrc } from "@/lib/media-url";
 import { commentErrorText } from "../lib/error-text";
 import { CommentForm } from "./comment-form";
